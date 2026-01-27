@@ -1,0 +1,2279 @@
+<?php 
+$edit_data		=	$this->db->get_where('inmonths' , array('id' => $id) )->result_array();
+?>
+
+
+
+					<div class="row">
+				
+					
+						<div class="col-md-6 col-lg-12">
+							<section class="panel">
+								<header class="panel-heading">
+										<div class="panel-actions">
+											<a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+											<a href="#" class="panel-action panel-action-dismiss" data-panel-dismiss></a>
+										</div>
+						
+										<h2 class="panel-title">Perfomance Report - <?php 
+		
+		
+		$month =$this->db->get_where('inmonths' , array('id' =>  $id))->row()->month; 
+		
+		
+		echo $month;
+		?></h2>	
+		
+	
+		
+		<?php
+			$dayincome = $this->db->get_where( 'collections', array('month' => $month) )->result_array();
+			$todayincome = 0;
+			foreach ( $dayincome as $rowd ):
+			$todayincome = $todayincome + $rowd[ 'actual' ] ;
+			$systemcash = $systemcash + $rowd[ 'systemcash' ] ;
+			$varience = $systemcash - $todayincome ;
+			
+			
+			
+			endforeach;
+			
+						
+		 ?>
+		 
+		 
+		 <?php
+		 
+		 	$monthly = $this->db->get_where( 'collections', array('month' => $month) )->result_array();
+			
+			foreach($monthly as $row):
+			
+			$street = $row['street'];
+			
+			
+		 
+		 	if($street == 'Gwamile Street')
+			{
+				$gwamile = $gwamile + $row['systemcash'];
+				$gwamile2 = $gwamile2 + $row['actual'];
+				$gwamile3 = $gwamile - $gwamile2;
+				$gwaloss = ($gwamile3 / $gwamile) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Betfusile Street')
+			{
+				$betfusile = $betfusile + $row['systemcash'];
+				$betfusile2 = $betfusile2 + $row['actual'];
+				$betfusile3 = $betfusile - $betfusile2;
+				$betloss = ($betfusile3 / $betfusile) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Dzeliwe Street')
+			{
+				$dzeliwe = $dzeliwe + $row['systemcash'];
+				$dzeliwe2 = $dzeliwe2 + $row['actual'];
+				$dzeliwe3 = $dzeliwe - $dzeliwe2;
+				$dzeloss = ($dzeliwe3 / $dzeliwe) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Makhosini Drive')
+			{
+				$makhosini = $makhosini + $row['systemcash'];
+				$makhosini2 = $makhosini2 + $row['actual'];
+				$makhosini3 = $makhosini - $makhosini2;
+				$mahloss = ($makhosini3 / $makhosini) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Karl Grant')
+			{
+			
+				$karl = $karl + $row['systemcash'];
+				$karl2 = $karl2 + $row['actual'];
+				$karl3 = $karl - $karl2;
+				$karloss = ($karl3 / $karl) * 100;
+				$pieces = explode(" ", $street);
+			}
+			elseif($street == 'Libandla Street')
+			{
+				$libandla = $libandla + $row['systemcash'];
+				$libandla2 = $libandla2 + $row['actual'];
+				$libandla3 = $libandla - $libandla2;
+				$libloss = ($libandla3 / $libandla) * 100;
+				$pieces = explode(" ", $street);
+			
+			}
+			elseif($street == 'Mahlokohla Street')
+			{
+			
+				$mahlokohla = $mahlokohla + $row['systemcash'];
+				$mahlokohla2 = $mahlokohla2 + $row['actual'];
+				$mahlokohla3 = $mahlokohla - $mahlokohla2;
+				$mahloss = ($mahlokohla3 / $mhlokohla) * 100;
+				$pieces = explode(" ", $street);
+			}
+			elseif($street == 'Mdada Street')
+			{
+				$mdada = $mdada + $row['systemcash'];
+				$mdada2 = $mdada2 + $row['actual'];
+				$mdada3 = $mdada - $mdada2;
+				$mdaloss = ($mdada3 / $mdada) * 100;
+				$pieces = explode(" ", $street);
+			
+			}
+			elseif($street == 'Msakato Street')
+			{
+			
+				$msakato = $msakato + $row['systemcash'];
+				$msakato2 = $msakato2 + $row['actual'];
+				$msakato3 = $msakato - $msakato2;
+				$msaloss = ($msakato3 / $msakato) * 100;
+				$pieces = explode(" ", $street);
+			}
+			elseif($street == 'Sheffield Road')
+			{
+			
+				$sheffield = $sheffield + $row['systemcash'];
+				$sheffield2 = $sheffield2 + $row['actual'];
+				$sheffield3 = $sheffield - $sheffield2;
+				$shefloss = ($sheffield3 / $sheffield) * 100;
+				$pieces = explode(" ", $street);
+			}
+			elseif($street == 'Somhlolo Street')
+			{
+				
+				$somhlolo = $somhlolo + $row['systemcash'];
+				$somhlolo2 = $somhlolo2 + $row['actual'];
+				$somhlolo3 = $somhlolo - $somhlolo2;
+				$somloss = ($somhlolo3 / $somhlolo) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Siyalu Street')
+			{
+				
+				$siyalu = $siyalu + $row['systemcash'];
+				$siyalu2 = $siyalu2 + $row['actual'];
+				$siyalu3 = $siyalu - $siyalu2;
+				$siyloss = ($siyalu3 / $siyalu) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'Njumbane Street')
+			{
+			
+				$njumbane = $njumbane + $row['systemcash'];
+				$njumbane2 = $njumbane2 + $row['actual'];
+				$njumbane3 = $njumbane - $njumbane2;
+				$njuloss = ($njumbane3 / $njumbane) * 100;
+				$pieces = explode(" ", $street);
+				
+			
+			}elseif($street == 'OBR')
+			{
+				$obr = $obr + $row['systemcash'];
+				$obr2 = $obr2 + $row['actual'];
+				$obr3 = $obr - $obr2;
+				$obrloss = ($obr3 / $obr) * 100;
+				$pieces = explode(" ", $street);
+			
+			}elseif($street == 'CBS Parking')
+			{
+			
+				$mcc = $mcc + $row['systemcash'];
+				$mcc2 = $mcc2 + $row['actual'];
+				$mcc3 = $mcc - $mcc2;
+				$mccloss = ($mcc3 / $mcc) * 100;
+				$pieces = explode(" ", $street);
+				
+			}elseif($street == 'Teba Street')
+			{
+				$teba = $teba + $row['systemcash'];
+				$teba2 = $teba2 + $row['actual'];
+				$teba3 = $teba - $teba2;
+				$tebaloss = ($teba3 / $teba) * 100;
+				$pieces = explode(" ", $street);
+			}
+		 	
+			
+			
+			
+		 	endforeach;
+		 ?>
+		 
+		 
+									</header>
+									
+								<div class="panel-body">
+									<div class="row">
+										<div class="col-lg-12" data-appear-animation="fadeInRightBig">
+										
+										<!-- Morris: Area -->
+										<div class="chart chart-md" id="morrisStacked"></div>
+										<script type="text/javascript">
+						
+											var morrisStackedData = [{
+												y: 'GWA',
+												a:   <?php echo  $gwamile ?>,
+												b:  <?php echo  $gwamile2 ?>
+											}, {
+												y: 'BET',
+												a:  <?php echo  $betfusile ?>,
+												b:  <?php echo  $betfusile2 ?>
+											}, {
+												y: 'DZE',
+												a:  <?php echo  $dzeliwe ?>,
+												b:  <?php echo  $dzeliwe2 ?>
+											}, {
+												y: 'MAK',
+												a:  <?php echo  $makhosini ?>,
+												b:  <?php echo  $makhosini2 ?>
+											}, {
+												y: 'NJU',
+												a:  <?php echo  $njumbane ?>,
+												b:  <?php echo  $njumbane2 ?>
+											}, {
+												y: 'LIB',
+												a:  <?php echo  $libandla ?>,
+												b:  <?php echo  $libandla2 ?>
+											}, {
+												y: 'MAH',
+												a:  <?php echo  $mahlokohla ?>,
+												b:  <?php echo  $mahlokohla ?>
+											}, {
+												y: 'MDA',
+												a:  <?php echo  $mdada ?>,
+												b:  <?php echo  $mdada2 ?>
+											}, {
+												y: 'MSA',
+												a:  <?php echo  $msakato ?>,
+												b:  <?php echo  $msakato2 ?>
+											}, {
+												y: 'SIY',
+												a:  <?php echo  $siyalu ?>,
+												b:  <?php echo  $siyalu ?>
+											}];
+						
+											// See: assets/javascripts/ui-elements/examples.charts.js for more settings.
+						
+										</script>
+						
+						
+						
+									</div>
+												
+												</div>
+					</section>
+					
+					<hr class="solid short mt-lg">
+					
+											</div>
+											
+										
+									
+								
+					
+						
+						
+						
+							<div class="col-md-3" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-primary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-primary">
+							<i class="fa fa-car"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('cars_parked');?></h4>
+							<div class="info">
+								
+								<strong class="amount">281107</strong>
+								<span class="text-primary text-uppercase"><?php echo get_phrase('-_2023');?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-3" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($systemcash, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-3" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($todayincome, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-3" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($varience, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+					
+	
+						
+						
+						<div class="row">
+						
+						
+							<div class="col-md-8" data-appear-animation="fadeInRightBig">
+								<section class="panel">
+								<header class="panel-heading">
+										<div class="panel-actions">
+											<a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+											<a href="#" class="panel-action panel-action-dismiss" data-panel-dismiss></a>
+										</div>
+										
+										<h2 class="panel-title">Datatable Presentation</h2>
+								</header>
+									
+									<div class="panel-body">
+									<div class="table-responsive">
+										<table class="table table-striped mb-none">
+											<thead>
+												<tr>
+													<th>#</th>
+													<th>Street</th>
+													<th>System</th>
+													<th>Actual</th>
+													<th>Variance</th>
+													<th>Loss %</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>1</td>
+													<td>Gwamile Street</td>
+													<td><?php echo $gwamile; ?></td>
+													<td><?php echo $gwamile2; ?></td>
+													<td><?php echo $gwamile3; ?></td>
+													<td>
+																<span class="text-center"><?php echo number_format($gwaloss); ?>%</span>
+															
+													</td>
+												</tr>
+												<tr>
+													<td>2</td>
+													<td>Betfusile Street</td>
+													<td><?php echo $betfusile; ?></td>
+													<td><?php echo $betfusile2; ?></td>
+													<td><?php echo $betfusile3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($betloss); ?>%</span>
+														
+													</td>
+												</tr>
+												
+												<tr>
+													<td>3</td>
+													<td>Dzeliwe Street</td>
+													<td><?php echo $dzeliwe; ?></td>
+													<td><?php echo $dzeliwe2; ?></td>
+													<td><?php echo $dzeliwe3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($dzeloss); ?>%</span>
+															
+													</td>
+												</tr>
+												<tr>
+													<td>4</td>
+													<td>Makhosini Drive</td>
+													<td><?php echo $makhosini; ?></td>
+													<td><?php echo $makhosini2; ?></td>
+													<td><?php echo $makhosini3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($makloss); ?>%</span>
+														
+													</td>
+												</tr>
+												<tr>
+													<td>5</td>
+													<td>Karl Grant</td>
+													<td><?php echo $karl; ?></td>
+													<td><?php echo $karl2; ?></td>
+													<td><?php echo $karl3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($karloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>6</td>
+													<td>Libandla Street</td>
+													<td><?php echo $libandla; ?></td>
+													<td><?php echo $libandla2; ?></td>
+													<td><?php echo $libandla3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($libloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>7</td>
+													<td>Mahlokohla Street</td>
+													<td><?php echo $mahlokohla; ?></td>
+													<td><?php echo $mahlokohla2; ?></td>
+													<td><?php echo $mahlokohla3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($mahloss); ?>%</span>
+														
+													</td>
+												</tr>
+												
+												<tr>
+													<td>8</td>
+													<td>Mdada Street</td>
+													<td><?php echo $mdada; ?></td>
+													<td><?php echo $mdada2; ?></td>
+													<td><?php echo $mdada3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($mdaloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>9</td>
+													<td>Msakato Street</td>
+													<td><?php echo $msakato; ?></td>
+													<td><?php echo $msakato2; ?></td>
+													<td><?php echo $msakato3; ?></td>
+													<td>
+												
+																<span class="text-center"><?php echo number_format($msaloss); ?>%</span>
+														
+													</td>
+												</tr>
+												<tr>
+													<td>10</td>
+													<td>Sheffield Road</td>
+													<td><?php echo $sheffield; ?></td>
+													<td><?php echo $sheffield2; ?></td>
+													<td><?php echo $sheffield3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($shefloss); ?>%</span>
+														
+													</td>
+												</tr>
+												<tr>
+													<td>11</td>
+													<td>Somhlolo Road</td>
+													<td><?php echo $somhlolo; ?></td>
+													<td><?php echo $somhlolo3; ?></td>
+													<td><?php echo $somhlolo3; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($somloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>12</td>
+													<td>Siyalu Street</td>
+													<td><?php echo $siyalu; ?></td>
+													<td><?php echo $siyalu; ?></td>
+													<td><?php echo $siyalu; ?></td>
+													<td>
+													
+																<span class="text-center"><?php echo number_format($siyloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>13</td>
+													<td>Njumbane Parking</td>
+													<td><?php echo $njumbane; ?></td>
+													<td><?php echo $njumbane; ?></td>
+													<td><?php echo $njumbane; ?></td>
+													<td>
+													<span class="text-center"><?php echo number_format($njuloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>14</td>
+													<td>OBR Parking</td>
+													<td><?php echo $obr; ?></td>
+													<td><?php echo $obr2; ?></td>
+													<td><?php echo $obr3; ?></td>
+													<td>
+													<span class="text-center"><?php echo number_format($obrloss); ?>%</span>
+													
+													</td>
+												</tr>
+												<tr>
+													<td>15</td>
+													<td>MCC Parking</td>
+													<td><?php echo $mcc; ?></td>
+													<td><?php echo $mcc2; ?></td>
+													<td><?php echo $mcc3; ?></td>
+													<td>
+													<span class="text-center"><?php echo number_format($mccloss); ?>%</span>
+													
+													</td>
+												</tr>
+												
+												<tr>
+													<td>16</td>
+													<td>TEBA Parking</td>
+													<td><?php echo $teba; ?></td>
+													<td><?php echo $teba2; ?></td>
+													<td><?php echo $teba3; ?></td>
+													<td>
+													<span class="text-center"><?php echo number_format($tebaloss); ?>%</span>
+													
+													</td>
+												</tr>
+												
+											</tbody>
+										</table>
+									
+									</div>
+								</section>
+								
+							</div>
+								<div class="col-md-4" data-appear-animation="fadeInRightBig">
+								<section class="panel">
+								<header class="panel-heading">
+										<div class="panel-actions">
+											<a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+											<a href="#" class="panel-action panel-action-dismiss" data-panel-dismiss></a>
+										</div>
+										
+										<h2 class="panel-title">Pie Chart Presentation</h2>
+								</header>
+									
+									<div class="panel-body">
+									<!-- Flot: Pie -->
+										<div class="chart chart-md" id="flotPie"></div>
+										<script type="text/javascript">
+						
+											var flotPieData = [{
+												label: "Gwamile",
+												data: [
+													[1, <?php echo number_format($gwaloss); ?>]
+												],
+												color: '#0088cc'
+											}, {
+												label: "Betfusile",
+												data: [
+													[1, <?php echo number_format($betloss); ?>]
+												],
+												color: '#2baab1'
+											}, {
+												label: "Dzeliwe",
+												data: [
+													[1, <?php echo number_format($dzeloss); ?>]
+												],
+												color: '#734ba9'
+											}, {
+												label: "Makhosini",
+												data: [
+													[1, <?php echo number_format($makloss); ?>]
+												],
+												color: '#E36159'
+											}, {
+												label: "Njumbane",
+												data: [
+													[1, <?php echo number_format($njuloss); ?>]
+												],
+												color: '#E36159'
+											}, {
+												label: "Libandla",
+												data: [
+													[1, <?php echo number_format($libloss); ?>]
+												],
+												color: '#01579B'
+											}, {
+												label: "Mahlokohla",
+												data: [
+													[1, <?php echo number_format($mahloss); ?>]
+												],
+												color: '#FF6F00'
+											}, {
+												label: "Mdada",
+												data: [
+													[1, <?php echo number_format($mdaloss); ?>]
+												],
+												color: '#E36159'
+											}, {
+												label: "Msakato",
+												data: [
+													[1, <?php echo number_format($msaloss); ?>]
+												],
+												color: '#F44336'
+											}, {
+												label: "Siyalu",
+												data: [
+													[1, <?php echo number_format($siyloss); ?>]
+												],
+												color: '#FFC107'
+											}];
+						
+											// See: assets/javascripts/ui-elements/examples.charts.js for more settings.
+						
+										</script>
+									
+									</div>
+								</section>
+								
+							</div>
+							
+						</div>
+						
+						
+						
+						<div class="row">
+						
+						
+							<div class="col-md-12" data-appear-animation="fadeInRightBig">
+								<section class="panel">
+								<header class="panel-heading">
+										<div class="panel-actions">
+											<a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+											<a href="#" class="panel-action panel-action-dismiss" data-panel-dismiss></a>
+										</div>
+										
+										<h2 class="panel-title">Milestone Presentation</h2>
+								</header>
+									
+									<div class="panel-body">
+									
+									
+									<!-- start: page -->
+					<div class="timeline">
+						<div class="tm-body">
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Gwamile Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+									
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($gwamile, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($gwamile2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($gwamile3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Betfusile Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($betfusile, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($betfusile2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($betfusile3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							
+							
+							
+					<div class="tm-title">
+								<h3 class="h5 text-uppercase">Dzeliwe Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($dzeliwe, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($dzeliwe2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($dzeliwe3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>	
+							
+							
+							
+							
+					<div class="tm-title">
+								<h3 class="h5 text-uppercase">Makhosini Drive</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($makhosini, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($makhosini2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($makhosini3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>	
+							
+							
+				<div class="tm-title">
+								<h3 class="h5 text-uppercase">Karl Grant</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($karl, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($karl2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($karl3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>	
+							
+							
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Libandla Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($libandla, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($libandla, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($libandla, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							
+							
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Mahlokohla Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mahlokohla, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($mahlokohla2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mahlokohla3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Mdada Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mdada, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($mdada2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mdada3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Msakato Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($msakato, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($msakato2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($msakato3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							
+							
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Sheffield Road</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($sheffield, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($sheffield2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($sheffield3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">Somhlolo Road</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($somhlolo, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($somhlolo2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($somhlolo3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol><div class="tm-title">
+								<h3 class="h5 text-uppercase">Siyalu Street</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($siyalu, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($siyalu2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($siyalu3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol><div class="tm-title">
+								<h3 class="h5 text-uppercase">Njumbane Parking</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($njumbane, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($njumbane2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($njumbane3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol><div class="tm-title">
+								<h3 class="h5 text-uppercase">OBR Parking</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($obr, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($obr2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($obr3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol><div class="tm-title">
+								<h3 class="h5 text-uppercase">MCC Parking</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mcc, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($mcc2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($mcc3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+							<div class="tm-title">
+								<h3 class="h5 text-uppercase">TEBA Parking</h3>
+							</div>
+							<ol class="tm-items">
+								
+								
+								<li>
+									<div class="tm-info">
+										<div class="tm-icon"><i class="fa fa-map-marker"></i></div>
+										
+									</div>
+									<div class="tm-box appear-animation" data-appear-animation="fadeInRight" data-appear-animation-delay="400">
+										<p>
+										
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-success">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-success">
+							<i class="fa fa-desktop"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_system');?></h4>
+							<div class="info">
+								<span class="text-success text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($teba, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-info">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-info">
+							<i class="fa fa-database"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_actual');?></h4>
+							<div class="info">
+								<span class="text-info text-uppercase">E</span>
+								<strong class="amount"> <?php echo number_format($teba2, 2, '.', ' ') ?></strong>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+		<div class="col-md-4" data-appear-animation="bounceInUp">
+		
+		<section class="panel panel-featured-left panel-featured-secondary">
+			<div class="panel-body">
+				<div class="widget-summary widget-summary-sm">
+					<div class="widget-summary-col widget-summary-col-icon">
+						<div class="summary-icon bg-secondary">
+							<i class="fa fa-arrow-down"></i>
+						</div>
+					</div>
+					<div class="widget-summary-col">
+						<div class="summary">
+							<h4 class="title"><?php echo get_phrase('total_variance');?></h4>
+							<div class="info">
+								<span class="text-secondary text-uppercase">E</span>
+								<strong class="amount"><?php echo number_format($teba3, 2, '.', ' ') ?></strong>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+										</p>
+										
+										<div id="gmap-checkin-example" class="mb-sm" style="height: 100px; width: 100%;"></div>
+										<div class="tm-meta">
+											
+										</div>
+									</div>
+								</li>
+							</ol>
+						
+					
+						</div>
+					</div>
+					<!-- end: page -->
+									
+									
+									
+						
+									</div>
+						
+						</section>
+						
+						</div>
+						
+						</div>
+	
