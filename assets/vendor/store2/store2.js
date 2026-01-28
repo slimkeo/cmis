@@ -1,8 +1,8 @@
-/*! store2 - v2.5.0 - 2023-01-09
-* Copyright (c) 2023 Nathan Bubna; Licensed MIT, GPL */
+/*! store2 - v2.7.0 - 2018-02-08
+* Copyright (c) 2018 Nathan Bubna; Licensed (MIT OR GPL-3.0) */
 ;(function(window, define) {
     var _ = {
-        version: "2.5.0",
+        version: "2.7.0",
         areas: {},
         apis: {},
 
@@ -101,27 +101,27 @@
                 return !!(this._in(key) in this._area);
             },
             size: function(){ return this.keys().length; },
-            each: function(fn, and) {
+            each: function(fn, value) {// value is used by keys(fillList) and getAll(fillList))
                 for (var i=0, m=_.length(this._area); i<m; i++) {
                     var key = this._out(_.key(this._area, i));
                     if (key !== undefined) {
-                        if (fn.call(this, key, and || this.get(key)) === false) {
+                        if (fn.call(this, key, value || this.get(key)) === false) {
                             break;
                         }
                     }
                     if (m > _.length(this._area)) { m--; i--; }// in case of removeItem
                 }
-                return and || this;
+                return value || this;
             },
-            keys: function() {
-                return this.each(function(k, list){ list.push(k); }, []);
+            keys: function(fillList) {
+                return this.each(function(k, list){ list.push(k); }, fillList || []);
             },
             get: function(key, alt) {
                 var s = _.get(this._area, this._in(key));
                 return s !== null ? _.parse(s) : alt || s;// support alt for easy default mgmt
             },
-            getAll: function() {
-                return this.each(function(k, all){ all[k] = this.get(k); }, {});
+            getAll: function(fillObj) {
+                return this.each(function(k, all){ all[k] = this.get(k); }, fillObj || {});
             },
             transact: function(key, fn, alt) {
                 var val = this.get(key, alt),
@@ -145,6 +145,24 @@
                     }
                 }
                 return changed;
+            },
+            add: function(key, data) {
+                var d = this.get(key);
+                if (d instanceof Array) {
+                    data = d.concat(data);
+                } else if (d !== null) {
+                    var type = typeof d;
+                    if (type === typeof data && type === 'object') {
+                        for (var k in data) {
+                            d[k] = data[k];
+                        }
+                        data = d;
+                    } else {
+                        data = d + data;
+                    }
+                }
+                _.set(this._area, this._in(key), _.stringify(data));
+                return data;
             },
             remove: function(key) {
                 var d = this.get(key);
@@ -208,7 +226,7 @@
                 }
             },
             getItem: function(k){ return this.has(k) ? this.items[k] : null; },
-            clear: function(){ for (var k in this.list){ this.removeItem(k); } },
+            clear: function(){ for (var k in this.items){ this.removeItem(k); } },
             toString: function(){ return this.length+' items in '+this.name+'Storage'; }
         }// end _.storageAPI
     };

@@ -8,7 +8,7 @@
 
   var defaultOptions = {
     tagClass: function(item) {
-      return 'label label-info';
+      return 'badge badge-info';
     },
     focusClass: 'focus',
     itemValue: function(item) {
@@ -119,7 +119,7 @@
       if (existing && !self.options.allowDuplicates) {
         // Invoke onTagExists
         if (self.options.onTagExists) {
-          var $existingTag = $(".tag", self.$container).filter(function() { return $(this).data("item") === existing; });
+          var $existingTag = $(".badge", self.$container).filter(function() { return $(this).data("item") === existing; });
           self.options.onTagExists(item, $existingTag);
         }
         return;
@@ -140,7 +140,7 @@
 
       // add a tag element
 
-      var $tag = $('<span class="tag ' + htmlEncode(tagClass) + (itemTitle !== null ? ('" title="' + itemTitle) : '') + '">' + htmlEncode(itemText) + '<span data-role="remove"></span></span>');
+      var $tag = $('<span class="badge ' + htmlEncode(tagClass) + (itemTitle !== null ? ('" title="' + itemTitle) : '') + '">' + htmlEncode(itemText) + '<span data-role="remove"></span></span>');
       $tag.data('item', item);
       self.findInputWrapper().before($tag);
       $tag.after(' ');
@@ -200,7 +200,7 @@
         if (beforeItemRemoveEvent.cancel)
           return;
 
-        $('.tag', self.$container).filter(function() { return $(this).data('item') === item; }).remove();
+        $('.badge', self.$container).filter(function() { return $(this).data('item') === item; }).remove();
         $('option', self.$element).filter(function() { return $(this).data('item') === item; }).remove();
         if($.inArray(item, self.itemsArray) !== -1)
           self.itemsArray.splice($.inArray(item, self.itemsArray), 1);
@@ -222,7 +222,7 @@
     removeAll: function() {
       var self = this;
 
-      $('.tag', self.$container).remove();
+      $('.badge', self.$container).remove();
       $('option', self.$element).remove();
 
       while(self.itemsArray.length > 0)
@@ -237,7 +237,7 @@
      */
     refresh: function() {
       var self = this;
-      $('.tag', self.$container).each(function() {
+      $('.badge', self.$container).each(function() {
         var $tag = $(this),
             item = $tag.data('item'),
             itemValue = self.options.itemValue(item),
@@ -246,7 +246,7 @@
 
           // Update tag's class and inner text
           $tag.attr('class', null);
-          $tag.addClass('tag ' + htmlEncode(tagClass));
+          $tag.addClass('badge ' + htmlEncode(tagClass));
           $tag.contents().filter(function() {
             return this.nodeType == 3;
           })[0].nodeValue = htmlEncode(itemText);
@@ -350,25 +350,31 @@
 
       // typeahead.js
       if (self.options.typeaheadjs) {
-          var typeaheadConfig = null;
-          var typeaheadDatasets = {};
+        // Determine if main configurations were passed or simply a dataset
+        var typeaheadjs = self.options.typeaheadjs;
+        if (!$.isArray(typeaheadjs)) {
+            typeaheadjs = [null, typeaheadjs];
+        }
 
-          // Determine if main configurations were passed or simply a dataset
-          var typeaheadjs = self.options.typeaheadjs;
-          if ($.isArray(typeaheadjs)) {
-            typeaheadConfig = typeaheadjs[0];
-            typeaheadDatasets = typeaheadjs[1];
+        $.fn.typeahead.apply(self.$input, typeaheadjs).on('typeahead:selected', $.proxy(function (obj, datum, name) {
+          var index = 0;
+          typeaheadjs.some(function(dataset, _index) {
+            if (dataset.name === name) {
+              index = _index;
+              return true;
+            }
+            return false;
+          });
+
+          // @TODO Dep: https://github.com/corejavascript/typeahead.js/issues/89
+          if (typeaheadjs[index].valueKey) {
+            self.add(datum[typeaheadjs[index].valueKey]);
           } else {
-            typeaheadDatasets = typeaheadjs;
+            self.add(datum);
           }
 
-          self.$input.typeahead(typeaheadConfig, typeaheadDatasets).on('typeahead:selected', $.proxy(function (obj, datum) {
-            if (typeaheadDatasets.valueKey)
-              self.add(datum[typeaheadDatasets.valueKey]);
-            else
-              self.add(datum);
-            self.$input.typeahead('val', '');
-          }, self));
+          self.$input.typeahead('val', '');
+        }, self));
       }
 
       self.$container.on('click', $.proxy(function(event) {
@@ -455,7 +461,7 @@
         var textLength = $input.val().length,
             wordSpace = Math.ceil(textLength / 5),
             size = textLength + wordSpace + 1;
-        $input.attr('size', Math.max(this.inputSize, $input.val().length));
+        $input.attr('size', Math.max(this.inputSize, size));
       }, self));
 
       self.$container.on('keypress', 'input', $.proxy(function(event) {
@@ -485,7 +491,7 @@
          var textLength = $input.val().length,
             wordSpace = Math.ceil(textLength / 5),
             size = textLength + wordSpace + 1;
-         $input.attr('size', Math.max(this.inputSize, $input.val().length));
+         $input.attr('size', Math.max(this.inputSize, size));
       }, self));
 
       // Remove icon clicked
@@ -493,7 +499,7 @@
         if (self.$element.attr('disabled')) {
           return;
         }
-        self.remove($(event.target).closest('.tag').data('item'));
+        self.remove($(event.target).closest('.badge').data('item'));
       }, self));
 
       // Only add existing value as tags when using strings as tags
