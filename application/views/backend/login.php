@@ -69,7 +69,7 @@
 
 						<div class="form-group mb-lg">
 							<div class="clearfix">
-								<label class="pull-left">Password</label>
+								<label class="pull-left">Passwordd</label>
 							</div>
 							<div class="input-group input-group-icon">
 								<input name="password" type="password" id="password" placeholder="Password" class="form-control input-lg"/>
