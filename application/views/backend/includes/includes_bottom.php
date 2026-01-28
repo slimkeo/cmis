@@ -84,14 +84,6 @@
 		<script src="assets/vendor/liquid-meter/liquid.meter.js"></script>
 		<script src="assets/vendor/snap.svg/snap.svg.js"></script>
 		
-	
-		<!-- Examples -->
-		<script src="assets/javascripts/dashboard/examples.dashboard.js"></script>
-		<script src="assets/javascripts/forms/custom_validation.js"></script>
-    
-		
-		<script src="assets/javascripts/ui-elements/examples.charts.js"></script>
-
 
 		<!-- SHOW PNOTIFIVATION -->
 		<?php if ($this->session->flashdata('flash_message') != ""):?>
@@ -131,13 +123,8 @@
 
 		?>
 		
-			<!-- Examples -->
-		<script src="js/examples/examples.datatables.default.js"></script>
-		<script src="js/examples/examples.datatables.row.with.details.js"></script>
-		<script src="js/examples/examples.datatables.tabletools.js"></script>
-		
-		
-			<!-- Specific Page Vendor Data Tables-->		
+
+			<!-- Specific Page Vendor Data Tables--> 		
 		<script src="vendor/select2/js/select2.js"></script>		
 		<script src="vendor/datatables/media/js/jquery.dataTables.min.js"></script>		
 		<script src="vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>		
@@ -148,6 +135,17 @@
 		<script src="vendor/datatables/extras/TableTools/JSZip-2.5.0/jszip.min.js"></script>		
 		<script src="vendor/datatables/extras/TableTools/pdfmake-0.1.32/pdfmake.min.js"></script>		
 		<script src="vendor/datatables/extras/TableTools/pdfmake-0.1.32/vfs_fonts.js"></script>
+
+			<!-- Examples -->
+		<script src="js/examples/examples.datatables.default.js"></script>
+		<script src="js/examples/examples.datatables.row.with.details.js"></script>
+		<script src="js/examples/examples.datatables.tabletools.js"></script>
+
+		<script src="assets/javascripts/dashboard/examples.dashboard.js"></script>
+		<script src="assets/javascripts/forms/custom_validation.js"></script>
+    
+		
+		<script src="assets/javascripts/ui-elements/examples.charts.js"></script>
 
 		<script>
 		$(document).ready(function () {
