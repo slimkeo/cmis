@@ -451,12 +451,14 @@ function members($param1 = '', $param2 = '', $param3 = '')
             ];
         }
 
-        echo json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
     }
 
 public function get_members()
