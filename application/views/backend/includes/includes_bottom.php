@@ -126,8 +126,8 @@
 
 			<!-- Specific Page Vendor Data Tables--> 		
 		<script src="<?php echo base_url();?>assets/vendor/select2/js/select2.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>		
+		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/jquery.datatables.min.js"></script>		
+		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/datatables.bootstrap4.min.js"></script>		
 		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/dataTables.buttons.min.js"></script>		
 		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.bootstrap4.min.js"></script>		
 		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.html5.min.js"></script>		
