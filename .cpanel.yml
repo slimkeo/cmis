@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/snatbur1/cmis.snatburialscheme.com
-    - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp -R application system index.php assets $DEPLOYPATH
