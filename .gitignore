@@ -21,7 +21,7 @@ Thumbs.db
 application/logs/*
 !application/logs/index.html
 
-application/cache/*
+
 !application/cache/index.html
 
 ############################
@@ -32,7 +32,7 @@ application/cache/*
 ############################
 # Uploads / generated files
 ############################
-assets/tmp/
+
 
 ############################
 # Composer / Node
@@ -49,5 +49,5 @@ node_modules/
 # Temp files
 ############################
 *.log
-*.tmp
+
 *.bak
