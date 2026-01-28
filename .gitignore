@@ -21,8 +21,6 @@ Thumbs.db
 application/logs/*
 !application/logs/index.html
 
-application/cache/*
-!application/cache/index.html
 
 ############################
 # Sessions (if file-based)
