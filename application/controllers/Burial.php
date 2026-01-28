@@ -66,7 +66,6 @@ class Burial extends CI_Controller
         $page_data['page_name']  = 'emptypage';
         $page_data['page_title'] = "Coming Soon";
         $this->load->view('backend/index', $page_data);
-        $this->load->view('backend/index', $page_data);
     }
 /********** MANAGE MEMBERS ********************/
 function members($param1 = '', $param2 = '', $param3 = '')
@@ -167,11 +166,11 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 $page_data['payable_beneficiaries'] = $summary['payable_beneficiaries'];
             
                 // Fees
-                $page_datadata['principal_fee'] = (float) $this->db
+                $page_data['principal_fee'] = (float) $this->db
                     ->get_where('settings', ['type' => 'principal_fee'])
                     ->row()->description;
-            
-                $data['member_fee'] = (float) $this->db
+
+                $page_data['member_fee'] = (float) $this->db
                     ->get_where('settings', ['type' => 'member_fee'])
                     ->row()->description;
 
@@ -552,12 +551,14 @@ public function get_members()
     ];
     }
 
-    echo json_encode([
-        "draw" => $draw,
-        "recordsTotal" => $recordsTotal,
-        "recordsFiltered" => $recordsFiltered,
-        "data" => $data
-    ]);
+    return $this->output
+        ->set_content_type('application/json')
+        ->set_output(json_encode([
+            "draw" => $draw,
+            "recordsTotal" => $recordsTotal,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
+        ]));
 }
 
     ///initaite sms sending
@@ -566,7 +567,9 @@ public function get_members()
         // You can restrict members (e.g., active only). For now all members.
         $total = $this->Member_model->count_all_members();
 
-        echo json_encode(['total' => (int)$total]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['total' => (int)$total]));
     }
     public function invite_batch()
     {
@@ -625,12 +628,14 @@ public function get_members()
         // total_success - useful at finish
         $total_success = $this->Attendance_model->count_sent(); // implement below
 
-        echo json_encode([
-            'processed' => $processed,
-            'success_count' => $success_count,
-            'logs' => $logs,
-            'total_success' => $total_success
-        ]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'processed' => $processed,
+                'success_count' => $success_count,
+                'logs' => $logs,
+                'total_success' => $total_success
+            ]));
     }
 
     /**
@@ -715,11 +720,13 @@ public function get_members()
         // compute processed count for client progress
         $processed = count($members);
 
-        echo json_encode([
-            'processed' => $processed,
-            'success_count' => $success_count,
-            'logs' => $logs
-        ]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'processed' => $processed,
+                'success_count' => $success_count,
+                'logs' => $logs
+            ]));
     }
 
     public function broadcast_message($phone,$message) {
@@ -867,12 +874,14 @@ public function get_members()
             ];
         }
 
-        echo json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
     }
     //DISPLAY ATTENDED MEMBERS ON DATATABLE
      public function get_attended()
@@ -930,12 +939,14 @@ public function get_members()
             ];
         }
 
-        echo json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
     }   
     /********** MANAGE AGMs (Annual General Meetings) ********************/
     function agms($param1 = '', $param2 = '', $param3 = '')
@@ -1118,7 +1129,9 @@ public function get_members()
         $response['status'] = 'updated';
 
         //Replying ajax request with validation response
-        echo json_encode($response);
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
     }    
 
     /********** SYSTEM SETTINGS ********************/
