@@ -31,7 +31,7 @@
 		<script src="<?php echo base_url();?>assets/vendor/bootstrap-colorpicker/js/bootstrap-colorpicker.js"></script>
 		<script src="<?php echo base_url();?>assets/vendor/bootstrap-timepicker/bootstrap-timepicker.js"></script>
 		<script src="<?php echo base_url();?>assets/vendor/fuelux/js/spinner.js"></script>
-		<script src="<?php echo base_url();?>/vendor/dropzone/dropzone.js"></script>
+		<script src="<?php echo base_url();?>vendor/dropzone/dropzone.js"></script>
 		<script src="<?php echo base_url();?>assets/vendor/bootstrap-markdown/js/markdown.js"></script>
 		<script src="<?php echo base_url();?>assets/vendor/bootstrap-markdown/js/to-markdown.js"></script>
 		<script src="<?php echo base_url();?>assets/vendor/bootstrap-markdown/js/bootstrap-markdown.js"></script>
@@ -125,16 +125,16 @@
 		
 
 			<!-- Specific Page Vendor Data Tables--> 		
-		<script src="<?php echo base_url();?>assets/vendor/select2/js/select2.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/jquery.dataTables.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/dataTables.buttons.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.bootstrap4.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.html5.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.print.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/JSZip-2.5.0/jszip.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/pdfmake-0.1.32/pdfmake.min.js"></script>		
-		<script src="<?php echo base_url();?>assets/vendor/datatables/extras/TableTools/pdfmake-0.1.32/vfs_fonts.js"></script>
+		<script src="<?php echo base_url();?>vendor/select2/js/select2.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/media/js/jquery.dataTables.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/media/js/dataTables.bootstrap4.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/Buttons-1.4.2/js/dataTables.buttons.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.bootstrap4.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.html5.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/Buttons-1.4.2/js/buttons.print.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/JSZip-2.5.0/jszip.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/pdfmake-0.1.32/pdfmake.min.js"></script>		
+		<script src="<?php echo base_url();?>vendor/datatables/extras/TableTools/pdfmake-0.1.32/vfs_fonts.js"></script>
 
 			<!-- Examples -->
 		<script src="<?php echo base_url();?>js/examples/examples.datatables.default.js"></script>
