@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/snatbur1/cmis.snatburialscheme.com
+    - /bin/cp -R * $DEPLOYPATH

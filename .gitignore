@@ -1,0 +1,56 @@
+############################
+# OS / Editor files
+############################
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+
+############################
+# Environment & config
+############################
+.env
+.env.*
+
+application/config/database.php
+application/config/config.php
+
+############################
+# Logs & cache (CI3)
+############################
+application/logs/*
+!application/logs/index.html
+
+application/cache/*
+!application/cache/index.html
+
+############################
+# Sessions (if file-based)
+############################
+application/sessions/
+
+############################
+# Uploads / generated files
+############################
+uploads/
+assets/uploads/
+assets/tmp/
+
+############################
+# Composer / Node
+############################
+vendor/
+node_modules/
+
+############################
+# PHPUnit
+############################
+.phpunit.result.cache
+
+############################
+# Temp files
+############################
+*.log
+*.tmp
+*.bak
