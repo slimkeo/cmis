@@ -53,6 +53,21 @@ foreach ($edit_data as $row):
                     </div>
                 </div>
 
+                <!-- Is Spouse? -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Is Spouse?</label>
+                    <div class="col-md-7">
+                        <div>
+                            <label style="display: inline; margin-right: 20px;">
+                                <input type="radio" name="is_spouse" value="0" <?php echo ($row['is_spouse'] == 0) ? 'checked' : ''; ?>> No
+                            </label>
+                            <label style="display: inline;">
+                                <input type="radio" name="is_spouse" value="1" <?php echo ($row['is_spouse'] == 1) ? 'checked' : ''; ?>> Yes
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Status -->
                 <div class="form-group">
                     <label class="col-md-3 control-label">Status</label>

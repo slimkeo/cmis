@@ -21,18 +21,44 @@
 					<span><?php echo get_phrase('dashboard'); ?></span>
 				</a>
 			</li> 
-			<li class="<?php if ($page_name == 'claims'|| $page_name=='user_details' ) echo 'nav-active'; ?> ">
+			<li class="<?php if ($page_name == 'manage_claims'|| $page_name=='claim_details' ) echo 'nav-active'; ?> ">
 				<a href="<?php echo base_url(); ?>index.php?burial/claims">
 					 <i class="fa fa-slideshare"></i>
 					<span><?php echo get_phrase('manage_claims'); ?></span>
 				</a>
-			</li> 
-			<li class="<?php if ($page_name == 'attendance'|| $page_name=='user_details' ) echo 'nav-active'; ?> ">
-				<a href="<?php echo base_url(); ?>index.php?burial/attendance">
-					 <i class="fa fa-slideshare"></i>
-					<span><?php echo get_phrase('manage_attendance'); ?></span>
-				</a>
-			</li>									
+			</li>  			
+			
+			<li class="nav-parent <?php
+				if ($page_name == 'payments' ||
+						$page_name == 'delete_member' || $page_name == 'upload_spreadsheet' || $page_name == 'upload_spreadsheet_process' )
+					echo 'nav-expanded nav-active';
+				?> ">
+					<a href="#">
+						<i class="fa fa-money"></i>
+						<span>Payments</span>
+					</a>
+				<ul class="nav nav-children">
+					<li class="<?php if ($page_name == 'payments' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/payments">
+							 <i class="fa fa-address-book"></i>
+							<span>Pay Subscriptions</span>
+						</a>
+					</li>
+					<li class="<?php if ($page_name == 'upload_spreadsheet' || $page_name == 'upload_spreadsheet_process') echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/upload_spreadsheet">
+							 <i class="fa fa-address-book"></i>
+							<span>Upload Spreadsheet</span>
+						</a>
+					</li>
+					<li class="<?php if ($page_name == 'delete_member' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/delete_member">
+							 <i class="fa fa-address-book-o"></i>
+							<span>Delete Member</span>
+						</a>
+					</li>								
+				</ul>
+			</li>				
+
 			<!-- manage attendance -->
 			<?php if ($this->session->userdata('level')==1) { ?>
 			<li class="nav-parent <?php
@@ -41,7 +67,7 @@
 					echo 'nav-expanded nav-active';
 				?> ">
 					<a href="#">
-						<i class="fa fa-users"></i>
+						<i class="fa fa-bullhorn"></i>
 						<span>SMS Communication</span>
 					</a>
 				<ul class="nav nav-children">
@@ -67,7 +93,7 @@
 				?> ">
 					<a href="#">
 						<i class="fa fa-users"></i>
-						<span>Members</span>
+						<span>Manage Members</span>
 					</a>
 				<ul class="nav nav-children">
 					<li class="<?php if ($page_name == 'members' ) echo 'nav-active'; ?> ">
@@ -106,13 +132,13 @@
 				?> ">
 					<a href="#">
 						<i class="fa fa-calendar-check-o"></i>
-						<span>AGM Reports</span>
+						<span>Manage AGMs</span>
 					</a>
 				<ul class="nav nav-children">
 					<li class="<?php if ($page_name == 'detailed_meetings' ) echo 'nav-active'; ?> ">
-						<a href="<?php echo base_url(); ?>index.php?burial/detailed_meetings">
+						<a href="<?php echo base_url(); ?>index.php?burial/attendance">
 							 <i class="fa fa-user"></i>
-							<span><?php echo get_phrase('detailed_meetings'); ?></span>
+							<span>Manage Attendance</span>
 						</a>
 					</li>
 					<li class="<?php if ($page_name == 'momo_agm' ) echo 'nav-active'; ?> ">

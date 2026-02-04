@@ -3,9 +3,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Beneficiary_model extends CI_Model
 {
-    /* =========================
-       GET BENEFICIARIES BY MEMBER
-    ========================= */
+    /**
+     * Statuses that should NOT be counted as payable and do NOT generate fees
+     */
+    private $non_payable_statuses = [
+        'BENEFITTED - REPLACED',
+        'DECEASED - REPLACED',
+        'DELETED'
+    ];
+
     public function get_by_member($member_id)
     {
         return $this->db
@@ -13,87 +19,120 @@ class Beneficiary_model extends CI_Model
             ->get('beneficiaries')
             ->result_array();
     }
-    /* =========================
-       PAYABLE BENEFICIARY COUNT
-    ========================= */
+
+    /**
+     * Returns counts and the calculated beneficiary fee for payable beneficiaries only
+     */
     public function get_payable_summary($member_id)
     {
         $beneficiaries = $this->get_by_member($member_id);
 
-        $payable = 0;
+        $payable_count = 0;
+        $payable_fee   = 0.0;
 
-        foreach ($beneficiaries as $b) {
+        $fees = $this->get_fee_settings();
 
-            $status = trim($b['status'] ?? '');
+        foreach ($beneficiaries as $ben) {
+            $status = trim($ben['status'] ?? '');
 
-            // ❗ Only exclude these
-            if (!in_array($status, [
-                'BENEFITTED - REPLACED','DECEASED - REPLACED',
-                'DELETED'
-            ], true)) {
-                $payable++;
+            if (in_array($status, $this->non_payable_statuses, true)) {
+                continue;
+            }
+
+            $payable_count++;
+
+            if ($ben['is_spouse'] == 1) {
+                $payable_fee += $fees['spouse_fee'];
+            } else {
+                $payable_fee += $fees['member_fee'];
             }
         }
 
         return [
-            'total_beneficiaries' => count($beneficiaries),
-            'payable_beneficiaries' => $payable
+            'total_beneficiaries'     => count($beneficiaries),
+            'payable_beneficiaries'   => $payable_count,
+            'payable_beneficiary_fee' => $payable_fee,
         ];
     }
 
-    /* =========================
-       BENEFICIARY MATURITY
-       1 YEAR RULE
-    ========================= */
-public function is_matured($beneficiary_id)
-{
-    $b = $this->db
-        ->where('id', $beneficiary_id)
-        ->get('beneficiaries')
-        ->row();
+    /**
+     * Returns the total monthly amount the member should pay
+     * (principal + beneficiary fees + minimum rule)
+     */
+    public function get_total_monthly_fee($member_id)
+    {
+        $fees = $this->get_fee_settings();
+        $summary = $this->get_payable_summary($member_id);
 
-    if (!$b) {
-        return '';
+        $total = $fees['principal_fee'] + $summary['payable_beneficiary_fee'];
+
+        // Minimum fee rule
+        if ($total < 105) {
+            $total = 105;
+        }
+
+        return $total;
     }
 
-    $status   = strtoupper(trim($b->status));
-    $memberid = $b->memberid;
+    /**
+     * Load all fee settings in one query
+     */
+    public function get_fee_settings()
+    {
+        $rows = $this->db
+            ->where_in('type', ['principal_fee', 'member_fee', 'spouse_fee'])
+            ->get('settings')
+            ->result_array();
 
-    /* =========================
-       NO MATURITY DISPLAY
-    ========================= */
-    if (in_array($status, [
-        'BENEFITTED',
-        'BENEFITTED-REPLACED'
-    ], true)) {
-        return '';
+        $fees = [
+            'principal_fee' => 0.0,
+            'member_fee'    => 0.0,
+            'spouse_fee'    => 0.0,
+        ];
+
+        foreach ($rows as $row) {
+            $fees[$row['type']] = (float) $row['description'];
+        }
+
+        return $fees;
     }
 
-    /* =========================
-       REPLACEE LOGIC
-    ========================= */
-    if ($status === 'REPLACEE') {
+    /**
+     * Determine maturity status for a single beneficiary
+     */
+    public function is_matured($beneficiary_id)
+    {
+        $b = $this->db
+            ->where('id', $beneficiary_id)
+            ->get('beneficiaries')
+            ->row();
 
-        $has_benefitted_replaced = $this->db
-            ->where('memberid', $memberid)
-            ->where('status', 'BENEFITTED-REPLACED')
-            ->count_all_results('beneficiaries');
+        if (!$b) {
+            return '';
+        }
 
-        return ($has_benefitted_replaced > 0)
-            ? 'MATURED'
-            : 'WAITING';
+        $status = strtoupper(trim($b->status));
+
+        if (in_array($status, ['BENEFITTED', 'BENEFITTED-REPLACED'], true)) {
+            return '';
+        }
+
+        if ($status === 'REPLACEE') {
+            $has_replaced = $this->db
+                ->where('memberid', $b->memberid)
+                ->where('status', 'BENEFITTED-REPLACED')
+                ->count_all_results('beneficiaries');
+
+            return $has_replaced > 0 ? 'MATURED' : 'WAITING';
+        }
+
+        if (empty($b->submission_date)) {
+            return 'WAITING';
+        }
+
+        $submitted = strtotime($b->submission_date);
+        $maturity  = strtotime('+1 year', $submitted);
+
+        return (time() >= $maturity) ? 'MATURED' : 'WAITING';
     }
-
-    /* =========================
-       1 YEAR MATURITY RULE
-    ========================= */
-    if (empty($b->submission_date)) {
-        return 'WAITING';
-    }
-
-    $submitted = strtotime($b->submission_date);
-    $maturity  = strtotime('+1 year', $submitted);
-
-    return (time() >= $maturity) ? 'MATURED' : 'WAITING';
-}
 }

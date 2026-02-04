@@ -22,11 +22,21 @@
 
 			<!--TABLE LISTING STARTS-->
 			<div class="tab-pane box active" id="list">
+
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-12 text-right">
+                        <button type="button" class="btn btn-primary" id="add_member_btn">
+                            <i class="fa fa-plus"></i> Add Member
+                        </button>
+                    </div>
+                </div>
+
 				<table class="table table-bordered table-striped mb-none" id="datatable-tabletools1">
 			<thead>
 				<tr>
                     <th>#</th>
                     <th>ID Number</th>
+					<th>Emp NO:</th>
                     <th>Surname</th>
                     <th>Name</th>
                     <th>Passbook No</th>
@@ -55,8 +65,8 @@
 			        <div class="form-group">
 			            <label class="col-md-3 control-label">ID Number</label>
 			            <div class="col-md-7">
-			                <input type="number" minlength="13" maxlength="13" class="form-control" 
-			                       name="idnumber" required placeholder="Enter 13-digit ID number">
+			                <input type="text" minlength="13" maxlength="13" class="form-control" 
+			                       id="idnumber_input" name="idnumber" required placeholder="Enter 13-digit ID number" oninput="extractDOBFromID()">
 			            </div>
 			        </div>
 
@@ -127,18 +137,12 @@
 					<div class="form-group">
 					    <label class="col-md-3 control-label">Date of Birth</label>
 					    <div class="col-md-7">
-                            <div class="input-group" data-plugin-datepicker>
-                                <span class="input-group-addon">
-                                    <i class="fa fa-calendar"></i>
-                                </span>
-                                <input type="text" 
-                                       class="form-control"
-                                       name="dob"
-                                       placeholder="1997-02-20"
-                                       inputmode="numeric"
-					                   pattern="\d{4}-\d{2}-\d{2}" 
-					                   title="Date must be in YYYY-MM-DD format (e.g., 1997-02-20)">
-                            </div>
+													<div class="input-daterange input-group" data-plugin-datepicker>
+														<span class="input-group-addon">
+															<i class="fa fa-calendar"></i>
+														</span>
+														<input type="text" class="form-control" id="dob_input" name="dob" placeholder="Auto-filled from ID">
+													</div>
 					    </div>
 					</div>
 
@@ -162,15 +166,37 @@
 			                       placeholder="School code">
 			            </div>
 			        </div>
-
-			        <!-- SUBMIT BUTTON -->
+			        <!-- SCHOOL CODE -->
 			        <div class="form-group">
-			            <div class="col-sm-offset-3 col-sm-5">
-			                <button type="submit" class="btn btn-primary">
-			                    Add Member
-			                </button>
+			            <label class="col-md-3 control-label">Permanent Residency</label>
+			            <div class="col-md-7">
+			                <input type="text" class="form-control" name="resident" 
+			                       placeholder="Plot 4" require>
 			            </div>
 			        </div>
+
+		        <!-- NOMINEE SECTION (ONLY ONE ALLOWED) -->
+		        <div class="form-group">
+		            <label class="col-md-3 control-label">Nominee</label>
+		            <div class="col-md-7">
+                        <input type="text"
+                               class="form-control"
+                               name="nominee_fullname"
+                               placeholder="Nominee full name">
+		                <small class="form-text text-muted">
+                            Only one nominee is allowed per member.
+                        </small>
+		            </div>
+		        </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="form-group">
+                    <div class="col-md-7 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Add Member
+                        </button>
+                    </div>
+                </div>
 
 			        </form>
 			    </div>
@@ -182,6 +208,32 @@
    </div>
 </div>
 <script>
+// Extract DOB from Swazi ID number
+// Format: YYMMDD (first 6 digits)
+// Example: 9702206100465 -> 1997-02-20
+function extractDOBFromID() {
+    const idInput = document.getElementById('idnumber_input');
+    const dobInput = document.getElementById('dob_input');
+    const idValue = idInput.value.trim();
+    
+    // Must be at least 6 digits
+    if (idValue.length >= 6) {
+        const dateStr = idValue.substring(0, 6);
+        const yy = parseInt(dateStr.substring(0, 2));
+        const mm = dateStr.substring(2, 4);
+        const dd = dateStr.substring(4, 6);
+        
+        // Determine full year: if YY <= current year's last 2 digits, it's 20YY, else 19YY
+        const currentYear = new Date().getFullYear();
+        const currentYY = currentYear % 100;
+        const fullYear = yy <= currentYY ? 2000 + yy : 1900 + yy;
+        
+        // Format as YYYY-MM-DD
+        const dobValue = fullYear + '-' + mm + '-' + dd;
+        dobInput.value = dobValue;
+    }
+}
+
 $(document).ready(function() {
 
     $('#datatable-tabletools1').DataTable({
@@ -200,6 +252,11 @@ $(document).ready(function() {
             { extend: 'pdf',   text: 'PDF' },
             { extend: 'print', text: 'Print' }
         ]
+    });
+
+    // Switch to "Add Member" tab when button is clicked
+    $('#add_member_btn').on('click', function () {
+        $('.nav-tabs a[href="#add"]').tab('show');
     });
 
 });

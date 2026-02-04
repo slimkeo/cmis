@@ -23,11 +23,9 @@ class Csv extends CI_Controller {
  
         $this->load->library('upload', $config);
  
- 
         // If upload failed, display error
         if (!$this->upload->do_upload()) {
             $data['error'] = $this->upload->display_errors();
- 
             $this->load->view('csv_import', $data);
         } else {
             $file_data = $this->upload->data();
@@ -35,26 +33,38 @@ class Csv extends CI_Controller {
  
             if ($this->csvimport->get_array($file_path)) {
                 $csv_array = $this->csvimport->get_array($file_path);
+                $insert_count = 0;
+                
                 foreach ($csv_array as $row) {
+                    // Validate required fields are not empty
+                    if (empty($row['date']) || empty($row['street'])) {
+                        continue; // Skip invalid rows
+                    }
+                    
                     $insert_data = array(
                         'date'=>$row['date'],
                         'street'=>$row['street'],
-                        'marshal'=>$row['marshal'],
-                        'broughtback'=>$row['broughtback'],
-						'systemcash'=>$row['systemcash'],
-                        'actual'=>$row['actual'],
-                        'varience'=>$row['varience'],
+                        'marshal'=>isset($row['marshal']) ? $row['marshal'] : '',
+                        'broughtback'=>isset($row['broughtback']) ? $row['broughtback'] : '',
+                        'systemcash'=>isset($row['systemcash']) ? $row['systemcash'] : '',
+                        'actual'=>isset($row['actual']) ? $row['actual'] : '',
+                        'varience'=>isset($row['varience']) ? $row['varience'] : '',
                     );
                     $this->csv_model->insert_csv($insert_data);
+                    $insert_count++;
                 }
-                $this->session->set_flashdata('success', 'Csv Data Imported Succesfully');
-                redirect(base_url().'csv');
-                //echo "<pre>"; print_r($insert_data);
-            } else 
-                $data['error'] = "Error occured";
-                $this->load->view('csvindex', $data);
+                
+                if ($insert_count > 0) {
+                    $this->session->set_flashdata('success', $insert_count . ' records imported successfully');
+                    redirect(base_url().'csv');
+                } else {
+                    $data['error'] = "No valid records found in CSV file";
+                    $this->load->view('csv_import', $data);
+                }
+            } else {
+                $data['error'] = "Invalid CSV file or file is empty";
+                $this->load->view('csv_import', $data);
             }
- 
         } 
  
 }

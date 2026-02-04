@@ -126,7 +126,6 @@ th { background: #eee; }
                 <tr>
                     <th>#</th>
                     <th>Full Name</th>
-                    <th>Status</th>
                     <th>Submission Date</th>
                     <th>Maturity</th>
                 </tr>
@@ -136,7 +135,6 @@ th { background: #eee; }
                 <tr>
                     <td><?php echo $i++; ?></td>
                     <td><?php echo $b['fullname']; ?></td>
-                    <td><?php echo $b['status']; ?></td>
                     <td><?php echo $b['submission_date']; ?></td>
                     <td>
                         <?php
