@@ -22,7 +22,7 @@ class Login extends CI_Controller {
     public function index() {
 
         if ($this->session->userdata('user_login') == 1)
-            redirect(base_url() . 'index.php?burial/attendance', 'refresh');
+            redirect(base_url() . 'index.php?burial/dashboard', 'refresh');
 
          if ($this->session->userdata('account_login') == 1)
              redirect(base_url() . 'index.php?client', 'refresh');
