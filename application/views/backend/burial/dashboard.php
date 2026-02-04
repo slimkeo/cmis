@@ -238,7 +238,7 @@
 											<div class="row">
 												<div class="col-md-4">
 													<div class="h4 text-weight-bold mb-none mt-lg">E <?php echo number_format($statements_amount, 2, '.', ' ') ?></div>
-													<p class="text-xs text-primary mb-none">Statements Total</p>
+													<p class="text-xs text-primary mb-none">Subscriptions Total</p>
 												</div>
 												<div class="col-md-4">
 													<div class="h4 text-weight-bold mb-none mt-lg">E <?php echo number_format($approved_claims, 2, '.', ' ') ?></div>

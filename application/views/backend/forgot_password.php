@@ -11,9 +11,9 @@
 	<!-- Basic -->
 	<meta charset="UTF-8">
 
-	<meta name="keywords" content="School Management Software"/>
-	<meta name="description" content="Shivas School Management System">
-	<meta name="author" content="PVS Systems Pvt Ltd">
+	<meta name="keywords" content="<?php echo $system_title; ?>"/>
+	<meta name="description" content="<?php echo $system_title; ?>">
+	<meta name="author" content="Hlanze Thabani">
 
 	<title> <?php echo get_phrase('reset_password'); ?> | <?php echo $system_title; ?> </title>
 
