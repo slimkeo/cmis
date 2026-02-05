@@ -131,7 +131,7 @@
 					<td>
 
 						<!-- VIEW CLAIM DETAILS LINK -->
-						<a href="<?php echo base_url(); ?>index.php?burial/claims/view/<?php echo $row['id'];?>" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" 
+						<a href="<?php echo base_url(); ?>index.php?burial/claims/view/<?php echo $row['isd'];?>" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" 
 						data-original-title="<?php echo get_phrase('view_claim');?>" target="_blank">
                         <i class="fa fa-eye"></i>
                         </a>
