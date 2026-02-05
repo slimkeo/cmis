@@ -2,14 +2,14 @@
 <header class="header">
 	<div class="logo-container">
 		<a href="<?php echo base_url();?>index.php?burial/dashboard" class="logo">
-			<img src="<?php echo base_url();?>uploads/logo.png" height="40" />
+			<img src="uploads/logo.png" height="40" />
 		</a>
 		<div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
 			<i class="fa fa-bars" aria-label="Toggle sidebar"></i>
 		</div>
 	</div>
 
-	<!-- start: search & user box, -->
+	<!-- start: search & user box -->
 	<div class="header-right">
 		<!--SESSION CHANGER-->
 		<form action="pages-search-results.html" class="search nav-form">
