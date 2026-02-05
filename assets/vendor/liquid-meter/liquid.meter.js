@@ -13,8 +13,6 @@
 	'use strict';
 
 	var defaultOptions = {
-		min: 0,
-		max: 100,
 		shape: 'circle',
 		color: '#82BF41',
 		background: '#4C4C52',
@@ -113,8 +111,6 @@
 		},
 
 		draw: function() {
-			this.min = parseInt(this.meter.attr('min'), 10);
-			this.max = parseInt(this.meter.attr('max'), 10);
 			this.value = parseInt(this.meter.val() || this.meter.attr('value'), 10);
 
 			var paper = this.paper;
@@ -209,7 +205,7 @@
 		},
 
 		makePath: function(value, t1, x1, y1, t2, x2, y2) {
-			var top = ((100 - ((value*100)/this.max)) * 1.76) + 22;
+			var top = ((100 - value) * 1.76) + 22;
 			return Snap.format('M0,{left} C{curve.x1},{curve.y1} {curve.x2},{curve.y2} 220,{right} L220,220 L0,220 z', {
 				left: top - (t1 || 0),
 				right: top - (t2 || 0),

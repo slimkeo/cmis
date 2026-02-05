@@ -225,7 +225,7 @@ Theme Version: 	1.7.0
 			data: morrisLineData,
 			xkey: 'y',
 			ykeys: ['a', 'b'],
-			labels: ['Subs', 'Claims'],
+			labels: ['System', 'Actual'],
 			xLabelFormat: function(x) { // <--- x.getMonth() returns valid index
     		var month = months[x.getMonth()];
     		return month;
@@ -261,7 +261,7 @@ Theme Version: 	1.7.0
 			data: morrisBarData,
 			xkey: 'y',
 			ykeys: ['a', 'b'],
-			labels: ['Subs', 'Claims'],
+			labels: ['System', 'Actual'],
 			hideHover: true,
 			barColors: ['#0088cc', '#2baab1']
 		});
@@ -277,7 +277,7 @@ Theme Version: 	1.7.0
 			data: morrisAreaData,
 			xkey: 'y',
 			ykeys: ['a', 'b'],
-			labels: ['Subs', 'Claims'],
+			labels: ['System', 'Actual'],
 			lineColors: ['#0088cc', '#2baab1'],
 			fillOpacity: 0.7,
 			hideHover: true
@@ -294,7 +294,7 @@ Theme Version: 	1.7.0
 			data: morrisStackedData,
 			xkey: 'y',
 			ykeys: ['a', 'b'],
-			labels: ['Subs', 'Claims'],
+			labels: ['System', 'Actual'],
 			barColors: ['#0088cc', '#2baab1'],
 			fillOpacity: 0.7,
 			smooth: false,

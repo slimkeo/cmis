@@ -21,7 +21,7 @@
 					<span><?php echo get_phrase('dashboard'); ?></span>
 				</a>
 			</li> 
-			<li class="<?php if ($page_name == 'manage_claims'|| $page_name=='claim_details' ) echo 'nav-active'; ?> ">
+			<li class="<?php if ($page_name == 'claims'|| $page_name=='claim_details' ) echo 'nav-active'; ?> ">
 				<a href="<?php echo base_url(); ?>index.php?burial/claims">
 					 <i class="fa fa-slideshare"></i>
 					<span><?php echo get_phrase('manage_claims'); ?></span>

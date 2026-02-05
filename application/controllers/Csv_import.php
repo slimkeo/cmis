@@ -66,46 +66,19 @@ class Csv_import extends CI_Controller {
  function import()
  {
   $file_data = $this->csvimport->get_array($_FILES["csv_file"]["tmp_name"]);
-  
-  // Check if CSV parsing was successful
-  if ($file_data === false) {
-      echo json_encode(array('status' => 'error', 'message' => 'Invalid CSV file or file is empty'));
-      return;
-  }
-  
-  // Check if array is empty
-  if (empty($file_data)) {
-      echo json_encode(array('status' => 'error', 'message' => 'No valid records found in CSV'));
-      return;
-  }
-  
-  $data = array();
-  $insert_count = 0;
-  
   foreach($file_data as $row)
   {
-      // Validate required fields
-      if (empty($row["date"]) && empty($row["street"])) {
-          continue; // Skip rows with no required data
-      }
-      
-      $data[] = array(
-           'date'        => isset($row["date"]) ? $row["date"] : '',
-           'street'      => isset($row["street"]) ? $row["street"] : '',
-           'marshal'     => isset($row["marshal"]) ? $row["marshal"] : '',
-           'broughtback' => isset($row["broughtback"]) ? $row["broughtback"] : '',
-           'systemcash'  => isset($row["systemcash"]) ? $row["systemcash"] : '',
-           'actual'      => isset($row["actual"]) ? $row["actual"] : '',
-           'varience'    => isset($row["varience"]) ? $row["varience"] : ''
-      );
+   $data[] = array(
+    	  'date' 		=> $row["date"],
+          'street'  	=> $row["street"],
+          'marshal'   	=> $row["marshal"],
+          'broughtback' => $row["broughtback"],
+		  'systemcash'  => $row["systemcash"],
+          'actual'   	=> $row["actual"],
+          'varience'    => $row["varience"]
+   );
   }
-  
-  if (!empty($data)) {
-      $this->csv_import_model->insert($data);
-      echo json_encode(array('status' => 'success', 'message' => count($data) . ' records imported successfully'));
-  } else {
-      echo json_encode(array('status' => 'error', 'message' => 'No valid records to insert'));
-  }
+  $this->csv_import_model->insert($data);
  }
  
   

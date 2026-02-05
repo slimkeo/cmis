@@ -106,7 +106,7 @@ $beneficiary_name = $beneficiary ? $beneficiary->fullname : '-';
                     </ul>
                 <?php else: ?>
                     <p>No documents uploaded.</p>
-                <?php endif; ?>rr
+                <?php endif; ?>
 
                 <div style="margin-top:20px;">
                     <?php if (($claim['status'] ?? '') == 'PENDING'): ?>

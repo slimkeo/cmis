@@ -1,24 +1,24 @@
 /*!
-	autosize 4.0.2
+	Autosize 3.0.20
 	license: MIT
 	http://www.jacklmoore.com/autosize
 */
 (function (global, factory) {
-	if (typeof define === "function" && define.amd) {
-		define(['module', 'exports'], factory);
-	} else if (typeof exports !== "undefined") {
-		factory(module, exports);
+	if (typeof define === 'function' && define.amd) {
+		define(['exports', 'module'], factory);
+	} else if (typeof exports !== 'undefined' && typeof module !== 'undefined') {
+		factory(exports, module);
 	} else {
 		var mod = {
 			exports: {}
 		};
-		factory(mod, mod.exports);
+		factory(mod.exports, mod);
 		global.autosize = mod.exports;
 	}
-})(this, function (module, exports) {
+})(this, function (exports, module) {
 	'use strict';
 
-	var map = typeof Map === "function" ? new Map() : function () {
+	var map = typeof Map === "function" ? new Map() : (function () {
 		var keys = [];
 		var values = [];
 
@@ -35,7 +35,7 @@
 					values.push(value);
 				}
 			},
-			delete: function _delete(key) {
+			'delete': function _delete(key) {
 				var index = keys.indexOf(key);
 				if (index > -1) {
 					keys.splice(index, 1);
@@ -43,7 +43,7 @@
 				}
 			}
 		};
-	}();
+	})();
 
 	var createEvent = function createEvent(name) {
 		return new Event(name, { bubbles: true });
@@ -52,7 +52,7 @@
 		new Event('test');
 	} catch (e) {
 		// IE does not support `new Event()`
-		createEvent = function createEvent(name) {
+		createEvent = function (name) {
 			var evt = document.createEvent('Event');
 			evt.initEvent(name, true, false);
 			return evt;
@@ -63,7 +63,7 @@
 		if (!ta || !ta.nodeName || ta.nodeName !== 'TEXTAREA' || map.has(ta)) return;
 
 		var heightOffset = null;
-		var clientWidth = null;
+		var clientWidth = ta.clientWidth;
 		var cachedHeight = null;
 
 		function init() {
@@ -122,16 +122,21 @@
 		}
 
 		function resize() {
-			if (ta.scrollHeight === 0) {
-				// If the scrollHeight is 0, then the element probably has display:none or is detached from the DOM.
-				return;
-			}
-
+			var originalHeight = ta.style.height;
 			var overflows = getParentOverflows(ta);
 			var docTop = document.documentElement && document.documentElement.scrollTop; // Needed for Mobile IE (ticket #240)
 
-			ta.style.height = '';
-			ta.style.height = ta.scrollHeight + heightOffset + 'px';
+			ta.style.height = 'auto';
+
+			var endHeight = ta.scrollHeight + heightOffset;
+
+			if (ta.scrollHeight === 0) {
+				// If the scrollHeight is 0, then the element probably has display:none or is detached from the DOM.
+				ta.style.height = originalHeight;
+				return;
+			}
+
+			ta.style.height = endHeight + 'px';
 
 			// used to check if an update is actually necessary on window.resize
 			clientWidth = ta.clientWidth;
@@ -151,24 +156,22 @@
 
 			var styleHeight = Math.round(parseFloat(ta.style.height));
 			var computed = window.getComputedStyle(ta, null);
+			var actualHeight = Math.round(parseFloat(computed.height));
 
-			// Using offsetHeight as a replacement for computed.height in IE, because IE does not account use of border-box
-			var actualHeight = computed.boxSizing === 'content-box' ? Math.round(parseFloat(computed.height)) : ta.offsetHeight;
-
-			// The actual height not matching the style height (set via the resize method) indicates that 
-			// the max-height has been exceeded, in which case the overflow should be allowed.
-			if (actualHeight < styleHeight) {
-				if (computed.overflowY === 'hidden') {
-					changeOverflow('scroll');
+			// The actual height not matching the style height (set via the resize method) indicates that
+			// the max-height has been exceeded, in which case the overflow should be set to visible.
+			if (actualHeight !== styleHeight) {
+				if (computed.overflowY !== 'visible') {
+					changeOverflow('visible');
 					resize();
-					actualHeight = computed.boxSizing === 'content-box' ? Math.round(parseFloat(window.getComputedStyle(ta, null).height)) : ta.offsetHeight;
+					actualHeight = Math.round(parseFloat(window.getComputedStyle(ta, null).height));
 				}
 			} else {
 				// Normally keep overflow set to hidden, to avoid flash of scrollbar as the textarea expands.
 				if (computed.overflowY !== 'hidden') {
 					changeOverflow('hidden');
 					resize();
-					actualHeight = computed.boxSizing === 'content-box' ? Math.round(parseFloat(window.getComputedStyle(ta, null).height)) : ta.offsetHeight;
+					actualHeight = Math.round(parseFloat(window.getComputedStyle(ta, null).height));
 				}
 			}
 
@@ -190,7 +193,7 @@
 			}
 		};
 
-		var destroy = function (style) {
+		var destroy = (function (style) {
 			window.removeEventListener('resize', pageResize, false);
 			ta.removeEventListener('input', update, false);
 			ta.removeEventListener('keyup', update, false);
@@ -201,8 +204,8 @@
 				ta.style[key] = style[key];
 			});
 
-			map.delete(ta);
-		}.bind(ta, {
+			map['delete'](ta);
+		}).bind(ta, {
 			height: ta.style.height,
 			resize: ta.style.resize,
 			overflowY: ta.style.overflowY,
@@ -251,7 +254,7 @@
 
 	// Do nothing in Node.js environment and IE8 (or lower)
 	if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'function') {
-		autosize = function autosize(el) {
+		autosize = function (el) {
 			return el;
 		};
 		autosize.destroy = function (el) {
@@ -261,7 +264,7 @@
 			return el;
 		};
 	} else {
-		autosize = function autosize(el, options) {
+		autosize = function (el, options) {
 			if (el) {
 				Array.prototype.forEach.call(el.length ? el : [el], function (x) {
 					return assign(x, options);
@@ -283,6 +286,5 @@
 		};
 	}
 
-	exports.default = autosize;
-	module.exports = exports['default'];
+	module.exports = autosize;
 });
