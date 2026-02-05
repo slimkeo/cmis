@@ -9,7 +9,7 @@
 		</div>
 	</div>
 
-	<!-- start: search & user box -->
+	<!-- start: search & user box, -->
 	<div class="header-right">
 		<!--SESSION CHANGER-->
 		<form action="pages-search-results.html" class="search nav-form">
@@ -29,7 +29,7 @@
 
 			<!-- Message Notifications -->
 			<?php
-			 $total_unread_message_number = 0;
+			 $total_unread_message_number = 1;
 			 $current_user = $this->session->userdata('login_type') . '-' . $this->session->userdata('login_user_id');
 
 			 $this->db->where('sender', $current_user);
