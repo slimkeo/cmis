@@ -48,6 +48,7 @@
 				<?php include $account_type.'/navigation.php';?>
 
 				<section role="main" class="content-body">
+					fsdfsd <?php echo base_url(); ?>
 					<header class="page-header">
 						<h2><?php echo $page_title;?></h2>
 				
