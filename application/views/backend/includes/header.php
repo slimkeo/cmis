@@ -2,7 +2,7 @@
 <header class="header">
 	<div class="logo-container">
 		<a href="<?php echo base_url();?>index.php?burial/dashboard" class="logo">
-			<img src="uploads/logo.png" height="40" />
+			<img src="<?php echo base_url();?>uploads/logo.png" height="40" />
 		</a>
 		<div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
 			<i class="fa fa-bars" aria-label="Toggle sidebar"></i>
@@ -29,7 +29,7 @@
 
 			<!-- Message Notifications -->
 			<?php
-			 $total_unread_message_number = 1;
+			 $total_unread_message_number = 0;
 			 $current_user = $this->session->userdata('login_type') . '-' . $this->session->userdata('login_user_id');
 
 			 $this->db->where('sender', $current_user);
