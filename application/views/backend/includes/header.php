@@ -123,7 +123,7 @@
 		<div id="userbox" class="userbox">
 			<a href="#" data-toggle="dropdown">
 				<figure class="profile-picture">
-					<img src="<?php echo $this->crud_model->get_image_url($this->session->userdata('login_type') , $this->session->userdata($account_type.'_id'));?>" alt="user-image" class="img-circle" data-lock-picture="assets/images/!logged-user.jpg" />
+					<img src="<?php echo base_url();?>assets/images/1.jpg" alt="user-image" class="img-circle" data-lock-picture="assets/images/!logged-user.jpg" />
 				</figure>
 				<div class="profile-info" data-lock-name="<?php echo $this->session->userdata('name');?>" data-lock-email="info@pvssystem.com">
 					<span class="name"><?php echo $this->session->userdata('name');?></span>
