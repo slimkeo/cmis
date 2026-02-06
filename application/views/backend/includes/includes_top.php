@@ -58,7 +58,7 @@
 		<script src="<?php echo base_url();?>assets/vendor/jquery/jquery.js"></script>
 	
         <!--Web Icon-->
-	    <link rel="shortcut icon" href="uploads/logo.png">
+	    <link rel="shortcut icon" href="assets/images/logo.png">
 		<script src="<?php echo base_url();?>assets/vendor/style-switcher/style.switcher.localstorage.js"></script>
 
         <!-- Disable Square Borders -->

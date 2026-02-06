@@ -39,7 +39,7 @@
 		<div class="center-sign">
 		
 		<a href="" class="logo pull-left">
-					<img src="uploads/logo.png" height="54" alt="" />
+					<img src="<?php echo base_url();?>assets/images/logo.png" height="54" alt="" />
 				</a>
 			<div class="errors-container"></div>
 
