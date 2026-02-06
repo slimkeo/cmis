@@ -262,7 +262,12 @@
 					</label>
 
 					<div class="col-md-7">
-						<input type="text" class="form-control" name="date_of_entry" required title="<?php echo get_phrase('value_required');?>">
+													<div class="input-daterange input-group" data-plugin-datepicker>
+														<span class="input-group-addon">
+															<i class="fa fa-calendar"></i>
+														</span>
+														<input type="text" class="form-control" name="date_of_entry">
+													</div>
 					</div>
 				</div>
 				<div class="form-group">

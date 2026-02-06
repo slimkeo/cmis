@@ -1,29 +1,43 @@
 ############################
-# OS / Editor
+# OS / Editor files
 ############################
 .DS_Store
 Thumbs.db
+
 .vscode/
 .idea/
 
 ############################
-# Environment
+# Environment & config
 ############################
 .env
 .env.*
 
+
+
 ############################
-# Logs & Cache
+# Logs & cache (CI3)
 ############################
 application/logs/*
 !application/logs/index.html
 
-application/cache/*
+
 !application/cache/index.html
+
+############################
+# Sessions (if file-based)
+############################
+
+
+############################
+# Uploads / generated files
+############################
+
 
 ############################
 # Composer / Node
 ############################
+
 node_modules/
 
 ############################
@@ -35,13 +49,5 @@ node_modules/
 # Temp files
 ############################
 *.log
-*.bak
 
-############################
-# Uploads (keep structure + core images)
-############################
-uploads/*
-!uploads/index.html
-!uploads/logo.png
-!uploads/default.png
-!uploads/.gitkeep
+*.bak
