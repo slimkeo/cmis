@@ -268,9 +268,9 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $page_data['months'] = $this->generate_month_range();
         
         $page_data['memberid']    = $memberid;
-        $page_data['page_name']  = 'burial/member_details';
+        $page_data['page_name']  = 'member_details';
         $page_data['page_title'] = 'Member Details';
-        $this->load->view('backend/member_details', $page_data);
+        $this->load->view('backend/index', $page_data);
     }
 
     /********** GENERATE MONTH RANGE ********************/
@@ -2694,8 +2694,8 @@ public function member_statement($memberid)
         $out = [];
         foreach ($all as $b) {
             $status = trim($b['status']);
-            // Exclude deleted or already replaced beneficiaries
-            if (in_array($status, ['DELETED', 'DECEASED - REPLACED', 'BENEFITTED - REPLACED'], true)) continue;
+            // Exclude deleted, benefittted or already replaced beneficiaries
+            if (in_array($status, ['DELETED', 'DECEASED - REPLACED', 'BENEFITTED', 'BENEFITTED - REPLACED'], true)) continue;
 
             // Parse submission_date similar to beneficiaries.php view
             $submission_ts = $this->_parse_date_to_ts($b['submission_date'] ?? '');

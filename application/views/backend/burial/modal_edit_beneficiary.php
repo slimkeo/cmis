@@ -41,7 +41,7 @@ foreach ($edit_data as $row):
                 <div class="form-group">
                     <label class="col-md-3 control-label">Date of Birth</label>
                     <div class="col-md-7">
-                        <input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" value="<?php echo $row['dob']; ?>" required>
+                        <input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" value="<?php echo $row['dob']; ?>">
                     </div>
                 </div>
 

@@ -1,9 +1,8 @@
 <?php
-// Assuming $member_row is already available in the view (passed from controller)
-// If not, you may still need to fetch it like before:
+// Assuming $member_row is passed from controller or fetched here
 $member_row = $this->db->get_where('members', ['id' => $memberid])->row_array();
 
-// Fetch data using models (preferred way)
+// Using model methods (preferred)
 $beneficiaries = $this->Beneficiary_model->get_by_member($member_row['id']);
 
 $summary = $this->Beneficiary_model->get_payable_summary($member_row['id']);
@@ -20,7 +19,7 @@ $principal_fee = $fees['principal_fee'];
 $member_fee    = $fees['member_fee'];
 $spouse_fee    = $fees['spouse_fee'];
 
-// Optional: breakdown of payable beneficiaries (members vs spouses)
+// Payable breakdown
 $non_payable_statuses = [
     'BENEFITTED - REPLACED',
     'DECEASED - REPLACED',
@@ -37,12 +36,20 @@ $payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spou
 ?>
 
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #222;
+    }
+
     .member-profile {
         background: #fff;
         padding: 30px;
         max-width: 1100px;
         margin: 0 auto;
     }
+
     .profile-header {
         text-align: center;
         border-bottom: 3px solid #333;
@@ -53,35 +60,49 @@ $payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spou
         margin: 0;
         font-size: 26px;
     }
+    .profile-header p {
+        margin: 6px 0;
+        color: #555;
+    }
+
+    .actions {
+        text-align: right;
+        margin-bottom: 25px;
+    }
+
     .section-title {
         font-size: 20px;
         font-weight: bold;
         color: #222;
         border-bottom: 2px solid #444;
         padding-bottom: 8px;
-        margin: 30px 0 15px;
+        margin: 35px 0 15px;
     }
+
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 16px 24px;
     }
+
     .info-row {
         display: flex;
         justify-content: space-between;
-        padding: 8px 0;
+        padding: 9px 0;
         border-bottom: 1px solid #eee;
     }
+
     .info-label {
         font-weight: 600;
         color: #444;
         min-width: 180px;
     }
+
     .info-value {
-        color: #222;
         flex: 1;
         text-align: right;
     }
+
     .summary-box {
         background: #f8f9fa;
         border: 1px solid #dee2e6;
@@ -89,52 +110,117 @@ $payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spou
         padding: 20px;
         margin-top: 15px;
     }
+
     .summary-row {
         display: flex;
         justify-content: space-between;
         padding: 10px 0;
         border-bottom: 1px solid #eee;
     }
+
     .summary-row.total {
-        font-size: 1.1em;
+        font-size: 1.15em;
         font-weight: bold;
-        border-top: 2px solid #ccc;
-        margin-top: 10px;
-        padding-top: 12px;
+        border-top: 2px solid #aaa;
+        margin-top: 12px;
+        padding-top: 14px;
     }
+
     table.beneficiaries-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
     }
+
     table th, table td {
-        border: 1px solid #ddd;
+        border: 1px solid #ccc;
         padding: 10px;
         text-align: left;
     }
+
     table th {
         background: #f1f3f5;
         font-weight: 600;
     }
-    .actions {
-        margin-bottom: 25px;
-        text-align: right;
+
+    .footer-note {
+        margin-top: 60px;
+        text-align: center;
+        color: #666;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    /* ────────────────────────────────────────────────
+       PRINT STYLES
+    ──────────────────────────────────────────────── */
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .member-profile {
+            padding: 20px;
+            max-width: none;
+            box-shadow: none;
+        }
+
+        .actions, .no-print {
+            display: none !important;
+        }
+
+        .profile-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            border-bottom: 1px solid #000;
+            margin-top: 30px;
+        }
+
+        .info-row, .summary-row {
+            border-bottom: 1px dotted #888;
+        }
+
+        table th, table td {
+            border: 1px solid #000;
+        }
+
+        table th {
+            background: #e8e8e8 !important;
+        }
+
+        .summary-box {
+            border: 1px solid #000;
+            background: none;
+        }
+
+        .footer-note {
+            margin-top: 80px;
+            font-size: 11px;
+        }
     }
 </style>
 
 <div class="member-profile">
 
-    <div class="profile-header">
-        <h2>SNAT BURIAL SCHEME</h2>
-        <p>Member Profile</p>
-        <p>Generated on: <?= date('d M Y H:i') ?></p>
-    </div>
-
-    <div class="actions">
+    <div class="actions no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fa fa-print"></i> Print Profile
+        </button>
         <a href="<?= base_url('index.php?burial/beneficiaries/'.$member_row['id']) ?>" 
            class="btn btn-info">
             <i class="fa fa-users"></i> Manage Beneficiaries
         </a>
+    </div>
+
+    <div class="profile-header">
+        <h2>SNAT BURIAL SCHEME</h2>
+        <p>Member Profile</p>
+        <p>Generated on: <?= date('d M Y H:i') ?></p>
     </div>
 
     <!-- Member Information -->
@@ -198,12 +284,12 @@ $payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spou
             <span><?= $payable_beneficiaries ?></span>
         </div>
         <?php if ($payable_members_count || $payable_spouses_count): ?>
-        <div class="summary-row" style="font-size:0.95em; color:#555;">
-            <span style="padding-left:20px;">→ Members</span>
+        <div class="summary-row" style="font-size:0.95em; color:#555; padding-left: 20px;">
+            <span>→ Members</span>
             <span><?= $payable_members_count ?></span>
         </div>
-        <div class="summary-row" style="font-size:0.95em; color:#555;">
-            <span style="padding-left:20px;">→ Spouses</span>
+        <div class="summary-row" style="font-size:0.95em; color:#555; padding-left: 20px;">
+            <span>→ Spouses</span>
             <span><?= $payable_spouses_count ?></span>
         </div>
         <?php endif; ?>
@@ -255,9 +341,9 @@ $payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spou
     </div>
     <?php endif; ?>
 
-    <div style="margin-top: 50px; text-align: center; color: #666; font-size: 13px;">
-        This document was generated by the SNAT Burial Scheme system.<br>
-        For official confirmation or updates, please contact the SNAT Burial Scheme office.
+    <div class="footer-note">
+        This is a computer-generated document.<br>
+        For official records or verification, please contact the SNAT Burial Scheme office.
     </div>
 
 </div>
