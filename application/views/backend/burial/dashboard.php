@@ -263,7 +263,7 @@
 								<div class="panel-actions">
 								</div>
 				
-								<h2 class="panel-title">Subscriptions Count - <?php echo $year ?></h2>
+								<h2 class="panel-title">Claims Count - <?php echo $year ?></h2>
 							</header>	
 										<div class="panel-body">
 											<div class="chart chart-sm" id="flotDashSales1" style="height: 352px;"></div>
@@ -290,11 +290,12 @@
 
 											$this->db->where('created_at >=',$startdated);
 											$this->db->where('created_at <=',$enddated);
-											$this->db->from('statements');
-											$statements_count = $this->db->count_all_results();
+											$this->db->where('status','paid');
+											$this->db->from('claims');
+											$claims_count = $this->db->count_all_results();
 											
 											?>
-				['<?php echo substr($month,0, 3); ?>', <?php echo $statements_count ?>],					
+				['<?php echo substr($month,0, 3); ?>', <?php echo $claims_count ?>],					
 				<?php endfor; ?>
 				     ],
 				color: "#2baab1"

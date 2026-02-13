@@ -225,7 +225,7 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Date of Birth</label>
 								<div class="col-sm-7">
-									<input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" required>
+									<input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" >
 								</div>
 							</div>
 

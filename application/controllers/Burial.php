@@ -541,6 +541,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
             $update_data['dob']             = $this->input->post('dob');
             $update_data['submission_date'] = $this->input->post('submission_date');
             $update_data['status']          = $this->input->post('status');
+            $update_data['status']          = $this->input->post('status');
             $update_data['is_spouse']       = (int) $this->input->post('is_spouse');
             $status_date_input              = $this->input->post('status_date');
             $replaced_with_input            = $this->input->post('replaced_with');

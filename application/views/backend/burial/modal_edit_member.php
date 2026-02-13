@@ -110,7 +110,17 @@ foreach ($edit_data as $row):
               <input type="text" class="form-control" name="schoolcode" value="<?php echo htmlspecialchars($row['schoolcode'] ?? '');?>"/>
             </div>
           </div>
-
+          <!-- SCHOOL CODE -->
+          <div class="form-group">
+            <label class="col-md-3 control-label">Benefitted</label>
+            <div class="col-md-7">
+              <select name="is_alive" class="form-control" required>
+                <option value="">Select</option>
+                <option value="1" <?php echo ($row['is_alive'] == 0) ? 'selected' : ''; ?>>Yes</option>
+                <option value="0" <?php echo ($row['is_alive'] == 1) ? 'selected' : ''; ?>>No</option>
+              </select>
+            </div>
+          </div>
           <!-- PERMANENT RESIDENCY -->
           <div class="form-group">
             <label class="col-md-3 control-label">Permanent Residency</label>
