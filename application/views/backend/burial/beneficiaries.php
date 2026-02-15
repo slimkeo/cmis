@@ -278,7 +278,7 @@ foreach ($member_data as $member_row):
 
 							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
 							<div class="form-group" id="replace-with-group" style="display: none;">
-								<label class="col-sm-3 control-label">Replace With</label>
+								<label class="col-sm-3 control-label">Replace</label>
 								<div class="col-sm-7">
 									<select name="replaced_with" id="replaced-with-select" class="form-control">
 										<option value="">-- Select Beneficiary to Replace --</option>
