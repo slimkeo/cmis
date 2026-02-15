@@ -79,8 +79,15 @@ function members($param1 = '', $param2 = '', $param3 = '')
     // CREATE MEMBER
     if ($param1 == 'create') {
 
+            $passbook = trim($this->input->post('passbook_no'));
+
+        if ($passbook !== '') {
+            // Build custom 7-digit ID starting with 11
+            $data['id'] = '11' . str_pad($passbook, 5, '0', STR_PAD_LEFT);
+        }
+
         $data['idnumber']    = $this->input->post('idnumber');
-        $data['passbook_no'] = $this->input->post('passbook_no');
+        $data['passbook_no'] = $passbook;
         $data['employeeno']  = $this->input->post('employeeno');
         $data['tscno']       = $this->input->post('tscno');
         $data['surname']     = $this->input->post('surname');
