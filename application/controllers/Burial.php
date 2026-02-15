@@ -846,7 +846,7 @@ public function get_members()
        data-toggle="tooltip"
        data-placement="top"
        title="Delete Member"
-       onclick="confirm_modal(\''.base_url('index.php?burial/member/delete/'.$r->id).'\')">
+       onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
         <i class="fa fa-trash"></i>
     </a>
     '
