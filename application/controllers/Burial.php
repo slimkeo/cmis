@@ -109,7 +109,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         if (!empty($data['passbook_no'])) $this->db->or_where('passbook_no', $data['passbook_no']);
         if (!empty($data['cellnumber']))  $this->db->or_where('cellnumber', $data['cellnumber']);
         if (!empty($data['employeeno']))  $this->db->or_where('employeeno', $data['employeeno']);
-        ->group_end();
+        $this->db->group_end();
 
         $exists = $this->db->get('members')->num_rows();
 
