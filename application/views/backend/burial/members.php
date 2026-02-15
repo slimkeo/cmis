@@ -140,7 +140,7 @@
 														<span class="input-group-addon">
 															<i class="fa fa-calendar"></i>
 														</span>
-														<input type="text" class="form-control" id="dob_input" name="dob" placeholder="Auto-filled from ID">
+														<input type="text" class="form-control" id="dob_input" name="dob" placeholder="Auto-filled from ID" readonly>
 													</div>
 					    </div>
 					</div>
