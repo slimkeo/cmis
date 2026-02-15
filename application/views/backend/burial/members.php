@@ -159,7 +159,7 @@
 
 			        <!-- SCHOOL CODE -->
 			        <div class="form-group">
-			            <label class="col-md-3 control-label">School Code</label>
+			            <label class="col-md-3 control-label">School Code (optional)</label>
 			            <div class="col-md-7">
 			                <input type="number" class="form-control" name="schoolcode" 
 			                       placeholder="School code">

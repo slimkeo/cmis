@@ -105,11 +105,11 @@ function members($param1 = '', $param2 = '', $param3 = '')
 
         // Prevent duplicate ID number or passbook number
         $this->db->group_start()
-                 ->where('idnumber', $data['idnumber'])
-                 ->or_where('passbook_no', $data['passbook_no'])
-                 ->or_where('cellnumber', $data['cellnumber'])
-                 ->or_where('employeeno', $data['employeeno'])
-                 ->group_end();
+        if (!empty($data['idnumber']))    $this->db->or_where('idnumber', $data['idnumber']);
+        if (!empty($data['passbook_no'])) $this->db->or_where('passbook_no', $data['passbook_no']);
+        if (!empty($data['cellnumber']))  $this->db->or_where('cellnumber', $data['cellnumber']);
+        if (!empty($data['employeeno']))  $this->db->or_where('employeeno', $data['employeeno']);
+        ->group_end();
 
         $exists = $this->db->get('members')->num_rows();
 
