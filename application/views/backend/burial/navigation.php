@@ -96,7 +96,7 @@
 						<span>Manage Members</span>
 					</a>
 				<ul class="nav nav-children">
-					<li class="<?php if ($page_name == 'members' ) echo 'nav-active'; ?> ">
+					<li class="<?php if ($page_name == 'members' || $page_name=='beneficiaries' ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/members">
 							 <i class="fa fa-address-book"></i>
 							<span>All Members</span>
