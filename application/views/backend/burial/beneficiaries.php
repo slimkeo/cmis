@@ -112,11 +112,12 @@ foreach ($member_data as $member_row):
 								$maturity_status = $b['status'];
 								$maturity_badge = 'label-danger';
 								$row_class = 'danger';
-							} elseif ($b['status'] == 'REPLACEE') {
-								$maturity_status = 'Matured';
-								$maturity_badge = 'label-success';
-								$row_class = 'success';
-							} elseif ($is_matured) {
+							}// elseif ($b['status'] == 'REPLACEE') {
+							//	$maturity_status = 'Matured';
+							//	$maturity_badge = 'label-success';
+							//	$row_class = 'success';
+							//} 
+							elseif ($is_matured) {
 								$maturity_status = 'Matured';
 								$maturity_badge = 'label-success';
 								$row_class = 'success';
