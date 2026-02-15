@@ -202,7 +202,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         }
 
         $this->session->set_flashdata('flash_message', 'Member updated successfully');
-        redirect(base_url() . 'index.php?burial/beneficiaries/'.$param2, 'refresh');
+        redirect(base_url() . 'index.php?burial/member_details/'.$param2, 'refresh');
     }
 
     // DELETE MEMBER
