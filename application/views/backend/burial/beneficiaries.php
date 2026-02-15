@@ -215,8 +215,8 @@ foreach ($member_data as $member_row):
 								<div class="col-sm-7">
 									<select name="gender" class="form-control" required>
 										<option value="">-- Select Gender --</option>
-										<option value="Male">Male</option>
-										<option value="Female">Female</option>
+										<option value="M">Male</option>
+										<option value="F">Female</option>
 									</select>
 								</div>
 							</div>

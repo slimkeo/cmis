@@ -31,8 +31,8 @@ foreach ($edit_data as $row):
                     <div class="col-md-7">
                         <select name="gender" class="form-control" required>
                             <option value="">-- Select Gender --</option>
-                            <option value="Male" <?php echo ($row['gender'] == 'Male') ? 'selected' : ''; ?>>Male</option>
-                            <option value="Female" <?php echo ($row['gender'] == 'Female') ? 'selected' : ''; ?>>Female</option>
+                            <option value="M" <?php echo ($row['gender'] == 'M') ? 'selected' : ''; ?>>Male</option>
+                            <option value="F" <?php echo ($row['gender'] == 'F') ? 'selected' : ''; ?>>Female</option>
                         </select>
                     </div>
                 </div>
