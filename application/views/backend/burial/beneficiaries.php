@@ -268,13 +268,7 @@ foreach ($member_data as $member_row):
 								</div>
 							</div>
 
-							<!-- Status Date (status_date in DB) - BENEFITTED date or Death Certificate date -->
-							<div class="form-group" id="status-date-group" style="display: none;">
-								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
-								<div class="col-sm-7">
-									<input type="text" name="status_date" class="form-control datepicker" placeholder="dd-mm-yyyy">
-								</div>
-							</div>
+
 
 							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
 							<div class="form-group" id="replace-with-group" style="display: none;">
@@ -314,6 +308,14 @@ foreach ($member_data as $member_row):
 								</div>
 							</div>
 							
+							<!-- Status Date (status_date in DB) - BENEFITTED date or Death Certificate date -->
+							<div class="form-group" id="status-date-group" style="display: none;">
+								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
+								<div class="col-sm-7">
+									<input type="text" name="status_date" class="form-control datepicker" placeholder="dd-mm-yyyy">
+								</div>
+							</div>
+
 							<div class="form-group">
 								<div class="col-sm-offset-3 col-sm-5">
 									<button type="submit" class="btn btn-primary"><?php echo get_phrase('add_beneficiary');?></button>
