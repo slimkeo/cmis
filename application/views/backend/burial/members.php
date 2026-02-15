@@ -90,10 +90,9 @@
 
 			        <!-- PASSBOOK NO -->
 			        <div class="form-group">
-			            <label class="col-md-3 control-label">Passbook No</label>
+			            <label class="col-md-3 control-label">Passbook No (for old member)</label>
 			            <div class="col-md-7">
-			                <input type="number" class="form-control" name="passbook_no" 
-			                       required placeholder="Enter passbook number">
+			                <input type="number" class="form-control" name="passbook_no"  placeholder="Enter passbook number - old member">
 			            </div>
 			        </div>
 
