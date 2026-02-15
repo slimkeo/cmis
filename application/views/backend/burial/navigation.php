@@ -88,7 +88,7 @@
 
 			<li class="nav-parent <?php
 				if ($page_name == 'members' ||
-						$page_name == 'detailed_meetings' || $pdddage_name == 'detailed_meetings' || $page_name=='beneficiaries')
+						$page_name == 'detailed_meetings' || $page_name == 'detailed_meetings' || $page_name=='beneficiaries')
 					echo 'nav-expanded nav-active';
 				?> ">
 					<a href="#">
