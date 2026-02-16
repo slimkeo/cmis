@@ -93,7 +93,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['surname']     = $this->input->post('surname');
         $data['name']        = $this->input->post('name');
         $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = date('d-m-Y', strtotime($this->input->post('dob')));
+        $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
         $data['gender']      = $this->input->post('gender');
         $data['resident']    = $this->input->post('resident');
         $data['schoolcode']  = $this->input->post('schoolcode');
@@ -148,7 +148,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['surname']     = $this->input->post('surname');
         $data['name']        = $this->input->post('name');
         $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = date('d-m-Y', strtotime($this->input->post('dob')));
+        $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
         $data['gender']      = $this->input->post('gender');
         $data['resident']    = $this->input->post('resident');
         $data['schoolcode']  = $this->input->post('schoolcode');
