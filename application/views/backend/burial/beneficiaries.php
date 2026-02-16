@@ -312,7 +312,12 @@ foreach ($member_data as $member_row):
 							<div class="form-group" id="status-date-group" style="display: none;">
 								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
 								<div class="col-sm-7">
-									<input type="text" name="status_date" class="form-control datepicker" placeholder="dd-mm-yyyy">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text" class="form-control"  name="status_date" required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+								</div>
 								</div>
 							</div>
 
