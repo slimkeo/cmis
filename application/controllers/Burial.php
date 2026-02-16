@@ -770,6 +770,7 @@ public function get_members()
         $this->db->group_start();
         $this->db->like("idnumber", $search);
         $this->db->or_like("surname", $search);
+        $this->db->or_like("id", $search);
         $this->db->or_like("name", $search);
         $this->db->or_like("cellnumber", $search);
         $this->db->or_like("passbook_no", $search);
