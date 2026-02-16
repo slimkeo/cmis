@@ -140,7 +140,7 @@
 								data-provide="datepicker"
 								data-date-format="yyyy-mm-dd">
 
-							<input type="text" class="form-control" />
+							<input type="text" class="form-control" id="dob_input" name="dob" placeholder="Auto-filled from ID" required>
 							<span class="input-group-addon">
 								<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
 							</span>
