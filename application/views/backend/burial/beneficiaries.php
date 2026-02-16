@@ -226,7 +226,7 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Date of Birth</label>
 								<div class="col-sm-7">
-								<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"
 											class="form-control"
 											name="dob"
@@ -234,10 +234,10 @@ foreach ($member_data as $member_row):
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
 											required>
-										<span class="input-group-addon">
-											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
-										</span>
 									</div>
+									<span class="input-group-addon">
+										<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+									</span>
 								</div>
 							</div>
 
