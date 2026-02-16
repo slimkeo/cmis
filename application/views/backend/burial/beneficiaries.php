@@ -234,10 +234,10 @@ foreach ($member_data as $member_row):
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
 											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
 									</div>
-									<span class="input-group-addon">
-										<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
-									</span>
 								</div>
 							</div>
 
