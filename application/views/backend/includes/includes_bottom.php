@@ -150,7 +150,7 @@
 		<script>
 		$(document).ready(function () {
 			$('.datepicker').datepicker({
-				format: 'dd-mm-yyyy',
+				format: 'd-m-Y',
 				autoclose: true,
 				todayHighlight: true
 			});
