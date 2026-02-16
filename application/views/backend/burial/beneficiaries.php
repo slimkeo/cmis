@@ -214,7 +214,7 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Gender</label>
 								<div class="col-sm-7">
-									<select name="gender" class="form-control" required>
+									<select name="gender" class="form-control" >
 										<option value="">-- Select Gender --</option>
 										<option value="M">Male</option>
 										<option value="F">Female</option>
@@ -233,7 +233,7 @@ foreach ($member_data as $member_row):
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
-											required>
+											>
 										<span class="input-group-addon">
 											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
 										</span>
