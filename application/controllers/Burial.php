@@ -327,6 +327,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
             $data['status']          = $this->input->post('status');
             $data['submission_date'] = $this->input->post('submission_date');
             $data['is_spouse']       = (int) $this->input->post('is_spouse');
+            $data['user']       =  $this->session->userdata('user_id');
             $status_date_input       = $this->input->post('status_date');
 
             // Default values for NEW beneficiary
