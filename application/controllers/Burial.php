@@ -93,7 +93,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['surname']     = $this->input->post('surname');
         $data['name']        = $this->input->post('name');
         $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = $this->input->post('dob');
+        $data['dob']         = date('d-m-Y', strtotime($this->input->post('dob')));
         $data['gender']      = $this->input->post('gender');
         $data['resident']    = $this->input->post('resident');
         $data['schoolcode']  = $this->input->post('schoolcode');
@@ -148,7 +148,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['surname']     = $this->input->post('surname');
         $data['name']        = $this->input->post('name');
         $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = $this->input->post('dob');
+        $data['dob']         = date('d-m-Y', strtotime($this->input->post('dob')));
         $data['gender']      = $this->input->post('gender');
         $data['resident']    = $this->input->post('resident');
         $data['schoolcode']  = $this->input->post('schoolcode');
@@ -323,7 +323,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
             $data['memberid']        = $param1;
             $data['fullname']        = $this->input->post('fullname');
             $data['gender']          = $this->input->post('gender');
-            $data['dob']             = $this->input->post('dob');
+            $data['dob']             = date('d-m-Y', strtotime($this->input->post('dob')));
             $data['status']          = $this->input->post('status');
             $data['submission_date'] = $this->input->post('submission_date');
             $data['is_spouse']       = (int) $this->input->post('is_spouse');
@@ -442,7 +442,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
 
             $batch_submission_date = $this->input->post('batch_submission_date');
             $batch_fullnames = $this->input->post('batch_fullname');
-            $batch_dobs = $this->input->post('batch_dob');
+            $batch_dobs = date('d-m-Y', strtotime($this->input->post('batch_dob')));
             $batch_genders = $this->input->post('batch_gender');
             $batch_is_spouses = $this->input->post('batch_is_spouse');
             $batch_statuses = $this->input->post('batch_status');
@@ -546,12 +546,12 @@ function members($param1 = '', $param2 = '', $param3 = '')
 
             $update_data['fullname']        = $this->input->post('fullname');
             $update_data['gender']          = $this->input->post('gender');
-            $update_data['dob']             = $this->input->post('dob');
-            $update_data['submission_date'] = $this->input->post('submission_date');
+            $update_data['dob']             = date('d-m-Y', strtotime($this->input->post('dob')));
+            $update_data['submission_date'] = date('d-m-Y', strtotime($this->input->post('submission_date')));
             $update_data['status']          = $this->input->post('status');
             $update_data['status']          = $this->input->post('status');
             $update_data['is_spouse']       = (int) $this->input->post('is_spouse');
-            $status_date_input              = $this->input->post('status_date');
+            $status_date_input              = date('d-m-Y', strtotime($this->input->post('status_date')));
             $replaced_with_input            = $this->input->post('replaced_with');
 
             // Handle status_date based on status
