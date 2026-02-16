@@ -136,12 +136,15 @@
 					<div class="form-group">
 					    <label class="col-md-3 control-label">Date of Birth</label>
 					    <div class="col-md-7">
-													<div class="input-daterange input-group" data-plugin-datepicker>
-														<span class="input-group-addon">
-															<i class="fa fa-calendar"></i>
-														</span>
-														<input type="text" class="form-control datepicker" id="dob_input" name="dob" placeholder="Auto-filled from ID" required>
-													</div>
+						<div class="input-group date" 
+								data-provide="datepicker"
+								data-date-format="yyyy-mm-dd">
+
+							<input type="text" class="form-control" />
+							<span class="input-group-addon">
+								<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+							</span>
+							</div>
 					    </div>
 					</div>
 
