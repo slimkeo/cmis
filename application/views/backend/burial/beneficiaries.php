@@ -226,7 +226,18 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Date of Birth</label>
 								<div class="col-sm-7">
-									<input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" >
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="dob"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+											required>
+									</div>
+									<span class="input-group-addon">
+										<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+									</span>
 								</div>
 							</div>
 
@@ -234,7 +245,18 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Submission Date</label>
 								<div class="col-sm-7">
-									<input type="text" name="submission_date" class="form-control datepicker" placeholder="dd-mm-yyyy" required>
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="submission_date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
 								</div>
 							</div>
 						<!-- Spouse? -->
@@ -323,7 +345,7 @@ foreach ($member_data as $member_row):
 										<span class="input-group-addon">
 											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
 										</span>
-								</div>
+									</div>
 								</div>
 							</div>
 
