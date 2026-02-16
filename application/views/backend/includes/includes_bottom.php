@@ -148,13 +148,15 @@
 		<script src="<?php echo base_url();?>assets/javascripts/ui-elements/examples.charts.js"></script>
 
 		<script>
-		$(document).ready(function () {
-			$('.datepicker').datepicker({
-				format: 'd-m-Y',
-				autoclose: true,
-				todayHighlight: true
+			$(document).ready(function() {
+				$('.date').datepicker({
+					format: "yyyy-mm-dd",       // ← this is critical
+					autoclose: true,
+					todayHighlight: true,
+					assumeNearbyYear: false,    // prevents weird 2-digit year guesses
+					forceParse: false           // ← very important: do NOT auto-correct invalid input
+				});
 			});
-		});
 		</script>
 
 
