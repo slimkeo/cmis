@@ -457,8 +457,8 @@ foreach ($member_data as $member_row):
                     <td>
                         <select name="batch_gender[]" class="form-control" required style="width: 100%; margin: 0;">
                             <option value="">Select</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
                         </select>
                     </td>
                     <td>
