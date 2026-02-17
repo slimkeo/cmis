@@ -11,7 +11,7 @@ class Date_model extends CI_Model
      *  yyyy-m-d, yyyy/m/d
      *  yyyy-mm-dd
      */
-    private function normalize_date($date)
+    public function normalize_date($date)
     {
         if (empty($date)) {
             return null;
