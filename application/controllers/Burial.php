@@ -441,9 +441,9 @@ function members($param1 = '', $param2 = '', $param3 = '')
         /********** ADD BATCH BENEFICIARIES **********/
         if ($param2 == 'add_batch_beneficiaries') {
 
-            $batch_submission_date =  $this->Date_model->normalize_date($this->input->post('batch_submission_date'));   
+            $batch_submission_date =  $this->input->post('batch_submission_date');   
             $batch_fullnames = $this->input->post('batch_fullname');
-            $batch_dobs = $this->Date_model->normalize_date($this->input->post('batch_dob'));
+            $batch_dobs = $this->input->post('batch_dob');
             $batch_genders = $this->input->post('batch_gender');
             $batch_is_spouses = $this->input->post('batch_is_spouse');
             $batch_statuses = $this->input->post('batch_status');
@@ -497,10 +497,10 @@ function members($param1 = '', $param2 = '', $param3 = '')
                         'memberid' => $param1,
                         'fullname' => $fullname,
                         'gender' => $gender,
-                        'dob' => $dob,
+                        'dob' => $this->Date_model->normalize_date($dob),
                         'is_spouse' => $is_spouse,
                         'status' => $status,
-                        'submission_date' => $batch_submission_date,
+                        'submission_date' => $this->Date_model->normalize_date($batch_submission_date),
                         'status_date' => !empty($status_date) ? $status_date : date('Y-m-d'),
                         'replaced' => 0,
                         'replaced_with' => null
