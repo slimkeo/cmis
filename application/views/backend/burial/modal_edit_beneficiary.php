@@ -41,7 +41,24 @@ foreach ($edit_data as $row):
                 <div class="form-group">
                     <label class="col-md-3 control-label">Date of Birth</label>
                     <div class="col-md-7">
-                        <input type="text" name="dob" class="form-control datepicker" placeholder="dd-mm-yyyy" value="<?php echo $row['dob']; ?>">
+                    <div class="form-group">
+								<label class="col-sm-3 control-label">Date of Birth</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="dob"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+                                             value="<?php echo $row['dob']; ?>"
+											>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+								</div>
+							</div>
                     </div>
                 </div>
 
@@ -49,7 +66,24 @@ foreach ($edit_data as $row):
                 <div class="form-group">
                     <label class="col-md-3 control-label">Submission Date</label>
                     <div class="col-md-7">
-                        <input type="text" name="submission_date" class="form-control datepicker" placeholder="dd-mm-yyyy" value="<?php echo $row['submission_date']; ?>" required>
+                    <div class="form-group">
+								<label class="col-sm-3 control-label">Submission Date</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="submission_date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+                                            value="<?php echo $row['submission_date']; ?>"
+											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+								</div>
+							</div>
                     </div>
                 </div>
 
@@ -91,7 +125,24 @@ foreach ($edit_data as $row):
                         <?php echo ($row['status'] == 'REPLACEE') ? 'Death Certificate Date' : 'Benefitted Date'; ?>
                     </label>
                     <div class="col-md-7">
-                        <input type="text" name="status_date" class="form-control datepicker" placeholder="dd-mm-yyyy" value="<?php echo $row['status_date']; ?>">
+                    <div class="form-group" id="status-date-group" style="display: none;">
+								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="status_date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+                                            value="<?php echo $row['status_date']; ?>"
+											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+								</div>
+							</div>
                     </div>
                 </div>
 
