@@ -495,11 +495,11 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-                        <div class="input-group date" data-provide="datepicker" data-date-format="dd-mm-yyyy">
+                        <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd">
 							<input type="text"
 								name="batch_dob[]"
 								class="form-control"
-								placeholder="dd-mm-yyyy"
+								placeholder="yyyy-mm-dd"
 								autocomplete="off"
 								style="width: 100%; margin: 0;"
 								required>
@@ -524,12 +524,12 @@ foreach ($member_data as $member_row):
                     <td>
                         <div class="input-group date batch-status-date-group" 
 							data-provide="datepicker" 
-							data-date-format="dd-mm-yyyy" 
+							data-date-format="yyyy-mm-dd" 
 							style="display: none;">
 							<input type="text"
 								name="batch_status_date[]"
 								class="form-control"
-								placeholder="dd-mm-yyyy"
+								placeholder="yyyy-mm-dd"
 								autocomplete="off"
 								data-index="${index}"
 								style="width: 100%; margin: 0;">
