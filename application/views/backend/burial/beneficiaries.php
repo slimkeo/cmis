@@ -567,7 +567,7 @@ foreach ($member_data as $member_row):
             if (!statusSelect) return;
 
             const row = statusSelect.closest('tr');
-            const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date`);
+            const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date-group`);
 
             statusSelect.addEventListener('change', function() {
                 const status = this.value;
