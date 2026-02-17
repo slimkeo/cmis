@@ -115,7 +115,7 @@ foreach ($edit_data as $row):
                         <?php echo ($row['status'] == 'REPLACEE') ? 'Death Certificate Date' : 'Benefitted Date'; ?>
                     </label>
                     <div class="col-md-7">
-                    <div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+                                    <div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"
 											class="form-control"
 											name="status_date"

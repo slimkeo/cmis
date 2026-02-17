@@ -477,49 +477,68 @@ foreach ($member_data as $member_row):
     // Batch Add Beneficiaries - Dynamic Row Management (Table Format)
     (function() {
         let rowCount = 0;
-
-        function createBeneficiaryRow(index) {
-            const rowHTML = `
-                <tr id="batch-row-${index}" class="batch-beneficiary-row">
-                    <td style="text-align: center; vertical-align: middle;">
-                        <span class="row-number">${index + 1}</span>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_fullname[]" class="form-control" placeholder="Full name" required style="width: 100%; margin: 0;">
-                    </td>
-                    <td>
-                        <select name="batch_gender[]" class="form-control" required style="width: 100%; margin: 0;">
-                            <option value="">Select</option>
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0;">
-                    </td>
-                    <td style="text-align: center;">
-                        <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
-                            <option value="0" selected>No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required style="width: 100%; margin: 0;">
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="BENEFITTED">BENEFITTED</option>
-                            <option value="DELETED">DELETED</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0; display: none;">
-                    </td>
-                    <td style="text-align: center; vertical-align: middle;">
-                        ${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
-                    </td>
-                </tr>
-            `;
-            return rowHTML;
-        }
+		function createBeneficiaryRow(index) {
+			const rowHTML = `
+				<tr id="batch-row-${index}" class="batch-beneficiary-row">
+					<td style="text-align: center; vertical-align: middle;">
+						<span class="row-number">${index + 1}</span>
+					</td>
+					<td>
+						<input type="text" name="batch_fullname[]" class="form-control" placeholder="Full name" required style="width: 100%; margin: 0;">
+					</td>
+					<td>
+						<select name="batch_gender[]" class="form-control" required style="width: 100%; margin: 0;">
+							<option value="">Select</option>
+							<option value="M">Male</option>
+							<option value="F">Female</option>
+						</select>
+					</td>
+					<td>
+						<div class="input-group date" data-provide="datepicker" data-date-format="dd-mm-yyyy">
+							<input type="text" 
+								name="batch_dob[]" 
+								class="form-control datepicker" 
+								placeholder="dd-mm-yyyy" 
+								style="width: 100%; margin: 0;" 
+								required>
+							<span class="input-group-addon">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</span>
+						</div>
+					</td>
+					<td style="text-align: center;">
+						<select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
+							<option value="0" selected>No</option>
+							<option value="1">Yes</option>
+						</select>
+					</td>
+					<td>
+						<select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required style="width: 100%; margin: 0;">
+							<option value="ACTIVE">ACTIVE</option>
+							<option value="BENEFITTED">BENEFITTED</option>
+							<option value="DELETED">DELETED</option>
+						</select>
+					</td>
+					<td>
+						<div class="input-group date batch-status-date-group" data-provide="datepicker" data-date-format="dd-mm-yyyy" style="display: none;">
+							<input type="text" 
+								name="batch_status_date[]" 
+								class="form-control batch-status-date datepicker" 
+								data-index="${index}" 
+								placeholder="dd-mm-yyyy" 
+								style="width: 100%; margin: 0;">
+							<span class="input-group-addon">
+								<i class="glyphicon glyphicon-calendar"></i>
+							</span>
+						</div>
+					</td>
+					<td style="text-align: center; vertical-align: middle;">
+						${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
+					</td>
+				</tr>
+			`;
+			return rowHTML;
+		}
 
         function updateRowNumbers() {
             document.querySelectorAll('.batch-beneficiary-row').forEach((row, idx) => {
