@@ -506,8 +506,18 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-                        <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0;">
-                    </td>
+						<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+							<input type="text"
+							pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+							placeholder="yyyy-mm-dd"
+							title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+							name="batch_dob[]" 
+							class="form-control datepicker" 
+							placeholder="yyyy-mm-dd" 
+							style="width: 100%; 
+							margin: 0;">
+						</div>
+						</td>
                     <td style="text-align: center;">
                         <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
                             <option value="0" selected>No</option>
@@ -522,7 +532,7 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-                        <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0; display: none;">
+                        <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0; display: none;">
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                         ${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
