@@ -214,7 +214,7 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Gender</label>
 								<div class="col-sm-7">
-									<select name="gender" class="form-control" >
+									<select name="gender" class="form-control" required>
 										<option value="">-- Select Gender --</option>
 										<option value="M">Male</option>
 										<option value="F">Female</option>
@@ -369,17 +369,7 @@ foreach ($member_data as $member_row):
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Date of Submission</label>
 							<div class="col-sm-3">
-							<div class="input-group date" data-provide="datepicker" data-date-format="dd-mm-yyyy">
-								<input type="text"
-									name="batch_submission_date"
-									class="form-control"
-									placeholder="dd-mm-yyyy"
-									autocomplete="off"
-									required>
-								<span class="input-group-addon">
-									<i class="glyphicon glyphicon-calendar"></i>
-								</span>
-							</div>
+								<input type="text" name="batch_submission_date" class="form-control datepicker" placeholder="dd-mm-yyyy" required>
 							</div>
 						</div>
 
@@ -505,18 +495,7 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-                        <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd">
-							<input type="text"
-								name="batch_dob[]"
-								class="form-control"
-								placeholder="yyyy-mm-dd"
-								autocomplete="off"
-								style="width: 100%; margin: 0;"
-								required>
-							<span class="input-group-addon">
-								<i class="glyphicon glyphicon-calendar"></i>
-							</span>
-						</div>
+                        <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0;">
                     </td>
                     <td style="text-align: center;">
                         <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
@@ -532,21 +511,7 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-                        <div class="input-group date batch-status-date-group" 
-							data-provide="datepicker" 
-							data-date-format="yyyy-mm-dd" 
-							style="display: none;">
-							<input type="text"
-								name="batch_status_date[]"
-								class="form-control"
-								placeholder="yyyy-mm-dd"
-								autocomplete="off"
-								data-index="${index}"
-								style="width: 100%; margin: 0;">
-							<span class="input-group-addon">
-								<i class="glyphicon glyphicon-calendar"></i>
-							</span>
-						</div>
+                        <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="dd-mm-yyyy" style="width: 100%; margin: 0; display: none;">
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                         ${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
@@ -567,7 +532,7 @@ foreach ($member_data as $member_row):
             if (!statusSelect) return;
 
             const row = statusSelect.closest('tr');
-            const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date-group`);
+            const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date`);
 
             statusSelect.addEventListener('change', function() {
                 const status = this.value;
