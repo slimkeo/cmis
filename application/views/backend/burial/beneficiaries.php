@@ -431,187 +431,211 @@ foreach ($member_data as $member_row):
 </div>
 
 <script>
-    // Status field toggle logic for Add Beneficiary form
-    (function() {
-        var statusSelect = document.getElementById('beneficiary-status');
-        var statusDateGroup = document.getElementById('status-date-group');
-        var statusDateLabel = document.getElementById('status-date-label');
-        var statusDateInput = statusDateGroup ? statusDateGroup.querySelector('input[name="status_date"]') : null;
-        var replaceWithGroup = document.getElementById('replace-with-group');
-        var replacedWithSelect = document.getElementById('replaced-with-select');
+// Status field toggle logic for single Add Beneficiary form
+(function() {
+    var statusSelect = document.getElementById('beneficiary-status');
+    var statusDateGroup = document.getElementById('status-date-group');
+    var statusDateLabel = document.getElementById('status-date-label');
+    var statusDateInput = statusDateGroup ? statusDateGroup.querySelector('input[name="status_date"]') : null;
+    var replaceWithGroup = document.getElementById('replace-with-group');
+    var replacedWithSelect = document.getElementById('replaced-with-select');
 
+    if (!statusSelect) return;
+
+    function toggleStatusFields() {
+        var status = statusSelect.value;
+        
+        // Handle status_date field
+        if (statusDateGroup && statusDateInput) {
+            if (status === 'BENEFITTED' || status === 'BENEFITTED - REPLACED') {
+                statusDateGroup.style.display = 'block';
+                if (statusDateLabel) statusDateLabel.textContent = 'Benefitted Date';
+                statusDateInput.required = true;
+            } else if (status === 'REPLACEE') {
+                statusDateGroup.style.display = 'block';
+                if (statusDateLabel) statusDateLabel.textContent = 'Death Certificate Date';
+                statusDateInput.required = true;
+            } else {
+                statusDateGroup.style.display = 'none';
+                statusDateInput.required = false;
+                statusDateInput.value = '';
+            }
+        }
+        
+        // Handle Replace With dropdown
+        if (replaceWithGroup) {
+            if (status === 'REPLACEE') {
+                replaceWithGroup.style.display = 'block';
+                if (replacedWithSelect) replacedWithSelect.required = true;
+            } else {
+                replaceWithGroup.style.display = 'none';
+                if (replacedWithSelect) {
+                    replacedWithSelect.required = false;
+                    replacedWithSelect.value = '';
+                }
+            }
+        }
+    }
+
+    statusSelect.addEventListener('change', toggleStatusFields);
+    toggleStatusFields(); // Initialize on load
+})();
+
+// ────────────────────────────────────────────────
+//   Batch Add Beneficiaries - Dynamic Rows + Datepickers
+// ────────────────────────────────────────────────
+(function() {
+    let rowCount = 0;
+
+    // Helper: Initialize / reinitialize Bootstrap datepickers
+    function initDatepickers(container = document) {
+        // First destroy any existing instances to prevent duplicates/memory issues
+        jQuery(container).find('.datepicker').each(function() {
+            if (jQuery(this).data('datepicker')) {
+                jQuery(this).datepicker('destroy');
+            }
+        });
+
+        // Then initialize
+        jQuery(container).find('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            // You can add more options if needed:
+            // orientation: "bottom auto",
+            // startView: "years",
+            // endDate: new Date()
+        });
+    }
+
+    function createBeneficiaryRow(index) {
+        return `
+            <tr id="batch-row-${index}" class="batch-beneficiary-row">
+                <td style="text-align: center; vertical-align: middle;">
+                    <span class="row-number">${index + 1}</span>
+                </td>
+                <td>
+                    <input type="text" name="batch_fullname[]" class="form-control" placeholder="Full name" required style="width: 100%; margin: 0;">
+                </td>
+                <td>
+                    <select name="batch_gender[]" class="form-control" required style="width: 100%; margin: 0;">
+                        <option value="">Select</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0;">
+                </td>
+                <td style="text-align: center;">
+                    <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
+                        <option value="0" selected>No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required style="width: 100%; margin: 0;">
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="BENEFITTED">BENEFITTED</option>
+                        <option value="DELETED">DELETED</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0; display: none;">
+                </td>
+                <td style="text-align: center; vertical-align: middle;">
+                    ${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
+                </td>
+            </tr>
+        `;
+    }
+
+    function updateRowNumbers() {
+        document.querySelectorAll('.batch-beneficiary-row').forEach((row, idx) => {
+            row.querySelector('.row-number').textContent = idx + 1;
+        });
+    }
+
+    function initializeRow(index) {
+        const statusSelect = document.querySelector(`select[data-index="${index}"].batch-status-select`);
         if (!statusSelect) return;
 
-        function toggleStatusFields() {
-            var status = statusSelect.value;
-            
-            // Handle status_date field
-            if (statusDateGroup && statusDateInput) {
-                if (status === 'BENEFITTED' || status === 'BENEFITTED - REPLACED') {
-                    statusDateGroup.style.display = 'block';
-                    if (statusDateLabel) statusDateLabel.textContent = 'Benefitted Date';
-                    statusDateInput.required = true;
-                } else if (status === 'REPLACEE') {
-                    statusDateGroup.style.display = 'block';
-                    if (statusDateLabel) statusDateLabel.textContent = 'Death Certificate Date';
-                    // required for replacement (controller will validate window)
+        const row = statusSelect.closest('tr');
+        const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date`);
+
+        statusSelect.addEventListener('change', function() {
+            const status = this.value;
+            if (statusDateInput) {
+                if (status === 'BENEFITTED' || status === 'DELETED') {
+                    statusDateInput.style.display = 'block';
                     statusDateInput.required = true;
                 } else {
-                    statusDateGroup.style.display = 'none';
+                    statusDateInput.style.display = 'none';
                     statusDateInput.required = false;
                     statusDateInput.value = '';
                 }
             }
-            
-            // Handle Replace With dropdown
-            if (replaceWithGroup) {
-                if (status === 'REPLACEE') {
-                    replaceWithGroup.style.display = 'block';
-                    if (replacedWithSelect) {
-                        replacedWithSelect.required = true;
-                    }
-                } else {
-                    replaceWithGroup.style.display = 'none';
-                    if (replacedWithSelect) {
-                        replacedWithSelect.required = false;
-                        replacedWithSelect.value = ''; // Clear selection
-                    }
-                }
-            }
-        }
+        });
+    }
 
-        statusSelect.addEventListener('change', toggleStatusFields);
-        // Initialize on page load
-        toggleStatusFields();
-    })();
-
-    // Batch Add Beneficiaries - Dynamic Row Management (Table Format)
-    (function() {
-        let rowCount = 0;
-
-        function createBeneficiaryRow(index) {
-            const rowHTML = `
-                <tr id="batch-row-${index}" class="batch-beneficiary-row">
-                    <td style="text-align: center; vertical-align: middle;">
-                        <span class="row-number">${index + 1}</span>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_fullname[]" class="form-control" placeholder="Full name" required style="width: 100%; margin: 0;">
-                    </td>
-                    <td>
-                        <select name="batch_gender[]" class="form-control" required style="width: 100%; margin: 0;">
-                            <option value="">Select</option>
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0;">
-                    </td>
-                    <td style="text-align: center;">
-                        <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
-                            <option value="0" selected>No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required style="width: 100%; margin: 0;">
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="BENEFITTED">BENEFITTED</option>
-                            <option value="DELETED">DELETED</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" name="batch_status_date[]" class="form-control batch-status-date datepicker" data-index="${index}" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0; display: none;">
-                    </td>
-                    <td style="text-align: center; vertical-align: middle;">
-                        ${index > 0 ? `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row"><i class="fa fa-trash"></i></button>` : `<span style="color: #999;">---</span>`}
-                    </td>
-                </tr>
-            `;
-            return rowHTML;
-        }
-
-        function updateRowNumbers() {
-            document.querySelectorAll('.batch-beneficiary-row').forEach((row, idx) => {
-                row.querySelector('.row-number').textContent = idx + 1;
-            });
-        }
-
-        function initializeRow(index) {
-            const statusSelect = document.querySelector(`select[data-index="${index}"].batch-status-select`);
-            if (!statusSelect) return;
-
-            const row = statusSelect.closest('tr');
-            const statusDateInput = row.querySelector(`input[data-index="${index}"].batch-status-date`);
-
-            statusSelect.addEventListener('change', function() {
-                const status = this.value;
-
-                if (statusDateInput) {
-                    if (status === 'BENEFITTED' || status === 'DELETED') {
-                        statusDateInput.style.display = 'block';
-                        statusDateInput.required = true;
-                    } else {
-                        statusDateInput.style.display = 'none';
-                        statusDateInput.required = false;
-                        statusDateInput.value = '';
-                    }
-                }
-            });
-        }
-
-        // Add initial 5 rows
-        const container = document.getElementById('beneficiaries-container');
-        if (container) {
-            for (let i = 0; i < 5; i++) {
-                container.insertAdjacentHTML('beforeend', createBeneficiaryRow(i));
-                initializeRow(i);
-                rowCount++;
-            }
-        }
-
-        // Add More Button
-        const addBtn = document.getElementById('add-beneficiary-row');
-        if (addBtn) {
-            addBtn.addEventListener('click', function(e) {
+    function attachRemoveListener(index) {
+        const removeBtn = document.querySelector(`button[data-index="${index}"].remove-row`);
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                const newRow = createBeneficiaryRow(rowCount);
-                container.insertAdjacentHTML('beforeend', newRow);
-                initializeRow(rowCount);
-                rowCount++;
-                updateRowNumbers();
-
-                // Reinitialize datepickers for new rows
-                if (typeof jQuery !== 'undefined' && jQuery.fn.datepicker) {
-                    jQuery('.datepicker').datepicker();
+                const row = document.getElementById(`batch-row-${index}`);
+                if (row) {
+                    row.remove();
+                    updateRowNumbers();
                 }
-
-                // Remove button functionality for new rows
-                attachRemoveListener(rowCount - 1);
             });
         }
+    }
 
-        function attachRemoveListener(index) {
-            const removeBtn = document.querySelector(`button[data-index="${index}"].remove-row`);
-            if (removeBtn) {
-                removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const row = document.getElementById(`batch-row-${index}`);
-                    if (row) {
-                        row.remove();
-                        updateRowNumbers();
-                    }
-                });
-            }
+    // ─── Initialize ────────────────────────────────────────────────
+
+    const container = document.getElementById('beneficiaries-container');
+    if (container) {
+        // Add initial 5 rows
+        for (let i = 0; i < 5; i++) {
+            container.insertAdjacentHTML('beforeend', createBeneficiaryRow(i));
+            initializeRow(i);
+            rowCount++;
         }
 
-        // Attach remove listeners to initial rows
+        // Initialize datepickers for the initial rows
+        initDatepickers(container);
+
+        // Attach remove listeners to any initial removable rows (though first row usually isn't)
         document.querySelectorAll('.remove-row').forEach(btn => {
             const idx = btn.getAttribute('data-index');
             attachRemoveListener(idx);
         });
-    })();
+    }
+
+    // Add More Row Button
+    const addBtn = document.getElementById('add-beneficiary-row');
+    if (addBtn) {
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const newRowHTML = createBeneficiaryRow(rowCount);
+            container.insertAdjacentHTML('beforeend', newRowHTML);
+
+            initializeRow(rowCount);
+
+            // Initialize datepicker ONLY on the newly added row
+            const newRowElement = document.getElementById(`batch-row-${rowCount}`);
+            initDatepickers(newRowElement);
+
+            rowCount++;
+            updateRowNumbers();
+
+            attachRemoveListener(rowCount - 1);
+        });
+    }
+
+})();
 </script>
 
 <?php
