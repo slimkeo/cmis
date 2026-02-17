@@ -146,6 +146,9 @@
     
 		
 		<script src="<?php echo base_url();?>assets/javascripts/ui-elements/examples.charts.js"></script>
+		<!-- Make sure these are included -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<!-- or your local version -->
 
 		<script>
 			$(document).ready(function() {
@@ -157,6 +160,9 @@
 					forceParse: false           // ← very important: do NOT auto-correct invalid input
 				});
 			});
+
+
+			
 		</script>
 
 

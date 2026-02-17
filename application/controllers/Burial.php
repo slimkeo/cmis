@@ -14,6 +14,7 @@ class Burial extends CI_Controller
         $this->load->model('Member_model');
         $this->load->model('Attendance_model');
         $this->load->model('Beneficiary_model');
+        $this->load->model('Date_model');
         $this->load->model('Enum_model');
         $this->load->model('Claims_model');
         // load config for SMS (you'll create this config or set constants)
@@ -323,12 +324,12 @@ function members($param1 = '', $param2 = '', $param3 = '')
             $data['memberid']        = $param1;
             $data['fullname']        = $this->input->post('fullname');
             $data['gender']          = $this->input->post('gender');
-            $data['dob']             = date('d-m-Y', strtotime($this->input->post('dob')));
+            $data['dob']             = $this->Date_model->normalize_date($this->input->post('dob'));
             $data['status']          = $this->input->post('status');
-            $data['submission_date'] = $this->input->post('submission_date');
+            $data['submission_date'] = $this->Date_model->normalize_date($this->input->post('submission_date'));
             $data['is_spouse']       = (int) $this->input->post('is_spouse');
             $data['user']       =  $this->session->userdata('user_id');
-            $status_date_input       = $this->input->post('status_date');
+            $status_date_input       = $this->Date_model->normalize_date($this->input->post('status_date'));
 
             // Default values for NEW beneficiary
             $data['replaced'] = 0;
@@ -339,11 +340,11 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 ($data['status'] === 'BENEFITTED' || $data['status'] === 'BENEFITTED - REPLACED') &&
                 $status_date_input
             ) {
-                $data['status_date'] = $status_date_input;
+                $data['status_date'] = $this->Date_model->normalize_date($status_date_input);
             } elseif ($data['status'] === 'REPLACEE' && $status_date_input) {
-                $data['status_date'] = $status_date_input; // death certificate date
+                $data['status_date'] = $this->Date_model->normalize_date($status_date_input); // death certificate date
             } else {
-                $data['status_date'] = date('Y-m-d');
+                $data['status_date'] = $this->Date_model->normalize_date(date('Y-m-d'));
             }
 
             $replaced_with_id = null;
@@ -364,7 +365,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 }
 
                 // Submission date must match replaced beneficiary
-                $data['submission_date'] = $old['submission_date'];
+                $data['submission_date'] = $this->Date_model->normalize_date($old['submission_date']);
 
                 // If old was NOT benefitted → require death cert & 2-month rule
                 $old_status = $old['status'] ?? '';
@@ -440,9 +441,9 @@ function members($param1 = '', $param2 = '', $param3 = '')
         /********** ADD BATCH BENEFICIARIES **********/
         if ($param2 == 'add_batch_beneficiaries') {
 
-            $batch_submission_date = $this->input->post('batch_submission_date');
+            $batch_submission_date =  $this->Date_model->normalize_date($this->input->post('batch_submission_date'));   
             $batch_fullnames = $this->input->post('batch_fullname');
-            $batch_dobs = date('d-m-Y', strtotime($this->input->post('batch_dob')));
+            $batch_dobs = $this->Date_model->normalize_date($this->input->post('batch_dob'));
             $batch_genders = $this->input->post('batch_gender');
             $batch_is_spouses = $this->input->post('batch_is_spouse');
             $batch_statuses = $this->input->post('batch_status');
@@ -546,12 +547,12 @@ function members($param1 = '', $param2 = '', $param3 = '')
 
             $update_data['fullname']        = $this->input->post('fullname');
             $update_data['gender']          = $this->input->post('gender');
-            $update_data['dob']             = date('d-m-Y', strtotime($this->input->post('dob')));
-            $update_data['submission_date'] = date('d-m-Y', strtotime($this->input->post('submission_date')));
+            $update_data['dob']             = $this->Date_model->normalize_date($this->input->post('dob'));
+            $update_data['submission_date'] = $this->Date_model->normalize_date($this->input->post('submission_date'));
             $update_data['status']          = $this->input->post('status');
             $update_data['status']          = $this->input->post('status');
             $update_data['is_spouse']       = (int) $this->input->post('is_spouse');
-            $status_date_input              = date('d-m-Y', strtotime($this->input->post('status_date')));
+            $status_date_input              = $this->Date_model->normalize_date($this->input->post('status_date'));
             $replaced_with_input            = $this->input->post('replaced_with');
 
             // Handle status_date based on status
