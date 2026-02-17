@@ -369,7 +369,17 @@ foreach ($member_data as $member_row):
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Date of Submission</label>
 							<div class="col-sm-3">
-								<input type="text" name="batch_submission_date" class="form-control datepicker" placeholder="dd-mm-yyyy" required>
+							<div class="input-group date" data-provide="datepicker" data-date-format="dd-mm-yyyy">
+								<input type="text"
+									name="batch_submission_date"
+									class="form-control"
+									placeholder="dd-mm-yyyy"
+									autocomplete="off"
+									required>
+								<span class="input-group-addon">
+									<i class="glyphicon glyphicon-calendar"></i>
+								</span>
+							</div>
 							</div>
 						</div>
 
