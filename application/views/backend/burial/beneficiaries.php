@@ -363,24 +363,23 @@ foreach ($member_data as $member_row):
 			<div class="tab-pane box" id="batch_add" style="padding: 15px">
 				<div class="box-content">
 					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/add_batch_beneficiaries',
-			        array('class' => 'form-horizontal form-bordered','enctype'=>'multipart/form-data'));?>
+						array('class' => 'form-horizontal form-bordered','enctype'=>'multipart/form-data')); ?>
 
 						<!-- Submission Date -->
 						<div class="form-group">
-							<label class="col-sm-3 control-label">Date of Submission</label>
+							<label class="col-sm-3 control-label">Date of Submission <span style="color:red;">*</span></label>
 							<div class="col-sm-3">
-							<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
-										<input type="text"
-											class="form-control"
-											name="batch_submission_date"
-											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
-											placeholder="yyyy-mm-dd"
-											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
-											>
-										<span class="input-group-addon">
-											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
-										</span>
-									</div>
+								<div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+									<input type="text"
+										class="form-control"
+										name="batch_submission_date"
+										placeholder="yyyy-mm-dd"
+										title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+										required>
+									<span class="input-group-addon">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</span>
+								</div>
 							</div>
 						</div>
 
@@ -421,8 +420,9 @@ foreach ($member_data as $member_row):
 								<i class="fa fa-refresh"></i> Clear
 							</button>
 						</div>
-				</form>                
-				</div>                
+
+					</form>
+				</div>
 			</div>
 			<!--BATCH CREATION FORM ENDS-->
 
@@ -506,18 +506,8 @@ foreach ($member_data as $member_row):
                         </select>
                     </td>
                     <td>
-						<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
-							<input type="text"
-							pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
-							placeholder="yyyy-mm-dd"
-							title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
-							name="batch_dob[]" 
-							class="form-control datepicker" 
-							placeholder="yyyy-mm-dd" 
-							style="width: 100%; 
-							margin: 0;">
-						</div>
-						</td>
+                        <input type="text" name="batch_dob[]" class="form-control datepicker" placeholder="yyyy-mm-dd" style="width: 100%; margin: 0;">
+                    </td>
                     <td style="text-align: center;">
                         <select name="batch_is_spouse[]" class="form-control" style="width: 100%; margin: 0;">
                             <option value="0" selected>No</option>
@@ -623,7 +613,142 @@ foreach ($member_data as $member_row):
         });
     })();
 </script>
+<script>
+// Global row counter
+let rowIndex = 0;
 
+$(document).ready(function() {
+
+    // Initialize the static submission date picker once
+    $('.input-group.date[data-provide="datepicker"]').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true,
+        todayBtn: "linked",
+        clearBtn: true
+    });
+
+    // Add first empty row on load (optional – remove if you want user to click "Add Row" first)
+    // addBeneficiaryRow();
+
+    // Add row button
+    $('#add-beneficiary-row').on('click', function() {
+        addBeneficiaryRow();
+    });
+
+    // Remove row
+    $(document).on('click', '.remove-row', function() {
+        const index = $(this).data('index');
+        $('#batch-row-' + index).remove();
+        updateRowNumbers();
+    });
+
+    // Status change → show/hide status date
+    $(document).on('change', '.batch-status-select', function() {
+        const index = $(this).data('index');
+        const status = $(this).val();
+        const $group = $('#batch-row-' + index).find('.batch-status-date-group');
+
+        if (status === 'BENEFITTED' || status === 'DELETED') {
+            $group.show();
+            $group.find('input').prop('required', true);
+        } else {
+            $group.hide();
+            $group.find('input').prop('required', false).val('');
+        }
+    });
+
+    // Initialize datepickers on dynamically added elements using event delegation
+    $(document).on('focus', '.input-group.date[data-provide="datepicker"] input:not(.hasDatepicker)', function() {
+        const $group = $(this).closest('.input-group.date');
+        if (!$group.data('datepicker')) {
+            $group.datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayHighlight: true,
+                todayBtn: "linked",
+                clearBtn: true
+            });
+            // Trigger open after init (better UX in some cases)
+            $(this).trigger('focus');
+        }
+    });
+
+});
+
+function addBeneficiaryRow() {
+    rowIndex++;
+    const html = createBeneficiaryRow(rowIndex - 1);
+    $('#beneficiaries-container').append(html);
+
+    // Optional: auto-focus first input of new row
+    $('#batch-row-' + (rowIndex - 1) + ' input[name="batch_fullname[]"]').focus();
+
+    updateRowNumbers();
+}
+
+function createBeneficiaryRow(index) {
+    return `
+        <tr id="batch-row-${index}" class="batch-beneficiary-row">
+            <td style="text-align: center; vertical-align: middle;">
+                <span class="row-number"></span>
+            </td>
+            <td>
+                <input type="text" name="batch_fullname[]" class="form-control" placeholder="Full name" required>
+            </td>
+            <td>
+                <select name="batch_gender[]" class="form-control" required>
+                    <option value="">Select</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                </select>
+            </td>
+            <td>
+                <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd">
+                    <input type="text" name="batch_dob[]" class="form-control" placeholder="yyyy-mm-dd" autocomplete="off">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <select name="batch_is_spouse[]" class="form-control">
+                    <option value="0" selected>No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </td>
+            <td>
+                <select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required>
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="BENEFITTED">BENEFITTED</option>
+                    <option value="DELETED">DELETED</option>
+                </select>
+            </td>
+            <td>
+                <div class="input-group date batch-status-date-group" data-provide="datepicker" data-date-format="yyyy-mm-dd" style="display:none;">
+                    <input type="text" name="batch_status_date[]" class="form-control" placeholder="yyyy-mm-dd" autocomplete="off" data-index="${index}">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                ${index > 0 ? 
+                    `<button type="button" class="btn btn-danger btn-xs remove-row" data-index="${index}" title="Remove row">
+                        <i class="fa fa-trash"></i>
+                    </button>` : 
+                    `<span style="color: #999;">---</span>`}
+            </td>
+        </tr>
+    `;
+}
+
+function updateRowNumbers() {
+    $('#beneficiaries-container .row-number').each(function(i) {
+        $(this).text(i + 1);
+    });
+}
+</script>
 <?php
 endforeach;
 ?>
