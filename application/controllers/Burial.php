@@ -76,15 +76,27 @@ function members($param1 = '', $param2 = '', $param3 = '')
 {
     if ($this->session->userdata('user_login') != 1)
         redirect('login', 'refresh');
-
+    
     // CREATE MEMBER
     if ($param1 == 'create') {
 
-            $passbook = trim($this->input->post('passbook_no'));
+        $passbook = trim($this->input->post('passbook_no'));
 
+        // Prepare ID if passbook exists
         if ($passbook !== '') {
-            // Build custom 7-digit ID starting with 11
-            $data['id'] = '11' . str_pad($passbook, 5, '0', STR_PAD_LEFT);
+
+            // Create 7-digit ID starting with 11
+            $custom_id = '11' . str_pad($passbook, 5, '0', STR_PAD_LEFT);
+
+            // Check if this ID already exists
+            $check_id = $this->db->get_where('members', ['id' => $custom_id])->num_rows();
+            if ($check_id > 0) {
+                $this->session->set_flashdata('flash_message_error', 'Generated Member ID already exists.');
+                redirect(base_url() . 'index.php?burial/members', 'refresh');
+                return;
+            }
+
+            $data['id'] = $custom_id;
         }
 
         $data['idnumber']    = $this->input->post('idnumber');
@@ -98,13 +110,13 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['gender']      = $this->input->post('gender');
         $data['resident']    = $this->input->post('resident');
         $data['schoolcode']  = $this->input->post('schoolcode');
-        
-        // Format cellnumber: append 268 if not present
+
+        // Format cellnumber (append 268 if not present)
         if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
             $data['cellnumber'] = '268' . $data['cellnumber'];
         }
 
-        // Prevent duplicate ID number or passbook number
+        // Prevent duplicates
         $this->db->group_start();
         if (!empty($data['idnumber']))    $this->db->or_where('idnumber', $data['idnumber']);
         if (!empty($data['passbook_no'])) $this->db->or_where('passbook_no', $data['passbook_no']);
@@ -115,24 +127,53 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $exists = $this->db->get('members')->num_rows();
 
         if ($exists > 0) {
-            $this->session->set_flashdata('flash_message_error', 'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed');
+
+            $this->session->set_flashdata(
+                'flash_message_error',
+                'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed'
+            );
+
         } else {
+
+            // Insert member
             $this->db->insert('members', $data);
-            $member_id = $this->db->insert_id();
-            
-            // Handle nominee creation (only ONE nominee allowed per member)
+
+            // Get correct member ID
+            if ($passbook !== '') {
+                $member_id = $custom_id;  // manually assigned ID
+            } else {
+                $member_id = $this->db->insert_id();  // auto increment ID
+            }
+
+            // -------------------------
+            // CREATE NOMINEE (if exists)
+            // -------------------------
             $nominee_name = trim((string)$this->input->post('nominee_fullname'));
             if (!empty($nominee_name)) {
+
                 $user_id = $this->session->userdata('user_id');
+
                 $nominee_data = [
-                    'member_id'   => $member_id,
-                    'fullname'    => $nominee_name,
-                    'user'        => !empty($user_id) ? $user_id : null,
-                    'createdate'  => date('Y-m-d H:i:s')
+                    'member_id'  => $member_id,
+                    'fullname'   => $nominee_name,
+                    'user'       => !empty($user_id) ? $user_id : null,
+                    'createdate' => date('Y-m-d H:i:s')
                 ];
+
                 $this->db->insert('nominee', $nominee_data);
             }
-            
+
+            // -------------------------
+            // SEND SMS
+            // -------------------------
+            if (!empty($data['cellnumber'])) {
+
+                $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
+                        . "Your Member ID is {$member_id}.";
+
+                send_sms($data['cellnumber'], $message);
+            }
+
             $this->session->set_flashdata('flash_message', 'Member added successfully');
         }
 
@@ -1189,7 +1230,29 @@ public function member_statement($memberid)
             return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
         }
     }
+    public function send_sms($phone,$message) {
 
+        // 2️⃣ Prepare message
+        /*$message = "Test";*/
+
+
+        // 4️⃣ API key
+        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
+
+        // 5️⃣ Construct API URL
+        //$phone="26876404197";
+        $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
+
+        // 6️⃣ Send SMS using file_get_contents
+        $response = file_get_contents($url);
+
+        if ($response !== FALSE) {
+            // Optional: you can parse response if RealSMS returns JSON/text
+            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
+        } else {
+            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
+        }
+    }
 
 
     /********** MANAGE ATTENDANCE (Members Present at AGM) ********************/
