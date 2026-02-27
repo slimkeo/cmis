@@ -1231,7 +1231,7 @@ public function member_statement($memberid)
         }
     }
     
-    function send_sms($phone,$message) {
+    public function send_sms($phone,$message) {
 
         // 2️⃣ Prepare message
         /*$message = "Test";*/
