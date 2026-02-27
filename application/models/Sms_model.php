@@ -7,18 +7,27 @@ class Sms_model extends CI_Model {
     }
 
     //COMMON FUNCTION FOR SENDING SMS
-    function send_sms($message = '' , $reciever_phone = '')
-    {
-        $active_sms_service = $this->db->get_where('settings' , array(
-            'type' => 'active_sms_service'
-        ))->row()->description;
-        if ($active_sms_service == '' || $active_sms_service == 'disabled')
-            return;
-        if ($active_sms_service == 'clickatell') {
-            $this->send_sms_via_clickatell($message , $reciever_phone );
-        }
-        if ($active_sms_service == 'twilio') {
-            $this->send_sms_via_twilio($message , $reciever_phone );
+    function send_sms($phone,$message) {
+
+        // 2️⃣ Prepare message
+        /*$message = "Test";*/
+
+
+        // 4️⃣ API key
+        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
+
+        // 5️⃣ Construct API URL
+        //$phone="26876404197";
+        $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
+
+        // 6️⃣ Send SMS using file_get_contents
+        $response = file_get_contents($url);
+
+        if ($response !== FALSE) {
+            // Optional: you can parse response if RealSMS returns JSON/text
+            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
+        } else {
+            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
         }
     }
     

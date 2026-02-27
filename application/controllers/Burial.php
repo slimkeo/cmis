@@ -17,6 +17,7 @@ class Burial extends CI_Controller
         $this->load->model('Date_model');
         $this->load->model('Enum_model');
         $this->load->model('Claims_model');
+        $this->load->model('Sms_model');
         // load config for SMS (you'll create this config or set constants)
         $this->load->config('sms_config', true); // optional, see notes        
         /* Cache control */
@@ -171,7 +172,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
                         . "Your Member ID is {$member_id}.";
 
-                send_sms($data['cellnumber'], $message);
+                        $this->Sms_model->send_sms($data['cellnumber'], $message);
             }
 
             $this->session->set_flashdata('flash_message', 'Member added successfully');
@@ -1231,29 +1232,6 @@ public function member_statement($memberid)
         }
     }
     
-    public function send_sms($phone,$message) {
-
-        // 2️⃣ Prepare message
-        /*$message = "Test";*/
-
-
-        // 4️⃣ API key
-        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
-
-        // 5️⃣ Construct API URL
-        //$phone="26876404197";
-        $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
-
-        // 6️⃣ Send SMS using file_get_contents
-        $response = file_get_contents($url);
-
-        if ($response !== FALSE) {
-            // Optional: you can parse response if RealSMS returns JSON/text
-            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
-        } else {
-            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
-        }
-    }
 
 
     /********** MANAGE ATTENDANCE (Members Present at AGM) ********************/
