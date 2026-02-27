@@ -1230,7 +1230,8 @@ public function member_statement($memberid)
             return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
         }
     }
-    public function send_sms($phone,$message) {
+    
+    function send_sms($phone,$message) {
 
         // 2️⃣ Prepare message
         /*$message = "Test";*/
