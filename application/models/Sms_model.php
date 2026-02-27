@@ -21,14 +21,8 @@ class Sms_model extends CI_Model {
         $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
 
         // 6️⃣ Send SMS using file_get_contents
-        $response = file_get_contents($url);
+        return $response = file_get_contents($url);
 
-        if ($response !== FALSE) {
-            // Optional: you can parse response if RealSMS returns JSON/text
-            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
-        } else {
-            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
-        }
     }
     
     // SEND SMS VIA CLICKATELL API

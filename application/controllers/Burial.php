@@ -172,10 +172,17 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
                         . "Your Member ID is {$member_id}.";
 
-                        $this->Sms_model->send_sms($data['cellnumber'], $message);
+                       $ismessage_sent= $this->Sms_model->send_sms($data['cellnumber'], $message);
             }
 
-            $this->session->set_flashdata('flash_message', 'Member added successfully');
+            if($ismessage_sent==TRUE){
+                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS sent');
+            }
+            else{
+                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS not sent');
+            }
+
+            
         }
 
         redirect(base_url() . 'index.php?burial/members', 'refresh');
