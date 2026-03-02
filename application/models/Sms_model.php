@@ -7,22 +7,28 @@ class Sms_model extends CI_Model {
     }
 
     //COMMON FUNCTION FOR SENDING SMS
-    function send_sms($phone,$message) {
+    function send_sms($phone, $message)
+    {
+        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw==";
 
-        // 2️⃣ Prepare message
-        /*$message = "Test";*/
+        // VERY IMPORTANT
+        $message = urlencode($message);
 
-
-        // 4️⃣ API key
-        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
-
-        // 5️⃣ Construct API URL
-        //$phone="26876404197";
         $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
 
-        // 6️⃣ Send SMS using file_get_contents
-        return $response = file_get_contents($url);
+        $response = @file_get_contents($url);
 
+        if ($response !== FALSE) {
+            return [
+                'success' => true,
+                'api_response' => $response
+            ];
+        } else {
+            return [
+                'success' => false,
+                'api_response' => $response
+            ];
+        }
     }
     
     // SEND SMS VIA CLICKATELL API
