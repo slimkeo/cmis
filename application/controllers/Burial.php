@@ -182,10 +182,10 @@ function members($param1 = '', $param2 = '', $param3 = '')
            }
 
             if($ismessage_sent==TRUE){
-                $this->session->set_flashdata('flash_message', 'Member added successfully.');
+                $this->session->set_flashdata('flash_message', 'Member added successfully. SMS SENT, NEW MEMBER');
             }
             else{
-                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS not sent due to error');
+                $this->session->set_flashdata('flash_message', 'Member added successfully. SMS NOT SENT, EXISITNG MEMBER');
             }
 
             
