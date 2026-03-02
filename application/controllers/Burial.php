@@ -169,7 +169,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
             // -------------------------
             $ismessage_sent = false; // DEFAULT VALUE (IMPORTANT)
 
-            if (!empty($data['cellnumber']) && !empty($data['passbook_no'])) {
+           // if (!empty($data['cellnumber']) && !empty($data['passbook_no'])) {
 
                 $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
                         . "Your Member ID is {$member_id}.";
@@ -179,19 +179,18 @@ function members($param1 = '', $param2 = '', $param3 = '')
                 if ($sms_result['success'] === true) {
                     $ismessage_sent = true;
                 }
-            }
+          //  }
 
             if($ismessage_sent==TRUE){
-                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS sent');
+                $this->session->set_flashdata('flash_message', 'Member added successfully.');
             }
             else{
-                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS not sent');
+                $this->session->set_flashdata('flash_message', 'Member added successfully.SMS not sent due to error');
             }
 
             
         }
 
-       // redirect(base_url() . 'index.php?burial/members', 'refresh');
     }
 
     // UPDATE MEMBER
