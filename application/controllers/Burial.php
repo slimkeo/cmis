@@ -202,6 +202,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
         $data['tscno']       = $this->input->post('tscno');
         $data['surname']     = $this->input->post('surname');
         $data['name']        = $this->input->post('name');
+        $data['is_alive']        = $this->input->post('is_alive');
         $data['cellnumber']  = $this->input->post('cellnumber');
         $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
         $data['gender']      = $this->input->post('gender');
