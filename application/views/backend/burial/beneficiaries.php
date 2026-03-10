@@ -455,7 +455,7 @@ foreach ($member_data as $member_row):
                 statusDateInput.required = true;
             } else if (status === 'REPLACEE') {
                 statusDateGroup.style.display = 'block';
-                if (statusDateLabel) statusDateLabel.textContent = 'Death Certificate Date';
+                if (statusDateLabel) statusDateLabel.textContent = 'Death Certificate Date / Benefitted Date';
                 statusDateInput.required = true;
             } else {
                 statusDateGroup.style.display = 'none';
