@@ -397,7 +397,7 @@ function members($param1 = '', $param2 = '', $param3 = '')
             ) {
                 $data['status_date'] = $this->Date_model->normalize_date($status_date_input);
             } elseif ($data['status'] === 'REPLACEE' && $status_date_input) {
-                $data['status_date'] = $this->Date_model->normalize_date($status_date_input); // death certificate date
+                 $data['status_date']= $this->Date_model->normalize_date(date('Y-m-d'));
             } else {
                 $data['status_date'] = $this->Date_model->normalize_date(date('Y-m-d'));
             }
