@@ -322,7 +322,7 @@ foreach ($member_data as $member_row):
 												value="<?php echo $eb['id']; ?>"
 												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
 												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
-												<?php echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $eb['submission_date'] . ')'; ?>
+												<?php echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $eb['status_date'] . ')'; ?>
 											</option>
 										<?php
 											endforeach;
