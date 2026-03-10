@@ -316,8 +316,12 @@ foreach ($member_data as $member_row):
 
 										if (!empty($existing_beneficiaries)):
 											foreach ($existing_beneficiaries as $eb):
+												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
 										?>
-											<option value="<?php echo $eb['id']; ?>">
+											<option
+												value="<?php echo $eb['id']; ?>"
+												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
+												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
 												<?php echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $eb['submission_date'] . ')'; ?>
 											</option>
 										<?php
@@ -444,6 +448,21 @@ foreach ($member_data as $member_row):
 
     if (!statusSelect) return;
 
+    function syncStatusDateFromReplacedBeneficiary() {
+        if (!replacedWithSelect || !statusDateInput) return;
+
+        // Only auto-fill when adding a REPLACEE
+        if (statusSelect.value !== 'REPLACEE') return;
+
+        var selectedOption = replacedWithSelect.options[replacedWithSelect.selectedIndex];
+        if (!selectedOption) return;
+
+        var benefittedStatusDate = selectedOption.getAttribute('data-status-date') || '';
+        if (benefittedStatusDate) {
+            statusDateInput.value = benefittedStatusDate;
+        }
+    }
+
     function toggleStatusFields() {
         var status = statusSelect.value;
         
@@ -457,6 +476,9 @@ foreach ($member_data as $member_row):
                 statusDateGroup.style.display = 'block';
                 if (statusDateLabel) statusDateLabel.textContent = 'Death Certificate Date / Benefitted Date';
                 statusDateInput.required = true;
+
+                // If a benefitted beneficiary is already selected to be replaced, copy its status_date
+                syncStatusDateFromReplacedBeneficiary();
             } else {
                 statusDateGroup.style.display = 'none';
                 statusDateInput.required = false;
@@ -468,7 +490,11 @@ foreach ($member_data as $member_row):
         if (replaceWithGroup) {
             if (status === 'REPLACEE') {
                 replaceWithGroup.style.display = 'block';
-                if (replacedWithSelect) replacedWithSelect.required = true;
+                if (replacedWithSelect) {
+                    replacedWithSelect.required = true;
+                    // When status becomes REPLACEE, immediately try to sync status date
+                    syncStatusDateFromReplacedBeneficiary();
+                }
             } else {
                 replaceWithGroup.style.display = 'none';
                 if (replacedWithSelect) {
@@ -480,6 +506,13 @@ foreach ($member_data as $member_row):
     }
 
     statusSelect.addEventListener('change', toggleStatusFields);
+
+    // When the "Replace" dropdown changes, update the status date if applicable
+    if (replacedWithSelect) {
+        replacedWithSelect.addEventListener('change', function () {
+            syncStatusDateFromReplacedBeneficiary();
+        });
+    }
     toggleStatusFields(); // Initialize on load
 })();
 
