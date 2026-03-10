@@ -322,7 +322,12 @@ foreach ($member_data as $member_row):
 												value="<?php echo $eb['id']; ?>"
 												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
 												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
-												<?php echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $eb['status_date'] . ')'; ?>
+												<?php
+													$displayDate = ($eb['status'] === 'ACTIVE')
+														? $eb['submission_date']
+														: $eb['status_date'];
+													echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $displayDate . ')';
+												?>
 											</option>
 										<?php
 											endforeach;
