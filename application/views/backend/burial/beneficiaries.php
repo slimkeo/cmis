@@ -443,6 +443,7 @@ foreach ($member_data as $member_row):
     var statusDateGroup = document.getElementById('status-date-group');
     var statusDateLabel = document.getElementById('status-date-label');
     var statusDateInput = statusDateGroup ? statusDateGroup.querySelector('input[name="status_date"]') : null;
+    var submissionDateInput = document.querySelector('input[name="submission_date"]');
     var replaceWithGroup = document.getElementById('replace-with-group');
     var replacedWithSelect = document.getElementById('replaced-with-select');
 
@@ -457,10 +458,25 @@ foreach ($member_data as $member_row):
         var selectedOption = replacedWithSelect.options[replacedWithSelect.selectedIndex];
         if (!selectedOption) return;
 
+        var selectedStatus = (selectedOption.getAttribute('data-status') || '').trim().toUpperCase();
         var benefittedStatusDate = selectedOption.getAttribute('data-status-date') || '';
-        if (benefittedStatusDate) {
+
+        // Auto-fill ONLY when the selected beneficiary being replaced is BENEFITTED
+        // For ACTIVE or REPLACEE (or anything else), leave it for the user to type (death certificate date)
+        if (selectedStatus === 'BENEFITTED' && benefittedStatusDate) {
             statusDateInput.value = benefittedStatusDate;
+        } else {
+            // Do not overwrite whatever the user may have typed; only clear if currently empty
+            if (!statusDateInput.value) {
+                statusDateInput.value = '';
+            }
         }
+    }
+
+    function syncStatusDateFromSubmissionForActive() {
+        if (!statusDateInput || !submissionDateInput) return;
+        if (statusSelect.value !== 'ACTIVE') return;
+        statusDateInput.value = submissionDateInput.value || '';
     }
 
     function toggleStatusFields() {
@@ -479,6 +495,11 @@ foreach ($member_data as $member_row):
 
                 // If a benefitted beneficiary is already selected to be replaced, copy its status_date
                 syncStatusDateFromReplacedBeneficiary();
+            } else if (status === 'ACTIVE') {
+                // Do not show the field, but keep status_date synced from submission_date
+                statusDateGroup.style.display = 'none';
+                statusDateInput.required = false;
+                syncStatusDateFromSubmissionForActive();
             } else {
                 statusDateGroup.style.display = 'none';
                 statusDateInput.required = false;
@@ -506,6 +527,13 @@ foreach ($member_data as $member_row):
     }
 
     statusSelect.addEventListener('change', toggleStatusFields);
+
+    // Keep status_date synced to submission_date when status is ACTIVE
+    if (submissionDateInput) {
+        submissionDateInput.addEventListener('change', function () {
+            syncStatusDateFromSubmissionForActive();
+        });
+    }
 
     // When the "Replace" dropdown changes, update the status date if applicable
     if (replacedWithSelect) {
