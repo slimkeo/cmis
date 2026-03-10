@@ -149,6 +149,49 @@
 					</li>
 				</ul>
 			</li>
+			<li class="nav-parent <?php
+				if ($page_name == 'reports' ||
+						$page_name == 'date_range_reports' || $page_name == 'date_range' || $page_name == 'upload_spreadsheet_process' || $page_name == 'subventions_date_range' || $page_name == 'subventions_report')
+					echo 'nav-expanded nav-active';
+				?> ">
+					<a href="#">
+						<i class="fa fa-money"></i>
+						<span>Reports</span>
+					</a>
+				<ul class="nav nav-children">
+					<li class="<?php if ($page_name == 'daterange' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/daterange">
+							 <i class="fa fa-calendar"></i>
+							<span>Date Range Reports</span>
+						</a>
+					</li>
+					<li class="<?php if ($page_name == 'user_picker' || $page_name == 'userreport') echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/user_picker">
+							 <i class="fa fa-users"></i>
+							<span> Per User</span>
+						</a>
+					</li>
+					<li class="<?php if ($page_name == 'year_picker' ||  $page_name == 'yearlyreport') echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/year_picker">
+							 <i class="fa fa-address-book-o"></i>
+							<span>Yearly Report</span>
+						</a>
+					</li>
+					<li class="<?php if ($page_name == 'payment_type_picker' || $page_name == 'payment_type_report') echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/payment_type_picker">
+							 <i class="fa fa-address-book-o"></i>
+							<span>Payment Type Report</span>
+						</a>
+					</li>	
+					<li class="<?php if ($page_name == 'member_picker' ||  $page_name == 'memberreport') echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/member_picker">
+							 <i class="fa fa-address-book-o"></i>
+							<span>Member Reports</span>
+						</a>
+					</li>								
+				</ul>
+			</li>			
+
 				<?php } ?>	
 			<!-- ADMIN MANAGEMENT PANEL -->
 			<?php if ($this->session->userdata('level') == 1) { ?>						

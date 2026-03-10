@@ -72,217 +72,217 @@ class Burial extends CI_Controller
         $this->load->view('backend/index', $page_data);
     }
 
-/********** MANAGE MEMBERS ********************/
-function members($param1 = '', $param2 = '', $param3 = '')
-{
-    if ($this->session->userdata('user_login') != 1)
-        redirect('login', 'refresh');
-    
-    // CREATE MEMBER
-    if ($param1 == 'create') {
+    /********** MANAGE MEMBERS ********************/
+    function members($param1 = '', $param2 = '', $param3 = '')
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+        
+        // CREATE MEMBER
+        if ($param1 == 'create') {
 
-        $passbook = trim($this->input->post('passbook_no'));
+            $passbook = trim($this->input->post('passbook_no'));
 
-        // Prepare ID if passbook exists
-        if ($passbook !== '') {
-
-            // Create 7-digit ID starting with 11
-            $custom_id = '11' . str_pad($passbook, 5, '0', STR_PAD_LEFT);
-
-            // Check if this ID already exists
-            $check_id = $this->db->get_where('members', ['id' => $custom_id])->num_rows();
-            if ($check_id > 0) {
-                $this->session->set_flashdata('flash_message_error', 'Generated Member ID already exists.');
-                redirect(base_url() . 'index.php?burial/members', 'refresh');
-                return;
-            }
-
-            $data['id'] = $custom_id;
-        }
-
-        $data['idnumber']    = $this->input->post('idnumber');
-        $data['passbook_no'] = $passbook;
-        $data['employeeno']  = $this->input->post('employeeno');
-        $data['tscno']       = $this->input->post('tscno');
-        $data['surname']     = $this->input->post('surname');
-        $data['name']        = $this->input->post('name');
-        $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
-        $data['gender']      = $this->input->post('gender');
-        $data['resident']    = $this->input->post('resident');
-        $data['schoolcode']  = $this->input->post('schoolcode');
-
-        // Format cellnumber (append 268 if not present)
-        if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
-            $data['cellnumber'] = '268' . $data['cellnumber'];
-        }
-
-        // Prevent duplicates
-        $this->db->group_start();
-        if (!empty($data['idnumber']))    $this->db->or_where('idnumber', $data['idnumber']);
-        if (!empty($data['passbook_no'])) $this->db->or_where('passbook_no', $data['passbook_no']);
-        if (!empty($data['cellnumber']))  $this->db->or_where('cellnumber', $data['cellnumber']);
-        if (!empty($data['employeeno']))  $this->db->or_where('employeeno', $data['employeeno']);
-        $this->db->group_end();
-
-        $exists = $this->db->get('members')->num_rows();
-
-        if ($exists > 0) {
-
-            $this->session->set_flashdata(
-                'flash_message_error',
-                'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed'
-            );
-
-        } else {
-
-            // Insert member
-            $this->db->insert('members', $data);
-
-            // Get correct member ID
+            // Prepare ID if passbook exists
             if ($passbook !== '') {
-                $member_id = $custom_id;  // manually assigned ID
-            } else {
-                $member_id = $this->db->insert_id();  // auto increment ID
+
+                // Create 7-digit ID starting with 11
+                $custom_id = '11' . str_pad($passbook, 5, '0', STR_PAD_LEFT);
+
+                // Check if this ID already exists
+                $check_id = $this->db->get_where('members', ['id' => $custom_id])->num_rows();
+                if ($check_id > 0) {
+                    $this->session->set_flashdata('flash_message_error', 'Generated Member ID already exists.');
+                    redirect(base_url() . 'index.php?burial/members', 'refresh');
+                    return;
+                }
+
+                $data['id'] = $custom_id;
             }
 
-            // -------------------------
-            // CREATE NOMINEE (if exists)
-            // -------------------------
+            $data['idnumber']    = $this->input->post('idnumber');
+            $data['passbook_no'] = $passbook;
+            $data['employeeno']  = $this->input->post('employeeno');
+            $data['tscno']       = $this->input->post('tscno');
+            $data['surname']     = $this->input->post('surname');
+            $data['name']        = $this->input->post('name');
+            $data['cellnumber']  = $this->input->post('cellnumber');
+            $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
+            $data['gender']      = $this->input->post('gender');
+            $data['resident']    = $this->input->post('resident');
+            $data['schoolcode']  = $this->input->post('schoolcode');
+
+            // Format cellnumber (append 268 if not present)
+            if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
+                $data['cellnumber'] = '268' . $data['cellnumber'];
+            }
+
+            // Prevent duplicates
+            $this->db->group_start();
+            if (!empty($data['idnumber']))    $this->db->or_where('idnumber', $data['idnumber']);
+            if (!empty($data['passbook_no'])) $this->db->or_where('passbook_no', $data['passbook_no']);
+            if (!empty($data['cellnumber']))  $this->db->or_where('cellnumber', $data['cellnumber']);
+            if (!empty($data['employeeno']))  $this->db->or_where('employeeno', $data['employeeno']);
+            $this->db->group_end();
+
+            $exists = $this->db->get('members')->num_rows();
+
+            if ($exists > 0) {
+
+                $this->session->set_flashdata(
+                    'flash_message_error',
+                    'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed'
+                );
+
+            } else {
+
+                // Insert member
+                $this->db->insert('members', $data);
+
+                // Get correct member ID
+                if ($passbook !== '') {
+                    $member_id = $custom_id;  // manually assigned ID
+                } else {
+                    $member_id = $this->db->insert_id();  // auto increment ID
+                }
+
+                // -------------------------
+                // CREATE NOMINEE (if exists)
+                // -------------------------
+                $nominee_name = trim((string)$this->input->post('nominee_fullname'));
+                if (!empty($nominee_name)) {
+
+                    $user_id = $this->session->userdata('user_id');
+
+                    $nominee_data = [
+                        'member_id'  => $member_id,
+                        'fullname'   => $nominee_name,
+                        'user'       => !empty($user_id) ? $user_id : null,
+                        'createdate' => date('Y-m-d H:i:s')
+                    ];
+
+                    $this->db->insert('nominee', $nominee_data);
+                }
+
+                // -------------------------
+                // SEND SMS
+                // -------------------------
+                $ismessage_sent = false; // DEFAULT VALUE (IMPORTANT)
+
+                if (empty($data['passbook_no'])) {
+
+                    $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
+                            . "Your Member ID is {$member_id}.";
+
+                    $sms_result = $this->Sms_model->send_sms($data['cellnumber'], $message);
+
+                    if ($sms_result['success'] === true) {
+                        $ismessage_sent = true;
+                    }
+            }
+
+                if($ismessage_sent==TRUE){
+                    $this->session->set_flashdata('flash_message', 'Member added successfully. SMS SENT, NEW MEMBER');
+                }
+                else{
+                    $this->session->set_flashdata('flash_message', 'Member added successfully. SMS NOT SENT, EXISITNG MEMBER');
+                }
+
+                
+            }
+
+        }
+
+        // UPDATE MEMBER
+        if ($param1 == 'do_update') {
+
+            $data['idnumber']    = $this->input->post('idnumber');
+            $data['passbook_no'] = $this->input->post('passbook_no');
+            $data['employeeno']  = $this->input->post('employeeno');
+            $data['tscno']       = $this->input->post('tscno');
+            $data['surname']     = $this->input->post('surname');
+            $data['name']        = $this->input->post('name');
+            $data['is_alive']    = $this->input->post('is_alive');
+            $data['cellnumber']  = $this->input->post('cellnumber');
+            $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
+            $data['gender']      = $this->input->post('gender');
+            $data['resident']    = $this->input->post('resident');
+            $data['schoolcode']  = $this->input->post('schoolcode');
+            
+            // Format cellnumber: append 268 if not present
+            if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
+                $data['cellnumber'] = '268' . $data['cellnumber'];
+            }
+
+            $this->db->where('id', $param2);
+            $this->db->update('members', $data);
+
+            // --- Handle nominee (only ONE nominee per member) ---
             $nominee_name = trim((string)$this->input->post('nominee_fullname'));
-            if (!empty($nominee_name)) {
 
-                $user_id = $this->session->userdata('user_id');
+            // Fetch existing nominees for this member
+            $existing_nominees = $this->db->get_where('nominee', ['member_id' => $param2])->result_array();
+            $primary_nominee   = null;
 
+            if (!empty($existing_nominees)) {
+                $primary_nominee = $existing_nominees[0];
+
+                // Ensure only one nominee row remains for this member
+                if (count($existing_nominees) > 1) {
+                    $ids_to_keep = [$primary_nominee['id']];
+                    $this->db->where('member_id', $param2);
+                    $this->db->where_not_in('id', $ids_to_keep);
+                    $this->db->delete('nominee');
+                }
+            }
+
+            // Decide how to apply updates
+            if ($nominee_name === '') {
+                // If field is empty, remove existing nominee (if any)
+                if ($primary_nominee) {
+                    $this->db->where('id', $primary_nominee['id']);
+                    $this->db->delete('nominee');
+                }
+            } else {
+                // We have nominee details to save
                 $nominee_data = [
-                    'member_id'  => $member_id,
-                    'fullname'   => $nominee_name,
-                    'user'       => !empty($user_id) ? $user_id : null,
-                    'createdate' => date('Y-m-d H:i:s')
+                    'fullname' => $nominee_name,
                 ];
 
-                $this->db->insert('nominee', $nominee_data);
-            }
+                if ($primary_nominee) {
+                    // Update existing nominee
+                    $this->db->where('id', $primary_nominee['id']);
+                    $this->db->update('nominee', $nominee_data);
+                } else {
+                    // Create new nominee for this member
+                    $user_id = $this->session->userdata('user_id');
+                    $nominee_data['member_id']  = $param2;
+                    $nominee_data['user']       = !empty($user_id) ? $user_id : null;
+                    $nominee_data['createdate'] = date('Y-m-d H:i:s');
 
-            // -------------------------
-            // SEND SMS
-            // -------------------------
-            $ismessage_sent = false; // DEFAULT VALUE (IMPORTANT)
-
-            if (empty($data['passbook_no'])) {
-
-                $message = "VM {$data['name']} {$data['surname']} successfully registered as a SNAT BURIAL member. "
-                        . "Your Member ID is {$member_id}.";
-
-                $sms_result = $this->Sms_model->send_sms($data['cellnumber'], $message);
-
-                if ($sms_result['success'] === true) {
-                    $ismessage_sent = true;
+                    $this->db->insert('nominee', $nominee_data);
                 }
-           }
-
-            if($ismessage_sent==TRUE){
-                $this->session->set_flashdata('flash_message', 'Member added successfully. SMS SENT, NEW MEMBER');
-            }
-            else{
-                $this->session->set_flashdata('flash_message', 'Member added successfully. SMS NOT SENT, EXISITNG MEMBER');
             }
 
-            
+            $this->session->set_flashdata('flash_message', 'Member updated successfully');
+            redirect(base_url() . 'index.php?burial/member_details/'.$param2, 'refresh');
         }
 
+        // DELETE MEMBER
+        if ($param1 == 'delete') {
+            $this->db->where('id', $param2);
+            $this->db->delete('members');
+            $this->session->set_flashdata('flash_message', 'Member deleted successfully');
+
+            redirect(base_url() . 'index.php?burial/members', 'refresh');
+        }
+
+        $page_data['members'] = $this->db->get('members')->result_array();
+        $page_data['page_name'] = 'members';
+        $page_data['page_title'] = 'Manage Members';
+
+        $this->load->view('backend/index', $page_data);
     }
-
-    // UPDATE MEMBER
-    if ($param1 == 'do_update') {
-
-        $data['idnumber']    = $this->input->post('idnumber');
-        $data['passbook_no'] = $this->input->post('passbook_no');
-        $data['employeeno']  = $this->input->post('employeeno');
-        $data['tscno']       = $this->input->post('tscno');
-        $data['surname']     = $this->input->post('surname');
-        $data['name']        = $this->input->post('name');
-        $data['is_alive']    = $this->input->post('is_alive');
-        $data['cellnumber']  = $this->input->post('cellnumber');
-        $data['dob']         = date('Y-m-d', strtotime($this->input->post('dob')));
-        $data['gender']      = $this->input->post('gender');
-        $data['resident']    = $this->input->post('resident');
-        $data['schoolcode']  = $this->input->post('schoolcode');
-        
-        // Format cellnumber: append 268 if not present
-        if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
-            $data['cellnumber'] = '268' . $data['cellnumber'];
-        }
-
-        $this->db->where('id', $param2);
-        $this->db->update('members', $data);
-
-        // --- Handle nominee (only ONE nominee per member) ---
-        $nominee_name = trim((string)$this->input->post('nominee_fullname'));
-
-        // Fetch existing nominees for this member
-        $existing_nominees = $this->db->get_where('nominee', ['member_id' => $param2])->result_array();
-        $primary_nominee   = null;
-
-        if (!empty($existing_nominees)) {
-            $primary_nominee = $existing_nominees[0];
-
-            // Ensure only one nominee row remains for this member
-            if (count($existing_nominees) > 1) {
-                $ids_to_keep = [$primary_nominee['id']];
-                $this->db->where('member_id', $param2);
-                $this->db->where_not_in('id', $ids_to_keep);
-                $this->db->delete('nominee');
-            }
-        }
-
-        // Decide how to apply updates
-        if ($nominee_name === '') {
-            // If field is empty, remove existing nominee (if any)
-            if ($primary_nominee) {
-                $this->db->where('id', $primary_nominee['id']);
-                $this->db->delete('nominee');
-            }
-        } else {
-            // We have nominee details to save
-            $nominee_data = [
-                'fullname' => $nominee_name,
-            ];
-
-            if ($primary_nominee) {
-                // Update existing nominee
-                $this->db->where('id', $primary_nominee['id']);
-                $this->db->update('nominee', $nominee_data);
-            } else {
-                // Create new nominee for this member
-                $user_id = $this->session->userdata('user_id');
-                $nominee_data['member_id']  = $param2;
-                $nominee_data['user']       = !empty($user_id) ? $user_id : null;
-                $nominee_data['createdate'] = date('Y-m-d H:i:s');
-
-                $this->db->insert('nominee', $nominee_data);
-            }
-        }
-
-        $this->session->set_flashdata('flash_message', 'Member updated successfully');
-        redirect(base_url() . 'index.php?burial/member_details/'.$param2, 'refresh');
-    }
-
-    // DELETE MEMBER
-    if ($param1 == 'delete') {
-        $this->db->where('id', $param2);
-        $this->db->delete('members');
-        $this->session->set_flashdata('flash_message', 'Member deleted successfully');
-
-        redirect(base_url() . 'index.php?burial/members', 'refresh');
-    }
-
-    $page_data['members'] = $this->db->get('members')->result_array();
-    $page_data['page_name'] = 'members';
-    $page_data['page_title'] = 'Manage Members';
-
-    $this->load->view('backend/index', $page_data);
-}
 
     /********** MEMBER SELECTION PAGE ********************/
     function member_selection()
@@ -806,253 +806,253 @@ function members($param1 = '', $param2 = '', $param3 = '')
             ]));
     }
 
-public function get_members()
-{
-    $draw   = intval($this->input->post("draw"));
-    $start  = intval($this->input->post("start"));
-    $length = intval($this->input->post("length"));
-    $search = $this->input->post("search")['value'];
+    public function get_members()
+    {
+        $draw   = intval($this->input->post("draw"));
+        $start  = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search")['value'];
 
-    // --------------------------------------------
-    // 1️⃣ Total records (no search)
-    // --------------------------------------------
-    $recordsTotal = $this->db->count_all("members");
+        // --------------------------------------------
+        // 1️⃣ Total records (no search)
+        // --------------------------------------------
+        $recordsTotal = $this->db->count_all("members");
 
-    // --------------------------------------------
-    // 2️⃣ Build filtered query
-    // --------------------------------------------
-    $this->db->from("members");
+        // --------------------------------------------
+        // 2️⃣ Build filtered query
+        // --------------------------------------------
+        $this->db->from("members");
 
-    if (!empty($search)) {
-        $this->db->group_start();
-        $this->db->like("idnumber", $search);
-        $this->db->or_like("surname", $search);
-        $this->db->or_like("id", $search);
-        $this->db->or_like("name", $search);
-        $this->db->or_like("cellnumber", $search);
-        $this->db->or_like("passbook_no", $search);
-         $this->db->or_like("employeeno", $search);
-        $this->db->group_end();
-    }
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like("idnumber", $search);
+            $this->db->or_like("surname", $search);
+            $this->db->or_like("id", $search);
+            $this->db->or_like("name", $search);
+            $this->db->or_like("cellnumber", $search);
+            $this->db->or_like("passbook_no", $search);
+            $this->db->or_like("employeeno", $search);
+            $this->db->group_end();
+        }
 
-    // --------------------------------------------
-    // 3️⃣ Count filtered records
-    // --------------------------------------------
-    $recordsFiltered = $this->db->count_all_results('', false);
+        // --------------------------------------------
+        // 3️⃣ Count filtered records
+        // --------------------------------------------
+        $recordsFiltered = $this->db->count_all_results('', false);
 
-    // --------------------------------------------
-    // 4️⃣ Pagination
-    // --------------------------------------------
-    $this->db->limit($length, $start);
+        // --------------------------------------------
+        // 4️⃣ Pagination
+        // --------------------------------------------
+        $this->db->limit($length, $start);
 
-    // --------------------------------------------
-    // 5️⃣ Fetch results
-    // --------------------------------------------
-    $query = $this->db->get();
+        // --------------------------------------------
+        // 5️⃣ Fetch results
+        // --------------------------------------------
+        $query = $this->db->get();
 
-    $data = [];
-    foreach($query->result() as $r){
-   $data[] = [
-    $r->id,
-    $r->idnumber,
-    $r->employeeno,
-    $r->surname,
-    $r->name,
-    $r->passbook_no,
-    $r->cellnumber,
-    $r->gender,
-    $r->schoolcode,
+        $data = [];
+        foreach($query->result() as $r){
+    $data[] = [
+        $r->id,
+        $r->idnumber,
+        $r->employeeno,
+        $r->surname,
+        $r->name,
+        $r->passbook_no,
+        $r->cellnumber,
+        $r->gender,
+        $r->schoolcode,
 
-    '
-    <a href="'.base_url('index.php?burial/member_statement/'.$r->id).'"
-       class="btn btn-xs btn-info"
-       target="_blank"
-       data-toggle="tooltip"
-       data-placement="top"
-       title="View Statement">
-        <i class="fa fa-money"></i>
-    </a>
+        '
+        <a href="'.base_url('index.php?burial/member_statement/'.$r->id).'"
+        class="btn btn-xs btn-info"
+        target="_blank"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="View Statement">
+            <i class="fa fa-money"></i>
+        </a>
 
-    <a href="'.base_url('index.php?burial/member_details/'.$r->id).'"
-       class="btn btn-xs btn-info"
-       target="_blank"
-       data-toggle="tooltip"
-       data-placement="top"
-       title="View Member">
-        <i class="fa fa-eye"></i>
-    </a>
+        <a href="'.base_url('index.php?burial/member_details/'.$r->id).'"
+        class="btn btn-xs btn-info"
+        target="_blank"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="View Member">
+            <i class="fa fa-eye"></i>
+        </a>
 
-    <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
-       class="btn btn-xs btn-warning"
-       data-toggle="tooltip"
-       data-placement="top"
-       title="View Beneficiaries">
-        <i class="fa fa-users"></i>
-    </a>
+        <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
+        class="btn btn-xs btn-warning"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="View Beneficiaries">
+            <i class="fa fa-users"></i>
+        </a>
 
-    <!-- EDIT (AJAX MODAL) -->
-    <a href="#"
-       class="btn btn-xs btn-primary"
-       data-toggle="tooltip"
-       data-placement="top"
-       title="Edit Member"
-       onclick="showAjaxModal(\''.base_url('index.php?modal/popup/modal_edit_member/'.$r->id).'\')">
-        <i class="fa fa-edit"></i>
-    </a>
+        <!-- EDIT (AJAX MODAL) -->
+        <a href="#"
+        class="btn btn-xs btn-primary"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Edit Member"
+        onclick="showAjaxModal(\''.base_url('index.php?modal/popup/modal_edit_member/'.$r->id).'\')">
+            <i class="fa fa-edit"></i>
+        </a>
 
-    <a href="#"
-       class="btn btn-xs btn-danger"
-       data-toggle="tooltip"
-       data-placement="top"
-       title="Delete Member"
-       onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
-        <i class="fa fa-trash"></i>
-    </a>
-    '
-];
-    }
+        <a href="#"
+        class="btn btn-xs btn-danger"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Delete Member"
+        onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
+            <i class="fa fa-trash"></i>
+        </a>
+        '
+    ];
+        }
 
-    return $this->output
-        ->set_content_type('application/json')
-        ->set_output(json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]));
-}
-
-public function get_member_statements()
-{
-    if ($this->session->userdata('user_login') != 1) {
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode(['success' => false, 'data' => []]));
-    }
-
-    $draw   = intval($this->input->post("draw"));
-    $start  = intval($this->input->post("start"));
-    $length = intval($this->input->post("length"));
-    $search = $this->input->post("search")['value'] ?? '';
-    $memberid = intval($this->input->post("memberid"));
-
-    if (!$memberid) {
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => []
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
             ]));
     }
 
-    // Total records for this member (no search)
-    $recordsTotal = $this->db->where('memberid', $memberid)
-                              ->count_all_results("statements");
+    public function get_member_statements()
+    {
+        if ($this->session->userdata('user_login') != 1) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'data' => []]));
+        }
 
-    // Build filtered query
-    $this->db->from("statements");
-    $this->db->where('memberid', $memberid);
+        $draw   = intval($this->input->post("draw"));
+        $start  = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search")['value'] ?? '';
+        $memberid = intval($this->input->post("memberid"));
 
-    if (!empty($search)) {
-        $this->db->group_start();
-        $this->db->like("date", $search);
-        $this->db->or_like("description", $search);
-        $this->db->or_like("type", $search);
-        $this->db->or_like("status", $search);
-        $this->db->or_like("source", $search);
-        $this->db->group_end();
+        if (!$memberid) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    "draw" => $draw,
+                    "recordsTotal" => 0,
+                    "recordsFiltered" => 0,
+                    "data" => []
+                ]));
+        }
+
+        // Total records for this member (no search)
+        $recordsTotal = $this->db->where('memberid', $memberid)
+                                ->count_all_results("statements");
+
+        // Build filtered query
+        $this->db->from("statements");
+        $this->db->where('memberid', $memberid);
+
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like("date", $search);
+            $this->db->or_like("description", $search);
+            $this->db->or_like("type", $search);
+            $this->db->or_like("status", $search);
+            $this->db->or_like("source", $search);
+            $this->db->group_end();
+        }
+
+        // Count filtered records
+        $recordsFiltered = $this->db->count_all_results('', false);
+
+        // Pagination
+        $this->db->limit($length, $start);
+        $this->db->order_by('date', 'DESC');
+
+        // Fetch results
+        $query = $this->db->get();
+
+        $data = [];
+        $count = $start + 1;
+        foreach($query->result() as $r){
+            $data[] = [
+                $count++,
+                date('Y-m-d', strtotime($r->date)),
+                htmlspecialchars($r->description),
+                number_format((float)$r->amount, 2),
+                htmlspecialchars($r->type),
+                htmlspecialchars($r->status),
+                htmlspecialchars($r->source ?? 'N/A'),
+                htmlspecialchars($r->created_at)
+            ];
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
     }
 
-    // Count filtered records
-    $recordsFiltered = $this->db->count_all_results('', false);
+    public function member_statement($memberid)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+        // Pagination settings
+        $per_page = 36;
 
-    // Pagination
-    $this->db->limit($length, $start);
-    $this->db->order_by('date', 'DESC');
+        // Use page query string ?page=offset
+        $page = intval($this->input->get('page')) ?: 0;
 
-    // Fetch results
-    $query = $this->db->get();
+        // Count total statements for member
+        $this->db->from('statements');
+        $this->db->where('memberid', $memberid);
+        $total_rows = $this->db->count_all_results();
 
-    $data = [];
-    $count = $start + 1;
-    foreach($query->result() as $r){
-        $data[] = [
-            $count++,
-            date('Y-m-d', strtotime($r->date)),
-            htmlspecialchars($r->description),
-            number_format((float)$r->amount, 2),
-            htmlspecialchars($r->type),
-            htmlspecialchars($r->status),
-            htmlspecialchars($r->source ?? 'N/A'),
-            htmlspecialchars($r->created_at)
-        ];
+        // Fetch paginated statements
+        $this->db->order_by('date', 'DESC');
+        $query = $this->db->get_where('statements', ['memberid' => $memberid], $per_page, $page);
+        $statements = $query->result_array();
+
+        // Setup pagination
+        $this->load->library('pagination');
+        $config = [];
+        $config['base_url'] = base_url("index.php?burial/member_statement/" . $memberid);
+        $config['page_query_string'] = TRUE;
+        $config['query_string_segment'] = 'page';
+        $config['total_rows'] = $total_rows;
+        $config['per_page'] = $per_page;
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_link'] = 'First';
+        $config['last_link'] = 'Last';
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_tag_open'] = '<li>';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="active"><a href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+
+        $this->pagination->initialize($config);
+
+        $page_data['memberid'] = $memberid;
+        $page_data['statements'] = $statements;
+        $page_data['pagination'] = $this->pagination->create_links();
+        $page_data['total_rows'] = $total_rows;
+        $page_data['page_name'] = 'member_statement';
+        $page_data['page_title'] = 'Member Statement : '.$memberid;
+        $this->load->view('backend/index', $page_data);
     }
-
-    return $this->output
-        ->set_content_type('application/json')
-        ->set_output(json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $recordsTotal,
-            "recordsFiltered" => $recordsFiltered,
-            "data" => $data
-        ]));
-}
-
-public function member_statement($memberid)
-{
-    if ($this->session->userdata('user_login') != 1)
-        redirect(base_url(), 'refresh');
-    // Pagination settings
-    $per_page = 36;
-
-    // Use page query string ?page=offset
-    $page = intval($this->input->get('page')) ?: 0;
-
-    // Count total statements for member
-    $this->db->from('statements');
-    $this->db->where('memberid', $memberid);
-    $total_rows = $this->db->count_all_results();
-
-    // Fetch paginated statements
-    $this->db->order_by('date', 'DESC');
-    $query = $this->db->get_where('statements', ['memberid' => $memberid], $per_page, $page);
-    $statements = $query->result_array();
-
-    // Setup pagination
-    $this->load->library('pagination');
-    $config = [];
-    $config['base_url'] = base_url("index.php?burial/member_statement/" . $memberid);
-    $config['page_query_string'] = TRUE;
-    $config['query_string_segment'] = 'page';
-    $config['total_rows'] = $total_rows;
-    $config['per_page'] = $per_page;
-    $config['full_tag_open'] = '<ul class="pagination">';
-    $config['full_tag_close'] = '</ul>';
-    $config['first_link'] = 'First';
-    $config['last_link'] = 'Last';
-    $config['first_tag_open'] = '<li>';
-    $config['first_tag_close'] = '</li>';
-    $config['prev_tag_open'] = '<li>';
-    $config['prev_tag_close'] = '</li>';
-    $config['next_tag_open'] = '<li>';
-    $config['next_tag_close'] = '</li>';
-    $config['cur_tag_open'] = '<li class="active"><a href="#">';
-    $config['cur_tag_close'] = '</a></li>';
-    $config['num_tag_open'] = '<li>';
-    $config['num_tag_close'] = '</li>';
-
-    $this->pagination->initialize($config);
-
-    $page_data['memberid'] = $memberid;
-    $page_data['statements'] = $statements;
-    $page_data['pagination'] = $this->pagination->create_links();
-    $page_data['total_rows'] = $total_rows;
-    $page_data['page_name'] = 'member_statement';
-    $page_data['page_title'] = 'Member Statement : '.$memberid;
-    $this->load->view('backend/index', $page_data);
-}
 
     ///initaite sms sending
     public function invite_batch_init()
@@ -1482,7 +1482,6 @@ public function member_statement($memberid)
         $page_data['page_title'] = get_phrase('manage_agms');
         $this->load->view('backend/index', $page_data);
     }
-
 
     /********** report per agm ********************/
     function report_per_agm($agmid="")
@@ -3035,5 +3034,228 @@ public function member_statement($memberid)
 
         redirect(base_url() . 'index.php?burial/payments', 'refresh');
     }
-  
+    /**
+     * Add subscription payment - Form submission
+     */
+    /**
+     * Date Range Selection
+     */
+    public function daterange(){
+        
+        $page_data['page_name']  = 'daterange';
+        $page_data['page_title'] = 'Date Range';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function daterangereport()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        $startdate_input = $this->input->post('startdate');
+        $enddate_input   = $this->input->post('enddate');
+
+        if (empty($startdate_input) || empty($enddate_input)) {
+            $this->session->set_flashdata('flash_message_error', 'Please select a date range');
+            redirect(base_url() . 'index.php?burial/daterange', 'refresh');
+        }
+
+        // Normalise to YYYY-MM-DD to keep all queries consistent
+        $start_ts = strtotime($startdate_input);
+        $end_ts   = strtotime($enddate_input);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid date format. Please use a valid date.');
+            redirect(base_url() . 'index.php?burial/daterange', 'refresh');
+        }
+
+        $startdate = date('Y-m-d', $start_ts);
+        $enddate   = date('Y-m-d', $end_ts);
+
+        /********** LOAD PAGE **********/
+        $page_data['page_name']  = 'daterangereport';
+        $page_data['page_title'] = 'Date Range Report '.$startdate.' to '.$enddate;
+        $page_data['startdate'] = $startdate;
+        $page_data['enddate'] = $enddate;  
+        $this->load->view('backend/index', $page_data);
+    } 
+
+    public function year_picker(){
+        
+        $page_data['page_name']  = 'year_picker';
+        $page_data['page_title'] = 'Year Picker';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function yearlyreport()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        $year = $this->input->post('year');
+
+        //here generate start and end date for the year
+        $startdate_input = $year . '-01-01';
+        $enddate_input = $year . '-12-31';
+
+
+        if (empty($startdate_input) || empty($enddate_input)) {
+            $this->session->set_flashdata('flash_message_error', 'Please select a year');
+            redirect(base_url() . 'index.php?burial/year_picker', 'refresh');
+        }
+
+        // Normalise to YYYY-MM-DD to keep all queries consistent
+        $start_ts = strtotime($startdate_input);
+        $end_ts   = strtotime($enddate_input);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid date format. Please use a valid date.');
+            redirect(base_url() . 'index.php?burial/year_picker', 'refresh');
+        }
+
+        $startdate = date('Y-m-d', $start_ts);
+        $enddate   = date('Y-m-d', $end_ts);
+
+        /********** LOAD PAGE **********/
+        $page_data['page_name']  = 'yearlyreport';
+        $page_data['page_title'] = 'Year Report '.$year;
+        $page_data['startdate'] = $startdate;
+        $page_data['enddate'] = $enddate;  
+        $this->load->view('backend/index', $page_data);
+    } 
+
+    public function member_picker(){
+        
+        $page_data['page_name']  = 'member_picker';
+        $page_data['page_title'] = 'Member Picker';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function memberreport()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        $memberid = $this->input->post('memberid');
+
+        $startdate_input = $this->input->post('startdate');
+        $enddate_input = $this->input->post('enddate');
+
+
+
+        if (empty($startdate_input) || empty($enddate_input)) {
+            $this->session->set_flashdata('flash_message_error', 'Please select daterange and member');
+            redirect(base_url() . 'index.php?burial/member_picker', 'refresh');
+        }
+
+        // Normalise to YYYY-MM-DD to keep all queries consistent
+        $start_ts = strtotime($startdate_input);
+        $end_ts   = strtotime($enddate_input);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid date format. Please use a valid date.');
+            redirect(base_url() . 'index.php?burial/member_picker', 'refresh');
+        }
+
+        $startdate = date('Y-m-d', $start_ts);
+        $enddate   = date('Y-m-d', $end_ts);
+
+        /********** LOAD PAGE **********/
+        $page_data['page_name']  = 'memberreport';
+        $page_data['page_title'] = 'Member Report';
+        $page_data['memberid'] = $memberid;
+        $page_data['startdate'] = $startdate;
+        $page_data['enddate'] = $enddate;  
+        $this->load->view('backend/index', $page_data);
+    } 
+
+    public function payment_type_picker(){
+        
+        $page_data['page_name']  = 'payment_type_picker';
+        $page_data['page_title'] = 'Payment Type Picker';
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    function payment_type_report()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        $payment_type = $this->input->post('payment_type');
+
+        $startdate_input = $this->input->post('startdate');
+        $enddate_input = $this->input->post('enddate');
+
+
+        if (empty($startdate_input) || empty($enddate_input)) {
+            $this->session->set_flashdata('flash_message_error', 'Please select a date range');
+            redirect(base_url() . 'index.php?burial/payment_type_picker', 'refresh');
+        }
+
+        // Normalise to YYYY-MM-DD to keep all queries consistent
+        $start_ts = strtotime($startdate_input);
+        $end_ts   = strtotime($enddate_input);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid date format. Please use a valid date.');
+            redirect(base_url() . 'index.php?burial/payment_type_picker', 'refresh');
+        }
+
+        $startdate = date('Y-m-d', $start_ts);
+        $enddate   = date('Y-m-d', $end_ts);
+
+        /********** LOAD PAGE **********/
+        $page_data['page_name']  = 'payment_type_report';
+        $page_data['page_title'] = 'Payment Type Report';
+        $page_data['startdate'] = $startdate;
+        $page_data['enddate'] = $enddate;
+        $page_data['payment_type'] = $payment_type;
+        $this->load->view('backend/index', $page_data);
+    } 
+
+    public function user_picker(){
+        
+        $page_data['page_name']  = 'user_picker';
+        $page_data['page_title'] = 'User Picker';
+        $this->load->view('backend/index', $page_data);
+    }
+    function userreport()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        $year = $this->input->post('year');
+        $user_id = $this->input->post('user_id');
+
+        //here generate start and end date for the year
+        $startdate_input = $year . '-01-01';
+        $enddate_input = $year . '-12-31';
+
+
+        if (empty($startdate_input) || empty($enddate_input)) {
+            $this->session->set_flashdata('flash_message_error', 'Please select a year and user');
+            redirect(base_url() . 'index.php?burial/user_picker', 'refresh');
+        }
+
+        // Normalise to YYYY-MM-DD to keep all queries consistent
+        $start_ts = strtotime($startdate_input);
+        $end_ts   = strtotime($enddate_input);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid date format. Please use a valid date.');
+            redirect(base_url() . 'index.php?burial/user_picker', 'refresh');
+        }
+
+        $startdate = date('Y-m-d', $start_ts);
+        $enddate   = date('Y-m-d', $end_ts);
+
+        /********** LOAD PAGE **********/
+        $page_data['page_name']  = 'userreport';
+        $page_data['page_title'] = 'User Report '.$year;
+        $page_data['user_id'] = $user_id;
+        $page_data['startdate'] = $startdate;
+        $page_data['enddate'] = $enddate;  
+        $this->load->view('backend/index', $page_data);
+    } 
+
 }
