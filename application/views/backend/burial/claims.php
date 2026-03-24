@@ -271,6 +271,19 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label class="col-md-3 control-label">Date of Burial <span class="required">*</span>
+					</label>
+
+					<div class="col-md-7">
+													<div class="input-daterange input-group" data-plugin-datepicker>
+														<span class="input-group-addon">
+															<i class="fa fa-calendar"></i>
+														</span>
+														<input type="text" class="form-control" name="date_of_burial">
+													</div>
+					</div>
+				</div>
+				<div class="form-group">
 					<label class="col-md-3 control-label">
 						<?php echo get_phrase('place_of_burial');?> <span class="required">*</span>
 					</label>

@@ -2039,8 +2039,9 @@ class Burial extends CI_Controller
             $data['claim_date']     = $this->input->post('claim_date');
             $data['bank']           = $this->input->post('bank');
             $data['account']        = $this->input->post('account');
-            $data['mortuary']           = $this->input->post('date_of_entry');
+            $data['mortuary']           = $this->input->post('mortuary');
             $data['date_of_entry']        = $this->input->post('date_of_entry');
+            $data['date_of_burial']        = $this->input->post('date_of_burial');
             $data['approved_date']  = !empty($this->input->post('approved_date')) ? $this->input->post('approved_date') : null;
             $data['status']         = $this->input->post('status') ? $this->input->post('status') : 'PENDING';
             $data['payment_date']   = !empty($this->input->post('payment_date')) ? $this->input->post('payment_date') : null;

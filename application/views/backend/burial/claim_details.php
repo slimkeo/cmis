@@ -41,6 +41,7 @@ $beneficiary_name = $beneficiary ? $beneficiary->fullname : '-';
                         <table class="table table-striped">
                             <tr><th>Mortuary</th><td><?php echo htmlspecialchars($claim['mortuary'] ?? '-'); ?></td></tr>
                             <tr><th>Date of Entry</th><td><?php echo !empty($claim['date_of_entry']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
+                            <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
                         </table>
                     </div>
                 </div>
