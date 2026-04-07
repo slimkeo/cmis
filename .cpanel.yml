@@ -2,4 +2,19 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/snatbur1/cmis.snatburialscheme.com
-    - /bin/cp -R application system index.php assets $DEPLOYPATH
+
+    # Ensure path exists
+    - /bin/mkdir -p $DEPLOYPATH
+
+    # Copy core folders
+    - /bin/cp -Rf application $DEPLOYPATH
+    - /bin/cp -Rf system $DEPLOYPATH
+    - /bin/cp -Rf apis $DEPLOYPATH
+    - /bin/cp -Rf assets $DEPLOYPATH
+    - /bin/cp -Rf vendor $DEPLOYPATH
+
+    # Optional (only if needed)
+    - /bin/cp -Rf uploads $DEPLOYPATH
+
+    # Copy entry file
+    - /bin/cp -f index.php $DEPLOYPATH
