@@ -2,4 +2,15 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/snatbur1/cmis.snatburialscheme.com
-    - /bin/cp -R application system index.php assets $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH
+
+    # Use rsync for faster, smarter copying (only changed files + preserves permissions)
+    - /usr/bin/rsync -av --delete application/ $DEPLOYPATH/application/
+    - /usr/bin/rsync -av --delete system/     $DEPLOYPATH/system/
+    - /usr/bin/rsync -av --delete assets/     $DEPLOYPATH/assets/
+
+    # Copy single files
+    - /bin/cp -f index.php $DEPLOYPATH/
+
+    # Optional: If you have an "uploads" or "vendor" folder and want to handle them
+    # - /usr/bin/rsync -av --delete --exclude='*.log' uploads/ $DEPLOYPATH/uploads/ || true
