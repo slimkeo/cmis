@@ -302,6 +302,7 @@ class Burial extends CI_Controller
     {
         if ($this->session->userdata('user_login') != 1)
             redirect(base_url() . 'index.php?login', 'refresh');
+        $this->load->model('Beneficiary_model');
 
         $start_date_raw = $this->input->post('start_date');
         $end_date_raw   = $this->input->post('end_date');
@@ -339,8 +340,16 @@ class Burial extends CI_Controller
             ->get()
             ->result_array();
 
+        foreach ($members as &$member_row) {
+            $member_id = (int)($member_row['id'] ?? 0);
+            $summary = $this->Beneficiary_model->get_payable_summary($member_id);
+            $member_row['payable_beneficiaries'] = (int)($summary['payable_beneficiaries'] ?? 0);
+            $member_row['monthly_fee'] = (float)$this->Beneficiary_model->get_total_monthly_fee($member_id);
+        }
+        unset($member_row);
+
         $beneficiary_updates = $this->db
-            ->select('id, memberid, fullname, gender, dob, is_spouse, status, submission_date, status_date, replaced, replaced_with, created_at, updated_at, user')
+            ->select('memberid, status_date, created_at, updated_at')
             ->from('beneficiaries')
             ->group_start()
                 ->where('DATE(created_at) >=', $start_date)
@@ -358,10 +367,54 @@ class Burial extends CI_Controller
             ->get()
             ->result_array();
 
+        $modified_member_dates = array();
+        foreach ($beneficiary_updates as $row) {
+            $member_id = (int)($row['memberid'] ?? 0);
+            if ($member_id <= 0) {
+                continue;
+            }
+
+            $row_dates = array_filter(array(
+                $row['status_date'] ?? '',
+                $row['created_at'] ?? '',
+                $row['updated_at'] ?? ''
+            ));
+
+            if (empty($row_dates)) {
+                continue;
+            }
+
+            $latest_change = max($row_dates);
+            if (!isset($modified_member_dates[$member_id]) || $latest_change > $modified_member_dates[$member_id]) {
+                $modified_member_dates[$member_id] = $latest_change;
+            }
+        }
+
+        $modified_members = array();
+        if (!empty($modified_member_dates)) {
+            $modified_member_ids = array_keys($modified_member_dates);
+            $modified_members = $this->db
+                ->select('id, idnumber, passbook_no, employeeno, tscno, surname, name, cellnumber, dob, gender, schoolcode, resident, createdate, timestamp, user, is_alive, new_id')
+                ->from('members')
+                ->where_in('id', $modified_member_ids)
+                ->order_by('surname', 'ASC')
+                ->get()
+                ->result_array();
+
+            foreach ($modified_members as &$modified_member_row) {
+                $member_id = (int)($modified_member_row['id'] ?? 0);
+                $summary = $this->Beneficiary_model->get_payable_summary($member_id);
+                $modified_member_row['payable_beneficiaries'] = (int)($summary['payable_beneficiaries'] ?? 0);
+                $modified_member_row['monthly_fee'] = (float)$this->Beneficiary_model->get_total_monthly_fee($member_id);
+                $modified_member_row['last_beneficiary_change'] = $modified_member_dates[$member_id] ?? '';
+            }
+            unset($modified_member_row);
+        }
+
         $page_data['start_date'] = $start_date;
         $page_data['end_date'] = $end_date;
         $page_data['new_members'] = $members;
-        $page_data['beneficiary_updates'] = $beneficiary_updates;
+        $page_data['modified_members'] = $modified_members;
         $page_data['page_name']  = 'modified_members_report';
         $page_data['page_title'] = get_phrase('modified_members_report');
         $this->load->view('backend/index', $page_data);
