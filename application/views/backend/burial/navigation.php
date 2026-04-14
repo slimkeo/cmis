@@ -88,7 +88,7 @@
 
 			<li class="nav-parent <?php
 				if ($page_name == 'members' ||
-						$page_name == 'detailed_meetings' || $page_name == 'detailed_meetings' || $page_name=='beneficiaries')
+						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'beneficiaries' || $page_name=='beneficiaries')
 					echo 'nav-expanded nav-active';
 				?> ">
 					<a href="#">
@@ -96,19 +96,19 @@
 						<span>Manage Members</span>
 					</a>
 				<ul class="nav nav-children">
-					<li class="<?php if ($page_name == 'members'  ) echo 'nav-active'; ?> ">
+					<li class="<?php if ($page_name == 'members' || $page_name == 'beneficiaries' ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/members">
 							 <i class="fa fa-address-book"></i>
 							<span>All Members</span>
 						</a>
 					</li>
-<!-- 					<li class="<?php if ($page_name == 'replace_member' ) echo 'nav-active'; ?> ">
-						<a href="<?php echo base_url(); ?>index.php?burial/replace_member">
+ 					<li class="<?php if ($page_name == 'modified_members' || $page_name == 'modified_members_report' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/modified_members">
 							 <i class="fa fa-address-book-o"></i>
-							<span><?php echo get_phrase('replace_member'); ?></span>
+							<span>Modified Members</span>
 						</a>
 					</li>
-					<li class="<?php if ($page_name == 'replace_memberreplace_member' ) echo 'nav-active'; ?> ">
+	<!--				<li class="<?php if ($page_name == 'replace_memberreplace_member' ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/deactivate_members">
 							 <i class="fa fa-user"></i>
 							<span>Deactivate Members</span>

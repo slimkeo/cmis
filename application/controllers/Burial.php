@@ -284,6 +284,89 @@ class Burial extends CI_Controller
         $this->load->view('backend/index', $page_data);
     }
 
+
+    /********** MODIFIED MEMBERS ********************/  
+    function modified_members($param1 = '', $param2 = '', $param3 = '')
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url() . 'index.php?login', 'refresh');
+
+        $page_data['start_date'] = date('Y-m-01');
+        $page_data['end_date']   = date('Y-m-d');
+        $page_data['page_name']  = 'modified_members';
+        $page_data['page_title'] = get_phrase('modified_members');
+        $this->load->view('backend/index', $page_data);
+    }     
+    /********** MODIFIED MEMBERS ********************/  
+    function modified_members_report($param1 = '', $param2 = '', $param3 = '')
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url() . 'index.php?login', 'refresh');
+
+        $start_date_raw = $this->input->post('start_date');
+        $end_date_raw   = $this->input->post('end_date');
+
+        if (empty($start_date_raw) || empty($end_date_raw)) {
+            $this->session->set_flashdata('flash_message', 'Please select start and end dates.');
+            redirect(base_url() . 'index.php?burial/modified_members', 'refresh');
+            return;
+        }
+
+        $start_ts = strtotime($start_date_raw);
+        $end_ts   = strtotime($end_date_raw);
+
+        if ($start_ts === false || $end_ts === false) {
+            $this->session->set_flashdata('flash_message', 'Invalid date format selected.');
+            redirect(base_url() . 'index.php?burial/modified_members', 'refresh');
+            return;
+        }
+
+        $start_date = date('Y-m-d', $start_ts);
+        $end_date   = date('Y-m-d', $end_ts);
+
+        if ($start_date > $end_date) {
+            $tmp = $start_date;
+            $start_date = $end_date;
+            $end_date = $tmp;
+        }
+
+        $members = $this->db
+            ->select('id, idnumber, passbook_no, employeeno, tscno, surname, name, cellnumber, dob, gender, schoolcode, resident, createdate, timestamp, user, is_alive, new_id')
+            ->from('members')
+            ->where('DATE(createdate) >=', $start_date)
+            ->where('DATE(createdate) <=', $end_date)
+            ->order_by('createdate', 'DESC')
+            ->get()
+            ->result_array();
+
+        $beneficiary_updates = $this->db
+            ->select('id, memberid, fullname, gender, dob, is_spouse, status, submission_date, status_date, replaced, replaced_with, created_at, updated_at, user')
+            ->from('beneficiaries')
+            ->group_start()
+                ->where('DATE(created_at) >=', $start_date)
+                ->where('DATE(created_at) <=', $end_date)
+            ->group_end()
+            ->or_group_start()
+                ->where('DATE(updated_at) >=', $start_date)
+                ->where('DATE(updated_at) <=', $end_date)
+            ->group_end()
+            ->or_group_start()
+                ->where('DATE(status_date) >=', $start_date)
+                ->where('DATE(status_date) <=', $end_date)
+            ->group_end()
+            ->order_by('updated_at', 'DESC')
+            ->get()
+            ->result_array();
+
+        $page_data['start_date'] = $start_date;
+        $page_data['end_date'] = $end_date;
+        $page_data['new_members'] = $members;
+        $page_data['beneficiary_updates'] = $beneficiary_updates;
+        $page_data['page_name']  = 'modified_members_report';
+        $page_data['page_title'] = get_phrase('modified_members_report');
+        $this->load->view('backend/index', $page_data);
+    }
+       
     /********** MEMBER SELECTION PAGE ********************/
     function member_selection()
     {
