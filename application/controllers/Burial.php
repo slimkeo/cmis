@@ -190,7 +190,7 @@ class Burial extends CI_Controller
 
                 
             }
-
+            redirect(base_url() . 'index.php?burial/member_details/'.$member_id, 'refresh');
         }
 
         // UPDATE MEMBER
