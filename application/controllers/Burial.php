@@ -2225,9 +2225,6 @@ class Burial extends CI_Controller
                 // MEMBER/NOMINEE CLAIM
                 $nominee_id = $this->input->post('nominee_id');
                 $data['nominee_id']      = !empty($nominee_id) ? $nominee_id : null;
-                $data['beneficiary_id']  = null;
-                $data['place_of_burial'] = null;
-                $data['date_of_burial']  = null;
             }
 
             $this->db->insert('claims', $data);
