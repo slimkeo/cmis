@@ -9,6 +9,11 @@ $member_name = $member ? $member->surname . ' ' . $member->name : '-';
 // Get beneficiary name
 $beneficiary = $this->db->get_where('beneficiaries', array('id' => $claim['beneficiary_id'] ?? 0))->row();
 $beneficiary_name = $beneficiary ? $beneficiary->fullname : '-';
+
+// Get nominee name
+$nominee = $this->db->get_where('nominee', array('id' => $claim['nominee_id'] ?? 0))->row();
+$nominee_name = $nominee ? $nominee->fullname : '-';
+
 ?>
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
@@ -32,6 +37,7 @@ $beneficiary_name = $beneficiary ? $beneficiary->fullname : '-';
                         <h5>Burial Information</h5>
                         <table class="table table-striped">
                             <tr><th>Place of Burial</th><td><?php echo htmlspecialchars($claim['place_of_burial'] ?? '-'); ?></td></tr>
+                            <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
                             <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
                             <tr><th>Claim Date</th><td><?php echo !empty($claim['claim_date']) ? date('d-m-Y', strtotime($claim['claim_date'])) : '-'; ?></td></tr>
                         </table>
