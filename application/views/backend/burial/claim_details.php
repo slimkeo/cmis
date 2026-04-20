@@ -38,7 +38,7 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                         <table class="table table-striped">
                             <tr><th>Place of Burial</th><td><?php echo htmlspecialchars($claim['place_of_burial'] ?? '-'); ?></td></tr>
                             <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
-                            <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
+                            <tr><th>Nominee Name</th><td><?php echo htmlspecialchars($nominee_name); ?></td></tr>
                             <tr><th>Claim Date</th><td><?php echo !empty($claim['claim_date']) ? date('d-m-Y', strtotime($claim['claim_date'])) : '-'; ?></td></tr>
                         </table>
                     </div>
