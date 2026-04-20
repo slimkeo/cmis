@@ -2165,68 +2165,75 @@ class Burial extends CI_Controller
 
         // CREATE CLAIM
         if ($param1 == 'create') {
+            // Common fields for ALL claim types
+            $claim_type = $this->input->post('claim_type') ?: 'BENEFICIARY';
 
-            $claim_type = $this->input->post('claim_type') ? $this->input->post('claim_type') : 'BENEFICIARY';
-            
-            $data['member_id']      = $this->input->post('member_id');
-            $data['claim_type']     = $claim_type;
-            $data['national_id']    = $this->input->post('national_id');
-            $data['amount']         = $this->input->post('amount');
-            $data['claim_date']     = $this->input->post('claim_date');
-            $data['bank']           = $this->input->post('bank');
-            $data['account']        = $this->input->post('account');
-            $data['mortuary']           = $this->input->post('mortuary');
-            $data['date_of_entry']        = $this->input->post('date_of_entry');
-            $data['date_of_burial']        = $this->input->post('date_of_burial');
-            $data['approved_date']  = !empty($this->input->post('approved_date')) ? $this->input->post('approved_date') : null;
-            $data['status']         = $this->input->post('status') ? $this->input->post('status') : 'PENDING';
-            $data['payment_date']   = !empty($this->input->post('payment_date')) ? $this->input->post('payment_date') : null;
-            // set processed_by to logged in user
-            $data['processed_by']   = $this->session->userdata('user_id');
-            $data['approved_by']    = !empty($this->input->post('approved_by')) ? $this->input->post('approved_by') : null;
-            $data['notes']          = !empty($this->input->post('notes')) ? $this->input->post('notes') : null;
-            $data['created_at']     = date('Y-m-d H:i:s');
-            $data['updated_at']     = date('Y-m-d H:i:s');
-
-            // Handle based on claim type
+            // Common fields for ALL claim types
+            $data = [
+                'member_id'       => $this->input->post('member_id'),
+                'claim_type'      => $claim_type,
+                'national_id'     => $this->input->post('national_id'),
+                'amount'          => $this->input->post('amount'),
+                'claim_date'      => $this->input->post('claim_date'),
+                'bank'            => $this->input->post('bank'),
+                'account'         => $this->input->post('account'),
+                'mortuary'        => $this->input->post('mortuary'),
+                'date_of_entry'   => $this->input->post('date_of_entry'),
+                'date_of_burial'  => $this->input->post('date_of_burial') ?: null,   // Always take value
+                'place_of_burial' => $this->input->post('place_of_burial') ?: null,  // Always take value
+                'approved_date'   => $this->input->post('approved_date') ?: null,
+                'status'          => $this->input->post('status') ?: 'PENDING',
+                'payment_date'    => $this->input->post('payment_date') ?: null,
+                'processed_by'    => $this->session->userdata('user_id'),
+                'approved_by'     => $this->input->post('approved_by') ?: null,
+                'notes'           => $this->input->post('notes') ?: null,
+                'created_at'      => date('Y-m-d H:i:s'),
+                'updated_at'      => date('Y-m-d H:i:s'),
+            ];
+        
+            // Handle type-specific fields
             if ($claim_type === 'BENEFICIARY') {
                 // BENEFICIARY CLAIM
                 $data['beneficiary_id'] = $this->input->post('beneficiary_id');
-                $data['place_of_burial'] = !empty($this->input->post('place_of_burial')) ? $this->input->post('place_of_burial') : null;
-                $data['date_of_burial']  = !empty($this->input->post('date_of_burial')) ? $this->input->post('date_of_burial') : null;
-                
-                // Check if national_id appears more than twice for beneficiary claims
+        
+                // Optional: You can add extra validation here if needed for beneficiary
+                // Check if national_id appears more than twice...
                 if (!empty($data['national_id'])) {
                     $this->db->where('national_id', $data['national_id'])
                              ->where('claim_type', 'BENEFICIARY');
                     $count = $this->db->get('claims')->num_rows();
-                    
+        
                     if ($count >= 2) {
-                        $this->session->set_flashdata('flash_message_error', 'A beneficiary with this national ID can only have maximum 2 claims. Please use a member claim if this is the member themselves.');
+                        $this->session->set_flashdata('flash_message_error', 'A beneficiary with this national ID can only have maximum 2 claims.');
                         redirect(base_url() . 'index.php?burial/claims', 'refresh');
                         return;
                     }
                 }
-                
+        
                 // Prevent duplicate claims for same member and beneficiary
                 $this->db->where('member_id', $data['member_id'])
                          ->where('beneficiary_id', $data['beneficiary_id'])
                          ->where('claim_type', 'BENEFICIARY')
                          ->where('claim_date', $data['claim_date']);
-
+        
                 $exists = $this->db->get('claims')->num_rows();
-
+        
                 if ($exists > 0) {
                     $this->session->set_flashdata('flash_message_error', 'A claim already exists for this member and beneficiary on this date');
                     redirect(base_url() . 'index.php?burial/claims', 'refresh');
                     return;
                 }
-            } else {
-                // MEMBER/NOMINEE CLAIM
+            } 
+            else {
+                // MEMBER / NOMINEE CLAIM
                 $nominee_id = $this->input->post('nominee_id');
-                $data['nominee_id']      = !empty($nominee_id) ? $nominee_id : null;
+                $data['nominee_id'] = !empty($nominee_id) ? $nominee_id : null;
+                
+                // beneficiary_id should be null for non-beneficiary claims
+                $data['beneficiary_id'] = null;
             }
-
+        
+            // Insert the claim
             $this->db->insert('claims', $data);
             $claim_id = $this->db->insert_id();
 
