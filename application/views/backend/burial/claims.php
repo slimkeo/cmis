@@ -279,7 +279,7 @@
 														<span class="input-group-addon">
 															<i class="fa fa-calendar"></i>
 														</span>
-														<input type="text" class="form-control" name="date_of_burial">
+														<input type="text" class="form-control" name="date_of_burial" required title="<?php echo get_phrase('value_required');?>">
 													</div>
 					</div>
 				</div>
@@ -616,8 +616,6 @@
 					$('#nominee_group').show();
 					$('#beneficiary_select').closest('.form-group').hide();
 					$('[name="beneficiary_id"]').closest('.form-group').hide();
-					$('[name="place_of_burial"]').closest('.form-group').hide();
-					$('[name="date_of_burial"]').closest('.form-group').hide();
 					
 					// Load nominees
 					loadNominees(memberId);
@@ -626,8 +624,6 @@
 					$('#nominee_group').hide();
 					$('#beneficiary_select').closest('.form-group').show();
 					$('[name="beneficiary_id"]').closest('.form-group').show();
-					$('[name="place_of_burial"]').closest('.form-group').show();
-					$('[name="date_of_burial"]').closest('.form-group').show();
 				}
 			});
 
