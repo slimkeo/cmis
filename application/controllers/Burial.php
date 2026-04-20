@@ -2231,6 +2231,15 @@ class Burial extends CI_Controller
                 
                 // beneficiary_id should be null for non-beneficiary claims
                 $data['beneficiary_id'] = null;
+
+                // ==================== IMPORTANT PART ====================
+                // Mark the MEMBER as deceased (is_alive = 0)
+                if (!empty($data['member_id'])) {
+                    $this->db->where('id', $data['member_id']);
+                    $this->db->update('members', ['is_alive' => 0]);   // Assuming your members table name is 'members'
+                }
+                // =======================================================
+            
             }
         
             // Insert the claim
