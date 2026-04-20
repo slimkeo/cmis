@@ -212,7 +212,7 @@
 							</div>
 							<div class="radio">
 								<label>
-									<input type="radio" name="claim_type" id="claim_type_member" value="MEMBER" required> 
+									<input type="radio" name="claim_type" id="claim_type_member" value="NOMINEE" required> 
 									Member/Policy Holder Claim (Nominee)
 								</label>
 							</div>
@@ -350,12 +350,7 @@
 							<div class="document-upload-row">
 								<select class="form-control" name="document_description[]" required>
 									<option value="">-- Select Document Type --</option>
-									<option value="ID OF Policy Holder">ID OF Policy Holder</option>
-									<option value="ID OF Deceased">ID OF Deceased</option>
-									<option value="Passport">Passport</option>
-									<option value="Death Certificate">Death Certificate</option>
-									<option value="Payslip">Payslip</option>
-									<option value="Passbook">Passbook</option>
+									<option value="Claim Documents">CLAIM DOCUMENTS</option>
 								</select>
 								<input type="file" class="form-control" name="document_file[]" required style="margin-top:5px;">
 								<button type="button" class="btn btn-danger btn-xs remove-document" style="margin-top:5px; display:none;"><i class="fa fa-trash"></i></button>
@@ -611,7 +606,7 @@
 				var claimType = $(this).val();
 				var memberId = $('#selected_member_id').val();
 				
-				if (claimType === 'MEMBER' && memberId) {
+				if (claimType === 'NOMINEE' && memberId) {
 					// Show nominee selection and hide beneficiary requirements
 					$('#nominee_group').show();
 					$('#beneficiary_select').closest('.form-group').hide();
