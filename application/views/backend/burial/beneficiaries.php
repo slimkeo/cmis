@@ -382,6 +382,7 @@ foreach ($member_data as $member_row):
 										<input type="text"
 											class="form-control"
 											name="batch_submission_date"
+											id="batch-submission-date"
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
@@ -554,6 +555,7 @@ foreach ($member_data as $member_row):
 // ────────────────────────────────────────────────
 (function() {
     let rowCount = 0;
+    const batchSubmissionDateInput = document.getElementById('batch-submission-date');
 
     // Helper: Initialize / reinitialize Bootstrap datepickers
     function initDatepickers(container = document) {
@@ -643,7 +645,18 @@ foreach ($member_data as $member_row):
                     statusDateInput.value = '';
                 }
             }
+            syncBatchSubmissionDateRequired();
         });
+    }
+
+    function syncBatchSubmissionDateRequired() {
+        if (!batchSubmissionDateInput) return;
+
+        const hasBenefitted = Array.from(document.querySelectorAll('.batch-status-select')).some(function(select) {
+            return select.value === 'BENEFITTED';
+        });
+
+        batchSubmissionDateInput.required = hasBenefitted;
     }
 
     function attachRemoveListener(index) {
@@ -655,6 +668,7 @@ foreach ($member_data as $member_row):
                 if (row) {
                     row.remove();
                     updateRowNumbers();
+                    syncBatchSubmissionDateRequired();
                 }
             });
         }
@@ -679,6 +693,8 @@ foreach ($member_data as $member_row):
             const idx = btn.getAttribute('data-index');
             attachRemoveListener(idx);
         });
+
+        syncBatchSubmissionDateRequired();
     }
 
     // Add More Row Button
@@ -700,6 +716,7 @@ foreach ($member_data as $member_row):
             updateRowNumbers();
 
             attachRemoveListener(rowCount - 1);
+            syncBatchSubmissionDateRequired();
         });
     }
 

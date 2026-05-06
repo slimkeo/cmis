@@ -522,6 +522,15 @@ class Burial extends CI_Controller
             $data['user']       =  $this->session->userdata('user_id');
             $status_date_input       = $this->Date_model->normalize_date($this->input->post('status_date'));
 
+            // Submission date is mandatory for benefitted beneficiaries.
+            if (
+                in_array($data['status'], ['BENEFITTED', 'BENEFITTED - REPLACED'], true) &&
+                empty($data['submission_date'])
+            ) {
+                $this->session->set_flashdata('flash_message_error', 'Submission Date is required for ' . $data['status']);
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
             // Default values for NEW beneficiary
             $data['replaced'] = 0;
             $data['replaced_with'] = null;
@@ -633,7 +642,7 @@ class Burial extends CI_Controller
         /********** ADD BATCH BENEFICIARIES **********/
         if ($param2 == 'add_batch_beneficiaries') {
 
-            $batch_submission_date =  $this->input->post('batch_submission_date');   
+            $batch_submission_date = $this->Date_model->normalize_date($this->input->post('batch_submission_date'));
             $batch_fullnames = $this->input->post('batch_fullname');
             $batch_dobs = $this->input->post('batch_dob');
             $batch_genders = $this->input->post('batch_gender');
@@ -675,6 +684,12 @@ class Burial extends CI_Controller
                         $errors[] = "Row " . ($i + 1) . ": Status Date is required for " . $status;
                         continue;
                     }
+
+                    // BENEFITTED rows must carry submission date as well.
+                    if ($status === 'BENEFITTED' && empty($batch_submission_date)) {
+                        $errors[] = "Row " . ($i + 1) . ": Submission Date is required for BENEFITTED";
+                        continue;
+                    }
                     
                     // Check for duplicates
                     $this->db->where('memberid', $param1);
@@ -692,7 +707,7 @@ class Burial extends CI_Controller
                         'dob' => $this->Date_model->normalize_date($dob),
                         'is_spouse' => $is_spouse,
                         'status' => $status,
-                        'submission_date' => $this->Date_model->normalize_date($batch_submission_date),
+                        'submission_date' => $batch_submission_date,
                         'status_date' => !empty($status_date) ? $status_date : date('Y-m-d'),
                         'replaced' => 0,
                         'replaced_with' => null
