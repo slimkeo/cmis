@@ -75,19 +75,7 @@ class Login extends CI_Controller {
             return 'success';
         }
 
-        
-              // Checking login credential for parent `id`, `national_id`, `fullname`, `lastname`, `contact`, `dob`, `email`, `password`, `gender`, `address`, `town`, `organization`, `org_contact`, `salary`, `status`, `createdate`, `timestamp`, `file`
 
-         $query = $this->db->get_where('client', $credential);
-         if ($query->num_rows() > 0) {
-             $row = $query->row();
-             $this->session->set_userdata('client_login', '1');
-             $this->session->set_userdata('client_id', $row->id);
-             $this->session->set_userdata('login_user_id', $row->id);
-             $this->session->set_userdata('name', $row->fullname);
-             $this->session->set_userdata('login_type', 'client');
-             return 'success';
-         }
 
         return 'invalid';
     }
