@@ -23,148 +23,22 @@
 		<br>
 			<!--TABLE LISTING STARTS-->
 			<div class="tab-pane box active" id="list">
-				<table class="table table-bordered table-striped mb-none" id="datatable-tabletools" >
+				<table class="table table-bordered table-striped mb-none" id="datatable-claims">
 			<thead>
 				<tr>
-                                        <th>
-						<div>
-							<?php echo get_phrase('#');?>
-						</div>
-					</th>
-					<th>
-						<div>
-							<?php echo get_phrase('member');?>
-						</div>
-					</th>
-					<th>
-						<div>
-							<?php echo get_phrase('beneficiary');?>
-						</div>
-					</th>
-					<th>
-						<div>
-							Claim Type
-						</div>
-					</th>
-					<th>
-						<div>
-							<?php echo get_phrase('amount');?>
-						</div>
-					</th>
-					<th>
-						<div>
-							<?php echo get_phrase('claim_date');?>
-						</div>
-					</th>
-					<th>
-						<div>
-							<?php echo get_phrase('status');?>
-						</div>
-					</th>
-
-					<th>
-						<div>
-							<?php echo get_phrase('options');?>
-						</div>
-					</th>
+					<th><?php echo get_phrase('#');?></th>
+					<th><?php echo get_phrase('member');?></th>
+					<th><?php echo get_phrase('national_id');?></th>
+					<th><?php echo get_phrase('beneficiary');?></th>
+					<th>Claim Type</th>
+					<th><?php echo get_phrase('amount');?></th>
+					<th><?php echo get_phrase('claim_date');?></th>
+					<th><?php echo get_phrase('status');?></th>
+					<th><?php echo get_phrase('options');?></th>
 				</tr>
 			</thead>
 			<tbody>
-			
-				<?php
-				
-				$i=1;
-				if(!empty($claims)):
-				foreach ( $claims as $row ): 
-					// Get member name
-					$member = $this->db->get_where('members', array('id' => $row['member_id']))->row();
-					$member_name = $member ? $member->surname . ' ' . $member->name : '-';
-					
-					// Get beneficiary or nominee name based on claim type
-					if ($row['claim_type'] === 'BENEFICIARY') {
-						$beneficiary = $this->db->get_where('beneficiaries', array('id' => $row['beneficiary_id']))->row();
-						$claimant_name = $beneficiary ? $beneficiary->fullname : '-';
-					} else {
-						// MEMBER claim - get nominee name if nominee_id exists
-						if (!empty($row['nominee_id'])) {
-							$nominee = $this->db->get_where('nominee', array('id' => $row['nominee_id']))->row();
-							$claimant_name = $nominee ? $nominee->fullname : 'Member Claim';
-						} else {
-							$claimant_name = 'Member Claim';
-						}
-					}
-				?>
-				<tr>
-                    <td>
-						<?php echo $i++;?>
-					</td>
-					<td>
-						<?php echo htmlspecialchars($member_name);?>
-					</td>
-					<td>
-						<?php echo htmlspecialchars($claimant_name);?>
-					</td>
-					<td>
-						<span class="label label-<?php 
-							if($row['claim_type'] == 'BENEFICIARY') echo 'primary';
-							else echo 'success';
-						?>">
-							<?php echo $row['claim_type'];?>
-						</span>
-					</td>
-					<td>
-						<?php echo number_format($row['amount'], 2);?>
-					</td>
-					<td>
-						<?php echo date('d-m-Y', strtotime($row['claim_date']));?>
-					</td>
-					<td>
-						<span class="label label-<?php 
-							if($row['status'] == 'PENDING') echo 'warning';
-							elseif($row['status'] == 'APPROVED') echo 'success';
-							elseif($row['status'] == 'REJECTED') echo 'danger';
-							elseif($row['status'] == 'PAID') echo 'info';
-						?>">
-							<?php echo $row['status'];?>
-						</span>
-					</td>
-					<td>
-
-						<!-- VIEW CLAIM DETAILS LINK -->
-						<a href="<?php echo base_url(); ?>index.php?burial/claims/view/<?php echo $row['id'];?>" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" 
-						data-original-title="<?php echo get_phrase('view_claim');?>" target="_blank">
-                        <i class="fa fa-eye"></i>
-                        </a>
-
-						<!-- VIEW CLAIM DETAILS LINK -->
-						<a href="<?php echo base_url(); ?>index.php?burial/print_claims_details/<?php echo $row['id'];?>" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" 
-						data-original-title="Print Claim" target="_blank">
-                        <i class="fa fa-print"></i>
-                        </a>
-						<!-- CLAIM EDITING LINK -->
-
-						<a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip" 
-						data-original-title="<?php echo get_phrase('edit');?>" onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_claim_edit/<?php echo $row['id'];?>');">
-                        <i class="fa fa-pencil"></i>
-                        </a>
-						
-
-						<!-- CLAIM DELETION LINK -->
-						<a href="#" class="btn btn-xs btn-danger" data-placement="top" data-toggle="tooltip"
-						 data-original-title="<?php echo get_phrase('delete');?>" onClick="confirm_modal('<?php echo base_url();?>index.php?burial/claims/delete/<?php echo $row['id'];?>');">
-                        <i class="fa fa-trash"></i>
-                        </a>			
-
-					</td>
-				</tr>
-				<?php endforeach;
-				else: ?>
-				<tr>
-					<td colspan="8" class="text-center">
-						<?php echo get_phrase('no_claims_found'); ?>
-					</td>
-				</tr>
-				<?php endif; ?>
+				<!-- Loaded via server-side DataTables -->
 			</tbody>
 		</table>
 			</div>
@@ -515,6 +389,28 @@
 
 		<script>
 		$(document).ready(function() {
+			$('#datatable-claims').DataTable({
+				processing: true,
+				serverSide: true,
+				pageLength: 25,
+				lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+				order: [[6, 'desc']],
+				columnDefs: [
+					{ orderable: false, targets: [0, 8] }
+				],
+				ajax: {
+					url: '<?php echo base_url('index.php?burial/get_claims');?>',
+					type: 'POST'
+				},
+				dom: 'Bfrtip',
+				buttons: [
+					{ extend: 'copy',  text: 'Copy' },
+					{ extend: 'excel', text: 'Excel' },
+					{ extend: 'pdf',   text: 'PDF' },
+					{ extend: 'print', text: 'Print' }
+				]
+			});
+
 			// Member search (reuses endpoint from payments)
 			$('#member_search').keyup(function() {
 				var search = $(this).val();

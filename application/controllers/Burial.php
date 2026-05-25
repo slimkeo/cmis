@@ -2484,8 +2484,7 @@ class Burial extends CI_Controller
             redirect(base_url() . 'index.php?burial/claims', 'refresh');
         }
 
-        // FETCH ALL CLAIMS
-        $page_data['claims'] = $this->Claims_model->get_all_claims();
+        // Claims list is loaded via AJAX (get_claims) for server-side DataTables
         
         // FETCH ALL DOCUMENTS
         $page_data['claims_documents'] = $this->db->get('claims_documents')->result_array();
@@ -2493,6 +2492,129 @@ class Burial extends CI_Controller
         $page_data['page_name']  = 'claims';
         $page_data['page_title'] = "Claims";
         $this->load->view('backend/index', $page_data);
+    }
+
+    /**
+     * Server-side provider for claims DataTable (search, pagination, sorting).
+     */
+    public function get_claims()
+    {
+        if ($this->session->userdata('user_login') != 1) {
+            show_error('Not authorized', 401);
+            return;
+        }
+
+        $draw   = intval($this->input->post('draw'));
+        $start  = intval($this->input->post('start'));
+        $length = intval($this->input->post('length'));
+        $search = $this->input->post('search')['value'] ?? '';
+
+        $recordsTotal = $this->db->count_all('claims');
+
+        $this->db->from('claims c');
+        $this->db->join('members m', 'm.id = c.member_id', 'left');
+        $this->db->join('beneficiaries b', 'b.id = c.beneficiary_id', 'left');
+        $this->db->join('nominee n', 'n.id = c.nominee_id', 'left');
+
+        if (!empty($search)) {
+            $this->db->group_start()
+                ->like('c.id', $search)
+                ->or_like('c.national_id', $search)
+                ->or_like('c.claim_type', $search)
+                ->or_like('c.status', $search)
+                ->or_like('c.amount', $search)
+                ->or_like('m.surname', $search)
+                ->or_like('m.name', $search)
+                ->or_like('b.fullname', $search)
+                ->or_like('n.fullname', $search)
+                ->group_end();
+        }
+
+        $recordsFiltered = $this->db->count_all_results('', false);
+
+        $order_column_index = $this->input->post('order')[0]['column'] ?? 6;
+        $order_direction    = $this->input->post('order')[0]['dir'] ?? 'desc';
+
+        $columns = [
+            0 => 'c.id',
+            1 => 'm.surname',
+            2 => 'c.national_id',
+            3 => 'b.fullname',
+            4 => 'c.claim_type',
+            5 => 'c.amount',
+            6 => 'c.claim_date',
+            7 => 'c.status',
+        ];
+
+        $order_column = $columns[$order_column_index] ?? 'c.claim_date';
+        $this->db->select('c.*, m.surname AS member_surname, m.name AS member_name, b.fullname AS beneficiary_name, n.fullname AS nominee_name');
+        $this->db->order_by($order_column, $order_direction);
+
+        if ($length != -1) {
+            $this->db->limit($length, $start);
+        }
+
+        $rows = $this->db->get()->result_array();
+
+        $data = [];
+        $i = $start + 1;
+
+        foreach ($rows as $row) {
+            $member_name = trim(($row['member_surname'] ?? '') . ' ' . ($row['member_name'] ?? ''));
+            if ($member_name === '') {
+                $member_name = '-';
+            }
+
+            $national_id = !empty($row['national_id']) ? htmlspecialchars($row['national_id']) : '-';
+
+            if ($row['claim_type'] === 'BENEFICIARY') {
+                $claimant_name = !empty($row['beneficiary_name']) ? $row['beneficiary_name'] : '-';
+            } elseif (!empty($row['nominee_name'])) {
+                $claimant_name = $row['nominee_name'];
+            } else {
+                $claimant_name = 'Member Claim';
+            }
+
+            $type_class = ($row['claim_type'] == 'BENEFICIARY') ? 'primary' : 'success';
+
+            $status_class = 'default';
+            if ($row['status'] == 'PENDING') {
+                $status_class = 'warning';
+            } elseif ($row['status'] == 'APPROVED') {
+                $status_class = 'success';
+            } elseif ($row['status'] == 'REJECTED') {
+                $status_class = 'danger';
+            } elseif ($row['status'] == 'PAID') {
+                $status_class = 'info';
+            }
+
+            $claim_id = (int) $row['id'];
+            $options = '<a href="' . base_url('index.php?burial/claims/view/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('view_claim') . '" target="_blank"><i class="fa fa-eye"></i></a> '
+                . '<a href="' . base_url('index.php?burial/print_claims_details/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="Print Claim" target="_blank"><i class="fa fa-print"></i></a> '
+                . '<a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('edit') . '" onClick="showAjaxModal(\'' . base_url('index.php?modal/popup/modal_claim_edit/' . $claim_id) . '\');"><i class="fa fa-pencil"></i></a> '
+                . '<a href="#" class="btn btn-xs btn-danger" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('delete') . '" onClick="confirm_modal(\'' . base_url('index.php?burial/claims/delete/' . $claim_id) . '\');"><i class="fa fa-trash"></i></a>';
+
+            $data[] = [
+                $i++,
+                htmlspecialchars($member_name),
+                $national_id,
+                htmlspecialchars($claimant_name),
+                '<span class="label label-' . $type_class . '">' . htmlspecialchars($row['claim_type']) . '</span>',
+                number_format((float) $row['amount'], 2),
+                date('d-m-Y', strtotime($row['claim_date'])),
+                '<span class="label label-' . $status_class . '">' . htmlspecialchars($row['status']) . '</span>',
+                $options,
+            ];
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'draw'            => $draw,
+                'recordsTotal'    => $recordsTotal,
+                'recordsFiltered' => $recordsFiltered,
+                'data'            => $data,
+            ]));
     }
 
     /********** MANAGE APPROVED Claims ********************/
