@@ -2520,6 +2520,7 @@ class Burial extends CI_Controller
             $this->db->group_start()
                 ->like('c.id', $search)
                 ->or_like('c.national_id', $search)
+                ->or_like('m.id', $search)
                 ->or_like('c.claim_type', $search)
                 ->or_like('c.status', $search)
                 ->or_like('c.amount', $search)
@@ -2537,17 +2538,18 @@ class Burial extends CI_Controller
 
         $columns = [
             0 => 'c.id',
-            1 => 'm.surname',
+            1 => 'm.id',
+            2 => 'm.surname',
             2 => 'c.national_id',
-            3 => 'b.fullname',
-            4 => 'c.claim_type',
-            5 => 'c.amount',
-            6 => 'c.claim_date',
-            7 => 'c.status',
+            4 => 'b.fullname',
+            5 => 'c.claim_type',
+            6 => 'c.amount',
+            7 => 'c.claim_date',
+            8 => 'c.status',
         ];
 
         $order_column = $columns[$order_column_index] ?? 'c.claim_date';
-        $this->db->select('c.*, m.surname AS member_surname, m.name AS member_name, b.fullname AS beneficiary_name, n.fullname AS nominee_name');
+        $this->db->select('c.*, m.id AS member_id, m.surname AS member_surname, m.name AS member_name, b.fullname AS beneficiary_name, n.fullname AS nominee_name');
         $this->db->order_by($order_column, $order_direction);
 
         if ($length != -1) {
@@ -2596,6 +2598,7 @@ class Burial extends CI_Controller
 
             $data[] = [
                 $i++,
+                htmlspecialchars($row['member_id']),
                 htmlspecialchars($member_name),
                 $national_id,
                 htmlspecialchars($claimant_name),
