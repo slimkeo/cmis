@@ -27,6 +27,7 @@
 			<thead>
 				<tr>
 					<th><?php echo get_phrase('#');?></th>
+					<th>Burial No</th>
 					<th><?php echo get_phrase('member');?></th>
 					<th><?php echo get_phrase('national_id');?></th>
 					<th><?php echo get_phrase('beneficiary');?></th>
