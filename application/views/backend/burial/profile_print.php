@@ -95,7 +95,7 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
     <div class="row">
         <div class="col-xs-6">
             <table class="table table-bordered">
-                <tr><th>SNAT Account</th><td><?php echo '058-' . $member['id']; ?></td></tr>
+                <tr><th>SNAT Account</th><td><?php echo $member['id']; ?></td></tr>
                 <tr><th>Full Name</th><td><?php echo htmlspecialchars(trim(($member['surname'] ?? '') . ' ' . ($member['name'] ?? ''))); ?></td></tr>
                 <tr><th>National ID</th><td><?php echo !empty($member['idnumber']) ? htmlspecialchars($member['idnumber']) : 'N/A'; ?></td></tr>
                 <tr><th>Employee No</th><td><?php echo !empty($member['employeeno']) ? htmlspecialchars($member['employeeno']) : 'N/A'; ?></td></tr>

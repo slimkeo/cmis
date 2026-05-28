@@ -86,7 +86,7 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
                     <div class="col-md-10 col-sm-9">
                         <h3 style="margin-top: 0; margin-bottom: 5px;">SNAT Burial Member Profile</h3>
                         <p class="text-muted" style="margin-bottom: 0;">
-                            Account: <strong><?php echo '058-' . $member['id']; ?></strong>
+                            Account: <strong><?php echo $member['id']; ?></strong>
                         </p>
                     </div>
                 </div>
