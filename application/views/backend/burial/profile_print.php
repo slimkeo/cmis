@@ -122,10 +122,9 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
             <tr>
                 <th>#</th>
                 <th>Date</th>
-                <th>Description</th>
+                <th>Source : Description</th>
                 <th>Type</th>
                 <th>Status</th>
-                <th>Source</th>
                 <th class="text-right">Amount (E)</th>
             </tr>
         </thead>
@@ -138,7 +137,6 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
                         <td><?php echo !empty($sub['description']) ? htmlspecialchars($sub['description']) : 'N/A'; ?></td>
                         <td><?php echo !empty($sub['type']) ? htmlspecialchars($sub['type']) : 'N/A'; ?></td>
                         <td><?php echo !empty($sub['status']) ? htmlspecialchars($sub['status']) : 'N/A'; ?></td>
-                        <td><?php echo !empty($sub['source']) ? htmlspecialchars($sub['source']) : 'N/A'; ?></td>
                         <td class="text-right"><?php echo number_format((float)($sub['amount'] ?? 0), 2); ?></td>
                     </tr>
                 <?php endforeach; ?>
