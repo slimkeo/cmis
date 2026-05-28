@@ -62,6 +62,10 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
         <section class="panel">
             <header class="panel-heading">
                 <div class="pull-right">
+                    <a href="<?php echo base_url('index.php?burial/beneficiaries/'.$member['id']); ?>" 
+                       class="btn btn-xs btn-info">
+                        <i class="fa fa-users"></i> Manage Beneficiaries
+                     </a>
                     <a href="#"
                        class="btn btn-xs btn-primary"
                        onclick="showAjaxModal('<?php echo base_url('index.php?modal/popup/modal_edit_member/' . $member['id']); ?>')">
