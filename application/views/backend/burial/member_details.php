@@ -1,263 +1,137 @@
 <?php
-// Assuming $member_row is already available in the view (passed from controller)
-// If not, you may still need to fetch it like before:
-$member_row = $this->db->get_where('members', ['id' => $memberid])->row_array();
+$member = $this->db->get_where('members', array('id' => $memberid))->row_array();
+if (!$member) {
+    echo '<div class="alert alert-danger">Member not found.</div>';
+    return;
+}
 
-// Fetch data using models (preferred way)
-$beneficiaries = $this->Beneficiary_model->get_by_member($member_row['id']);
+$branch_name = '';
+if (!empty($member['branch'])) {
+    $branch_name = $this->db->select('name')->get_where('branches', array('id' => $member['branch']))->row('name');
+}
 
-$summary = $this->Beneficiary_model->get_payable_summary($member_row['id']);
+$status_name = '';
+if (!empty($member['employment_status'])) {
+    $status_name = $this->db->select('description')->get_where('employment_status', array('id' => $member['employment_status']))->row('description');
+}
 
-$total_beneficiaries     = $summary['total_beneficiaries'];
-$payable_beneficiaries   = $summary['payable_beneficiaries'];
-$beneficiary_fee         = $summary['payable_beneficiary_fee'];
+$nominee = $this->db
+    ->order_by('id', 'ASC')
+    ->get_where('nominee', array('member_id' => $member['id']))
+    ->row_array();
 
-$total_monthly           = $this->Beneficiary_model->get_total_monthly_fee($member_row['id']);
-
-$fees = $this->Beneficiary_model->get_fee_settings();
-
-$principal_fee = $fees['principal_fee'];
-$member_fee    = $fees['member_fee'];
-$spouse_fee    = $fees['spouse_fee'];
-
-// Optional: breakdown of payable beneficiaries (members vs spouses)
-$non_payable_statuses = [
-    'BENEFITTED - REPLACED',
-    'DECEASED - REPLACED',
-    'DELETED'
-];
-
-$payable_list = array_filter($beneficiaries, function($b) use ($non_payable_statuses) {
-    $status = trim($b['status'] ?? '');
-    return !in_array($status, $non_payable_statuses, true);
-});
-
-$payable_members_count = count(array_filter($payable_list, fn($b) => $b['is_spouse'] == 0));
-$payable_spouses_count = count(array_filter($payable_list, fn($b) => $b['is_spouse'] == 1));
+$subscriptions = $this->db
+    ->where('memberid', $member['id'])
+    ->order_by('date', 'DESC')
+    ->limit(12)
+    ->get('subscriptions')
+    ->result_array();
 ?>
 
-<style>
-    .member-profile {
-        background: #fff;
-        padding: 30px;
-        max-width: 1100px;
-        margin: 0 auto;
-    }
-    .profile-header {
-        text-align: center;
-        border-bottom: 3px solid #333;
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-    }
-    .profile-header h2 {
-        margin: 0;
-        font-size: 26px;
-    }
-    .section-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: #222;
-        border-bottom: 2px solid #444;
-        padding-bottom: 8px;
-        margin: 30px 0 15px;
-    }
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 16px 24px;
-    }
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-    }
-    .info-label {
-        font-weight: 600;
-        color: #444;
-        min-width: 180px;
-    }
-    .info-value {
-        color: #222;
-        flex: 1;
-        text-align: right;
-    }
-    .summary-box {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 20px;
-        margin-top: 15px;
-    }
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-    }
-    .summary-row.total {
-        font-size: 1.1em;
-        font-weight: bold;
-        border-top: 2px solid #ccc;
-        margin-top: 10px;
-        padding-top: 12px;
-    }
-    table.beneficiaries-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    table th, table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-    }
-    table th {
-        background: #f1f3f5;
-        font-weight: 600;
-    }
-    .actions {
-        margin-bottom: 25px;
-        text-align: right;
-    }
-</style>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <header class="panel-heading">
+                <div class="pull-right">
+                    <a href="#"
+                       class="btn btn-xs btn-primary"
+                       onclick="showAjaxModal('<?php echo base_url('index.php?modal/popup/modal_edit_member/' . $member['id']); ?>')">
+                        <i class="fa fa-edit"></i> Edit Member
+                    </a>
+                    <a href="<?php echo base_url('index.php?burial/member_profile_print/' . $member['id']); ?>"
+                       target="_blank"
+                       class="btn btn-xs btn-default">
+                        <i class="fa fa-print"></i> Print Profile
+                    </a>
+                </div>
+                <h2 class="panel-title">
+                    <i class="fa fa-user"></i> Member Profile
+                </h2>
+            </header>
 
-<div class="member-profile">
+            <div class="panel-body">
+                <div class="row" style="margin-bottom: 15px;">
+                    <div class="col-md-2 col-sm-3 text-center">
+                        <img src="<?php echo base_url('uploads/logo.png'); ?>" alt="SNAT Logo" class="img-responsive center-block" style="max-height: 70px;">
+                    </div>
+                    <div class="col-md-10 col-sm-9">
+                        <h3 style="margin-top: 0; margin-bottom: 5px;">SNAT Burial Member Profile</h3>
+                        <p class="text-muted" style="margin-bottom: 0;">
+                            Account: <strong><?php echo '058-' . $member['id']; ?></strong>
+                        </p>
+                    </div>
+                </div>
 
-    <div class="profile-header">
-        <h2>SNAT BURIAL SCHEME</h2>
-        <p>Member Profile</p>
-        <p>Generated on: <?= date('d M Y H:i') ?></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr><th style="width: 35%;">Full Name</th><td><?php echo htmlspecialchars(trim(($member['surname'] ?? '') . ' ' . ($member['name'] ?? ''))); ?></td></tr>
+                                <tr><th>National ID</th><td><?php echo !empty($member['idnumber']) ? htmlspecialchars($member['idnumber']) : 'N/A'; ?></td></tr>
+                                <tr><th>Employee No</th><td><?php echo !empty($member['employeeno']) ? htmlspecialchars($member['employeeno']) : 'N/A'; ?></td></tr>
+                                <tr><th>TSC No</th><td><?php echo !empty($member['tscno']) ? htmlspecialchars($member['tscno']) : 'N/A'; ?></td></tr>
+                                <tr><th>Date of Birth</th><td><?php echo !empty($member['dob']) ? htmlspecialchars($member['dob']) : 'N/A'; ?></td></tr>
+                                <tr><th>Gender</th><td><?php echo !empty($member['gender']) ? htmlspecialchars($member['gender']) : 'N/A'; ?></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr><th style="width: 35%;">Cell Number</th><td><?php echo !empty($member['cellnumber']) ? htmlspecialchars($member['cellnumber']) : 'N/A'; ?></td></tr>
+                                <tr><th>School Code</th><td><?php echo !empty($member['schoolcode']) ? htmlspecialchars($member['schoolcode']) : 'N/A'; ?></td></tr>
+                                <tr><th>Institution</th><td><?php echo !empty($member['institution']) ? htmlspecialchars($member['institution']) : 'N/A'; ?></td></tr>
+                                <tr><th>Branch</th><td><?php echo !empty($branch_name) ? htmlspecialchars($branch_name) : 'N/A'; ?></td></tr>
+                                <tr><th>Employment Status</th><td><?php echo !empty($status_name) ? htmlspecialchars($status_name) : 'N/A'; ?></td></tr>
+                                <tr><th>Nominee</th><td><?php echo !empty($nominee['fullname']) ? htmlspecialchars($nominee['fullname']) : 'N/A'; ?></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <header class="panel-heading">
+                <h2 class="panel-title"><i class="fa fa-list"></i> Last 12 Subscriptions</h2>
+            </header>
+            <div class="panel-body">
+                <?php if (!empty($subscriptions)): ?>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Source</th>
+                                    <th class="text-right">Amount (E)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $i = 1; foreach ($subscriptions as $sub): ?>
+                                    <tr>
+                                        <td><?php echo $i++; ?></td>
+                                        <td><?php echo !empty($sub['date']) ? date('Y-m-d', strtotime($sub['date'])) : 'N/A'; ?></td>
+                                        <td><?php echo !empty($sub['description']) ? htmlspecialchars($sub['description']) : 'N/A'; ?></td>
+                                        <td><?php echo !empty($sub['type']) ? htmlspecialchars($sub['type']) : 'N/A'; ?></td>
+                                        <td><?php echo !empty($sub['status']) ? htmlspecialchars($sub['status']) : 'N/A'; ?></td>
+                                        <td><?php echo !empty($sub['source']) ? htmlspecialchars($sub['source']) : 'N/A'; ?></td>
+                                        <td class="text-right"><?php echo number_format((float)($sub['amount'] ?? 0), 2); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning" style="margin-bottom: 0;">
+                        No subscriptions found for this member.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
     </div>
-
-    <div class="actions">
-        <a href="<?= base_url('index.php?burial/beneficiaries/'.$member_row['id']) ?>" 
-           class="btn btn-info">
-            <i class="fa fa-users"></i> Manage Beneficiaries
-        </a>
-    </div>
-
-    <!-- Member Information -->
-    <div class="section-title">Member Information</div>
-    <div class="info-grid">
-        <div class="info-row">
-            <span class="info-label">SNAT Burial Account:</span>
-            <span class="info-value"><?= $member_row['id'] ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Full Name:</span>
-            <span class="info-value"><?= $member_row['surname'] . ' ' . $member_row['name'] ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">National ID:</span>
-            <span class="info-value"><?= $member_row['idnumber'] ?: '—' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Passbook No:</span>
-            <span class="info-value"><?= $member_row['passbook_no'] ?: '—' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Employee No:</span>
-            <span class="info-value"><?= $member_row['employeeno'] ?: 'N/A' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">TSC No:</span>
-            <span class="info-value"><?= $member_row['tscno'] ?: 'N/A' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Date of Birth:</span>
-            <span class="info-value"><?= $member_row['dob'] ?: '—' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Gender:</span>
-            <span class="info-value"><?= $member_row['gender'] ?: '—' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Cell Number:</span>
-            <span class="info-value"><?= $member_row['cellnumber'] ?: '—' ?></span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">School Code:</span>
-            <span class="info-value"><?= $member_row['schoolcode'] ?: 'N/A' ?></span>
-        </div>
-    </div>
-
-    <!-- Financial Summary -->
-    <div class="section-title">Monthly Contribution Summary</div>
-    <div class="summary-box">
-        <div class="summary-row">
-            <span>Principal Fee:</span>
-            <span>E <?= number_format($principal_fee, 2) ?></span>
-        </div>
-        <div class="summary-row">
-            <span>Total Registered Beneficiaries:</span>
-            <span><?= $total_beneficiaries ?></span>
-        </div>
-        <div class="summary-row">
-            <span>Payable Beneficiaries:</span>
-            <span><?= $payable_beneficiaries ?></span>
-        </div>
-        <?php if ($payable_members_count || $payable_spouses_count): ?>
-        <div class="summary-row" style="font-size:0.95em; color:#555;">
-            <span style="padding-left:20px;">→ Members</span>
-            <span><?= $payable_members_count ?></span>
-        </div>
-        <div class="summary-row" style="font-size:0.95em; color:#555;">
-            <span style="padding-left:20px;">→ Spouses</span>
-            <span><?= $payable_spouses_count ?></span>
-        </div>
-        <?php endif; ?>
-        <div class="summary-row">
-            <span>Beneficiary Fee (<?= $payable_beneficiaries ?> × E <?= number_format($member_fee, 2) ?>):</span>
-            <span>E <?= number_format($beneficiary_fee, 2) ?></span>
-        </div>
-        <div class="summary-row total">
-            <span>Total Monthly Contribution:</span>
-            <span>E <?= number_format($total_monthly, 2) ?></span>
-        </div>
-    </div>
-
-    <!-- Beneficiaries List -->
-    <div class="section-title">Beneficiaries (<?= $total_beneficiaries ?>)</div>
-
-    <?php if (!empty($beneficiaries)): ?>
-    <table class="beneficiaries-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Full Name</th>
-                <th>Relationship</th>
-                <th>Gender</th>
-                <th>Date of Birth</th>
-                <th>Submission Date</th>
-                <th>Status</th>
-                <th>Status Date</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php $i = 1; foreach ($beneficiaries as $b): ?>
-            <tr>
-                <td><?= $i++ ?></td>
-                <td><?= htmlspecialchars($b['fullname']) ?></td>
-                <td><?= $b['is_spouse'] ? 'Spouse' : 'Member/Child' ?></td>
-                <td><?= $b['gender'] ?: '—' ?></td>
-                <td><?= $b['dob'] ?: '—' ?></td>
-                <td><?= $b['submission_date'] ?: '—' ?></td>
-                <td><?= $b['status'] ?: '—' ?></td>
-                <td><?= $b['status_date'] ?: '—' ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php else: ?>
-    <div style="text-align:center; padding:40px; color:#888; font-style:italic;">
-        No beneficiaries registered yet.
-    </div>
-    <?php endif; ?>
-
-    <div style="margin-top: 50px; text-align: center; color: #666; font-size: 13px;">
-        This document was generated by the SNAT Burial Scheme system.<br>
-        For official confirmation or updates, please contact the SNAT Burial Scheme office.
-    </div>
-
 </div>

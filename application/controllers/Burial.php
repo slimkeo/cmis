@@ -472,6 +472,17 @@ class Burial extends CI_Controller
         $this->load->view('backend/index', $page_data);
     }
 
+     /********** MEMBER PROFILE PRINT ********************/
+     function member_profile_print($memberid)
+     {
+         if ($this->session->userdata('user_login') != 1)
+             redirect(base_url(), 'refresh');
+ 
+         $page_data['memberid'] = $memberid;
+         $this->load->view('backend/burial/profile_print', $page_data);
+     }
+    
+
     /********** GENERATE MONTH RANGE ********************/
     private function generate_month_range()
     {
