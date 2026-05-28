@@ -20,12 +20,41 @@ $nominee = $this->db
     ->get_where('nominee', array('member_id' => $member['id']))
     ->row_array();
 
-$subscriptions = $this->db
+$statements = $this->db
     ->where('memberid', $member['id'])
     ->order_by('date', 'DESC')
     ->limit(12)
-    ->get('subscriptions')
+    ->get('statements')
     ->result_array();
+
+$beneficiaries = $this->Beneficiary_model->get_by_member($member['id']);
+$summary = $this->Beneficiary_model->get_payable_summary($member['id']);
+$total_beneficiaries = $summary['total_beneficiaries'];
+$payable_beneficiaries = $summary['payable_beneficiaries'];
+$beneficiary_fee = $summary['payable_beneficiary_fee'];
+$total_monthly = $this->Beneficiary_model->get_total_monthly_fee($member['id']);
+$fees = $this->Beneficiary_model->get_fee_settings();
+$principal_fee = $fees['principal_fee'];
+$member_fee = $fees['member_fee'];
+
+$non_payable_statuses = array(
+    'BENEFITTED - REPLACED',
+    'DECEASED - REPLACED',
+    'DELETED'
+);
+
+$payable_list = array_filter($beneficiaries, function ($b) use ($non_payable_statuses) {
+    $status = trim($b['status'] ?? '');
+    return !in_array($status, $non_payable_statuses, true);
+});
+
+$payable_members_count = count(array_filter($payable_list, function ($b) {
+    return (int)($b['is_spouse'] ?? 0) === 0;
+}));
+
+$payable_spouses_count = count(array_filter($payable_list, function ($b) {
+    return (int)($b['is_spouse'] ?? 0) === 1;
+}));
 ?>
 <!doctype html>
 <html>
@@ -39,6 +68,7 @@ $subscriptions = $this->db
         .header { border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
         .logo { max-height: 60px; }
         .table th { width: 35%; }
+        .section-title { margin-top: 18px; margin-bottom: 8px; font-weight: 700; }
         @media print {
             .no-print { display: none !important; }
             body { padding: 0; }
@@ -86,7 +116,7 @@ $subscriptions = $this->db
         </div>
     </div>
 
-    <h4>Last 12 Subscriptions</h4>
+    <h4 class="section-title">Last 12 Statements</h4>
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
@@ -100,8 +130,8 @@ $subscriptions = $this->db
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($subscriptions)): ?>
-                <?php $i = 1; foreach ($subscriptions as $sub): ?>
+            <?php if (!empty($statements)): ?>
+                <?php $i = 1; foreach ($statements as $sub): ?>
                     <tr>
                         <td><?php echo $i++; ?></td>
                         <td><?php echo !empty($sub['date']) ? date('Y-m-d', strtotime($sub['date'])) : 'N/A'; ?></td>
@@ -114,7 +144,56 @@ $subscriptions = $this->db
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="7" class="text-center text-muted">No subscriptions found for this member.</td>
+                    <td colspan="7" class="text-center text-muted">No statements found for this member.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <h4 class="section-title">Monthly Amount To Pay</h4>
+    <table class="table table-bordered table-striped">
+        <tbody>
+            <tr><th>Principal Fee</th><td>E <?php echo number_format((float)$principal_fee, 2); ?></td></tr>
+            <tr><th>Total Registered Beneficiaries</th><td><?php echo (int)$total_beneficiaries; ?></td></tr>
+            <tr><th>Payable Beneficiaries</th><td><?php echo (int)$payable_beneficiaries; ?></td></tr>
+            <tr><th>Payable Members</th><td><?php echo (int)$payable_members_count; ?></td></tr>
+            <tr><th>Payable Spouses</th><td><?php echo (int)$payable_spouses_count; ?></td></tr>
+            <tr><th>Beneficiary Fee (<?php echo (int)$payable_beneficiaries; ?> x E <?php echo number_format((float)$member_fee, 2); ?>)</th><td>E <?php echo number_format((float)$beneficiary_fee, 2); ?></td></tr>
+            <tr><th>Total Monthly Contribution</th><td><strong>E <?php echo number_format((float)$total_monthly, 2); ?></strong></td></tr>
+        </tbody>
+    </table>
+
+    <h4 class="section-title">Beneficiaries (<?php echo (int)$total_beneficiaries; ?>)</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Relationship</th>
+                <th>Gender</th>
+                <th>Date of Birth</th>
+                <th>Submission Date</th>
+                <th>Status</th>
+                <th>Status Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($beneficiaries)): ?>
+                <?php $k = 1; foreach ($beneficiaries as $b): ?>
+                    <tr>
+                        <td><?php echo $k++; ?></td>
+                        <td><?php echo htmlspecialchars($b['fullname'] ?? 'N/A'); ?></td>
+                        <td><?php echo !empty($b['is_spouse']) ? 'Spouse' : 'Member/Child'; ?></td>
+                        <td><?php echo !empty($b['gender']) ? htmlspecialchars($b['gender']) : 'N/A'; ?></td>
+                        <td><?php echo !empty($b['dob']) ? htmlspecialchars($b['dob']) : 'N/A'; ?></td>
+                        <td><?php echo !empty($b['submission_date']) ? htmlspecialchars($b['submission_date']) : 'N/A'; ?></td>
+                        <td><?php echo !empty($b['status']) ? htmlspecialchars($b['status']) : 'N/A'; ?></td>
+                        <td><?php echo !empty($b['status_date']) ? htmlspecialchars($b['status_date']) : 'N/A'; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No beneficiaries registered yet.</td>
                 </tr>
             <?php endif; ?>
         </tbody>
