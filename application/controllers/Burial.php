@@ -1101,13 +1101,18 @@ class Burial extends CI_Controller
                 ]));
         }
 
-        // Total records for this member (no search)
-        $recordsTotal = $this->db->where('memberid', $memberid)
-                                ->count_all_results("statements");
+        $member = $this->db->get_where('members', ['id' => $memberid])->row();
+        $memberEmployeeno = $member ? trim((string) $member->employeeno) : '';
+        $memberIdnumber = $member ? trim((string) $member->idnumber) : '';
+
+        // Total records for this member using memberid OR identifier linking.
+        $this->db->from("statements");
+        $this->apply_statement_member_filters($memberid, $memberEmployeeno, $memberIdnumber);
+        $recordsTotal = $this->db->count_all_results();
 
         // Build filtered query
         $this->db->from("statements");
-        $this->db->where('memberid', $memberid);
+        $this->apply_statement_member_filters($memberid, $memberEmployeeno, $memberIdnumber);
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -1164,14 +1169,21 @@ class Burial extends CI_Controller
         // Use page query string ?page=offset
         $page = intval($this->input->get('page')) ?: 0;
 
-        // Count total statements for member
+        $member = $this->db->get_where('members', ['id' => $memberid])->row();
+        $memberEmployeeno = $member ? trim((string) $member->employeeno) : '';
+        $memberIdnumber = $member ? trim((string) $member->idnumber) : '';
+
+        // Count total statements for member using memberid OR identifier linking.
         $this->db->from('statements');
-        $this->db->where('memberid', $memberid);
+        $this->apply_statement_member_filters($memberid, $memberEmployeeno, $memberIdnumber);
         $total_rows = $this->db->count_all_results();
 
         // Fetch paginated statements
+        $this->db->from('statements');
+        $this->apply_statement_member_filters($memberid, $memberEmployeeno, $memberIdnumber);
         $this->db->order_by('date', 'DESC');
-        $query = $this->db->get_where('statements', ['memberid' => $memberid], $per_page, $page);
+        $this->db->limit($per_page, $page);
+        $query = $this->db->get();
         $statements = $query->result_array();
 
         // Setup pagination
@@ -1206,6 +1218,24 @@ class Burial extends CI_Controller
         $page_data['page_name'] = 'member_statement';
         $page_data['page_title'] = 'Member Statement : '.$memberid;
         $this->load->view('backend/index', $page_data);
+    }
+
+    /**
+     * Build statement filters for a member using memberid or known identifiers.
+     */
+    private function apply_statement_member_filters($memberid, $employeeno = '', $idnumber = '')
+    {
+        $this->db->group_start();
+        $this->db->where('memberid', (int) $memberid);
+
+        if ($employeeno !== '') {
+            $this->db->or_where('employeeno', $employeeno);
+        }
+
+        if ($idnumber !== '') {
+            $this->db->or_where('idnumber', $idnumber);
+        }
+        $this->db->group_end();
     }
 
     ///initaite sms sending
@@ -1945,15 +1975,36 @@ class Burial extends CI_Controller
                 ->set_output(json_encode(['success' => false, 'error' => 'Unable to open file']));
         }
 
-        // Check if this month has already been uploaded (duplicate month prevention)
+        // Check if this month/source has already been uploaded (duplicate spreadsheet prevention)
         $month_str = $month; // e.g., "2024-03"
+        $source = ($upload_type === 'treasurer' ? 'Treasure' : 'SNAT Employee');
         $existing_count = $this->db
             ->where('date >=', $month_str . '-01')
             ->where('date <', date('Y-m-d', strtotime($month_str . '-01 +1 month')))
             ->where('type', 'Subscription')
+            ->where('source', $source)
             ->count_all_results('statements');
 
         $is_duplicate_month = ($existing_count > 0);
+
+        if ($is_duplicate_month) {
+            fclose($handle);
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => true,
+                    'inserted' => 0,
+                    'skipped' => 0,
+                    'missing_count' => 0,
+                    'rows_processed' => 0,
+                    'next_offset' => $offset,
+                    'has_more' => false,
+                    'is_duplicate_month' => true,
+                    'duplicate_blocked' => true,
+                    'missing' => [],
+                    'message' => 'This month and source have already been uploaded.'
+                ]));
+        }
 
         // Skip to offset
         $current_row = 0;
@@ -2031,36 +2082,24 @@ class Burial extends CI_Controller
             $this->db->stop_cache();
             $this->db->flush_cache();
 
-            if ($member) {
-                // Check if statement already exists for this member in this month
-                $existing = $this->db
-                    ->where('memberid', $member->id)
-                    ->where('date >=', $statement_date)
-                    ->where('date <', date('Y-m-d', strtotime($statement_date . ' +1 month')))
-                    ->where('type', 'Subscription')
-                    ->count_all_results('statements');
+            $statement_data = [
+                'memberid' => $member ? $member->id : null,
+                'idnumber' => ($idnumber !== '' ? $idnumber : null),
+                'employeeno' => ($employeeno !== '' ? $employeeno : null),
+                'date' => $statement_date,
+                'description' => ($upload_type === 'treasurer' ? 'Treasurer : '.date('F Y', strtotime($statement_date)) : 'SNAT EMP Subscription : '.date('F Y', strtotime($statement_date))),
+                'amount' => $amount,
+                'type' => 'Subscription',
+                'status' => 'Paid',
+                'source' => $source,
+                'user' => $this->session->userdata('user_id'),
+                'created_at' => date('Y-m-d')
+            ];
 
-                if ($existing > 0) {
-                    // Duplicate found - skip this record
-                    $skipped++;
-                } else {
-                    // New record - insert it
-                    $statement_data = [
-                        'memberid' => $member->id,
-                        'date' => $statement_date,
-                        'description' => ($upload_type === 'treasurer' ? 'Treasurer : '.date('F Y', strtotime($statement_date)) : 'SNAT EMP Subscription : '.date('F Y', strtotime($statement_date))),
-                        'amount' => $amount,
-                        'type' => 'Subscription',
-                        'status' => 'Paid',
-                        'source' => ($upload_type === 'treasurer' ? 'Treasure' : 'SNAT Employee'),
-                        'user' => $this->session->userdata('user_id'),
-                        'created_at' => date('Y-m-d')
-                    ];
+            $this->db->insert('statements', $statement_data);
+            $inserted++;
 
-                    $this->db->insert('statements', $statement_data);
-                    $inserted++;
-                }
-            } else {
+            if (!$member) {
                 $missing[] = ['employeeno' => $employeeno, 'idnumber' => $idnumber, 'fullname' => $fullname];
             }
 
