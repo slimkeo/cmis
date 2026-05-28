@@ -21,7 +21,7 @@
 
 				<!-- Duplicate Month Warning -->
 				<div id="duplicateWarning" style="display: none;" class="alert alert-warning">
-					<strong>Warning:</strong> This month/source has already been uploaded before. No rows were added.
+					<strong>Warning:</strong> This month has existing subscriptions. Matching rows with the same ID number are skipped; new rows are still uploaded.
 				</div>
 
 				<!-- Results -->
@@ -100,12 +100,6 @@ $(document).ready(function() {
 					// Show duplicate warning if applicable
 					if (response.is_duplicate_month && offset === 0) {
 						$('#duplicateWarning').show();
-					}
-
-					if (response.duplicate_blocked) {
-						addStatusMessage('Skipped: ' + (response.message || 'Duplicate month/source detected.'), 'error');
-						completeProcessing();
-						return;
 					}
 
 					// Accumulate totals

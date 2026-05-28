@@ -1975,7 +1975,7 @@ class Burial extends CI_Controller
                 ->set_output(json_encode(['success' => false, 'error' => 'Unable to open file']));
         }
 
-        // Check if this month/source has already been uploaded (duplicate spreadsheet prevention)
+        // Check if this month/source already has subscriptions (used for warning only).
         $month_str = $month; // e.g., "2024-03"
         $source = ($upload_type === 'treasurer' ? 'Treasure' : 'SNAT Employee');
         $existing_count = $this->db
@@ -1986,25 +1986,6 @@ class Burial extends CI_Controller
             ->count_all_results('statements');
 
         $is_duplicate_month = ($existing_count > 0);
-
-        if ($is_duplicate_month) {
-            fclose($handle);
-            return $this->output
-                ->set_content_type('application/json')
-                ->set_output(json_encode([
-                    'success' => true,
-                    'inserted' => 0,
-                    'skipped' => 0,
-                    'missing_count' => 0,
-                    'rows_processed' => 0,
-                    'next_offset' => $offset,
-                    'has_more' => false,
-                    'is_duplicate_month' => true,
-                    'duplicate_blocked' => true,
-                    'missing' => [],
-                    'message' => 'This month and source have already been uploaded.'
-                ]));
-        }
 
         // Skip to offset
         $current_row = 0;
@@ -2043,8 +2024,8 @@ class Burial extends CI_Controller
             }
 
             // Extract fields
-            $employeeno = trim($row_assoc['employeeno'] ?? '');
-            $idnumber = trim($row_assoc['idnumber'] ?? '');
+            $employeeno = $this->normalize_statement_identifier($row_assoc['employeeno'] ?? '');
+            $idnumber = $this->normalize_statement_identifier($row_assoc['idnumber'] ?? '');
             $amount = trim($row_assoc['amount'] ?? '');
             $fullname = trim($row_assoc['fullname'] ?? '');
 
@@ -2066,6 +2047,23 @@ class Burial extends CI_Controller
                 $rows_processed++;
                 $current_row++;
                 continue;
+            }
+
+            // If same month already has this idnumber, skip this row.
+            if ($idnumber !== '') {
+                $duplicate_by_idnumber = $this->db
+                    ->where('date >=', $statement_date)
+                    ->where('date <', date('Y-m-d', strtotime($statement_date . ' +1 month')))
+                    ->where('type', 'Subscription')
+                    ->where('idnumber', $idnumber)
+                    ->count_all_results('statements');
+
+                if ($duplicate_by_idnumber > 0) {
+                    $skipped++;
+                    $rows_processed++;
+                    $current_row++;
+                    continue;
+                }
             }
 
             // Try to find member by employee number OR id number
@@ -2134,6 +2132,70 @@ class Burial extends CI_Controller
                 'is_duplicate_month' => $is_duplicate_month,
                 'missing' => array_slice($missing, 0, 10) // Return first 10 missing for display
             ]));
+    }
+
+    /**
+     * Normalize identifiers from CSV, including scientific notation from spreadsheets.
+     */
+    private function normalize_statement_identifier($value)
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        // Strip common CSV formatting artifacts.
+        $value = str_replace([',', ' ', "'"], '', $value);
+        if ($value === '') {
+            return '';
+        }
+
+        // Convert scientific notation string to plain number string without float casting.
+        if (preg_match('/^([+-]?\d+(?:\.\d+)?)[eE]([+-]?\d+)$/', $value, $matches)) {
+            $mantissa = $matches[1];
+            $exponent = (int) $matches[2];
+            $negative = false;
+
+            if (strpos($mantissa, '-') === 0) {
+                $negative = true;
+                $mantissa = substr($mantissa, 1);
+            } elseif (strpos($mantissa, '+') === 0) {
+                $mantissa = substr($mantissa, 1);
+            }
+
+            $parts = explode('.', $mantissa, 2);
+            $intPart = $parts[0];
+            $fracPart = isset($parts[1]) ? $parts[1] : '';
+
+            $digits = ltrim($intPart . $fracPart, '0');
+            if ($digits === '') {
+                return '0';
+            }
+
+            $decimalPos = strlen($intPart) + $exponent;
+            if ($decimalPos <= 0) {
+                $normalized = '0.' . str_repeat('0', abs($decimalPos)) . $digits;
+            } elseif ($decimalPos >= strlen($digits)) {
+                $normalized = $digits . str_repeat('0', $decimalPos - strlen($digits));
+            } else {
+                $normalized = substr($digits, 0, $decimalPos) . '.' . substr($digits, $decimalPos);
+            }
+
+            // For identifiers we prefer plain integer when decimal part is only zeros.
+            if (strpos($normalized, '.') !== false) {
+                $normalized = rtrim(rtrim($normalized, '0'), '.');
+            }
+
+            return $negative ? '-' . $normalized : $normalized;
+        }
+
+        // Normalize plain numeric text like 12345.0 -> 12345.
+        if (preg_match('/^[+-]?\d+(\.\d+)?$/', $value)) {
+            $value = rtrim(rtrim($value, '0'), '.');
+            return $value === '' || $value === '+' || $value === '-' ? '0' : $value;
+        }
+
+        return $value;
     }
 
     /**
