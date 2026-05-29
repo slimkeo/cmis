@@ -133,6 +133,8 @@ class Burial extends CI_Controller
                     'flash_message_error',
                     'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed'
                 );
+                redirect(base_url() . 'index.php?burial/members', 'refresh');
+                return;
 
             } else {
 
@@ -188,9 +190,9 @@ class Burial extends CI_Controller
                     $this->session->set_flashdata('flash_message', 'Member added successfully. SMS NOT SENT, EXISITNG MEMBER');
                 }
 
-                
+                redirect(base_url() . 'index.php?burial/member_details/'.$member_id, 'refresh');
+                return;
             }
-            redirect(base_url() . 'index.php?burial/member_details/'.$member_id, 'refresh');
         }
 
         // UPDATE MEMBER
