@@ -2425,7 +2425,7 @@ class Burial extends CI_Controller
 
             $this->session->set_flashdata('flash_message', 'Claim added successfully');
 
-            redirect(base_url() . 'index.php?burial/claims', 'refresh');
+            redirect(base_url() . 'index.php?burial/print_claims_details/'.$claim_id, 'refresh');
         }
 
         // UPDATE CLAIM
