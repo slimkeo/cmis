@@ -3,6 +3,7 @@ $claim = $claim ?? [];
 
 $member = $this->db->get_where('members', array('id' => $claim['member_id'] ?? 0))->row();
 $member_name = $member ? trim($member->surname . ' ' . $member->name) : '-';
+$member_id = $member ? trim($member->id) : '-';
 $member_cell = $member && !empty($member->cellnumber) ? $member->cellnumber : '-';
 $member_school = $member && !empty($member->schoolcode) ? $member->schoolcode : '-';
 $member_resident = $member && !empty($member->resident) ? $member->resident : '-';
