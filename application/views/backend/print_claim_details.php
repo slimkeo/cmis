@@ -250,11 +250,6 @@ if (($claim['status'] ?? '') === 'PENDING') {
                     <tr><th>Amount</th><td><strong><?php echo isset($claim['amount']) ? number_format($claim['amount'], 2) : '-'; ?></strong></td></tr>
                     <tr><th>Bank</th><td><?php echo htmlspecialchars($claim['bank'] ?? '-'); ?></td></tr>
                     <tr><th>Account</th><td><?php echo htmlspecialchars($claim['account'] ?? '-'); ?></td></tr>
-                    <tr>
-                        <th>Status</th>
-                        <td><span class="label label-<?php echo $status_class; ?>"><?php echo htmlspecialchars($claim['status'] ?? '-'); ?></span></td>
-                    </tr>
-                    <tr><th>Approved</th><td><?php echo !empty($claim['approved_date']) ? date('d-m-Y', strtotime($claim['approved_date'])) : '-'; ?></td></tr>
                     <tr><th>Paid</th><td><?php echo !empty($claim['payment_date']) ? date('d-m-Y', strtotime($claim['payment_date'])) : '-'; ?></td></tr>
                 </table>
             </div>
