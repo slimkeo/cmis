@@ -13,6 +13,14 @@ $beneficiary_name = $beneficiary ? $beneficiary->fullname : '-';
 $nominee = $this->db->get_where('nominee', array('id' => $claim['nominee_id'] ?? 0))->row();
 $nominee_name = $nominee ? $nominee->fullname : '-';
 
+// Claimant: member for beneficiary claims, nominee for member/policy-holder claims
+$claim_type = strtoupper(trim((string)($claim['claim_type'] ?? 'BENEFICIARY')));
+if ($claim_type === 'NOMINEE' || (!empty($claim['nominee_id']) && empty($claim['beneficiary_id']))) {
+    $claimant_name = $nominee_name;
+} else {
+    $claimant_name = $member_name;
+}
+
 $processed_by_name = '-';
 if (!empty($claim['processed_by'])) {
     $admin = $this->db->get_where('admin', array('id' => $claim['processed_by']))->row();
@@ -266,7 +274,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
             <tbody>
                 <tr>
                     <th>Claimant</th>
-                    <td><?php echo htmlspecialchars($beneficiary_name); ?></td>
+                    <td><?php echo htmlspecialchars($claimant_name); ?></td>
                     <td><div class="signature-line"></div></td>
                 </tr>
                 <tr>
