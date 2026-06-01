@@ -69,14 +69,14 @@ if (($claim['status'] ?? '') === 'PENDING') {
             min-height: 265mm;
         }
         .print-top { flex: 0 0 auto; }
-        .print-middle { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; padding: 10mm 0; }
+        .print-middle { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; padding: 4mm 0; }
         .print-bottom { flex: 0 0 auto; margin-top: auto; }
         .header {
             border-bottom: 2px solid #333;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
         }
-        .logo { max-height: 72px; }
+        .logo { max-height: 60px; }
         .header h3 { font-size: 22px; margin: 0 0 6px; font-weight: 700; }
         .header small { font-size: 12px; }
         .section-title {
@@ -84,10 +84,29 @@ if (($claim['status'] ?? '') === 'PENDING') {
             font-size: 14px;
             font-weight: 700;
         }
-        .details-row { margin-bottom: 8px; }
+        .details-row .section-title {
+            margin: 8px 0 4px;
+            font-size: 11px;
+        }
+        .details-row { margin-bottom: 4px; }
         .table {
             margin-bottom: 12px;
             font-size: 12.5px;
+        }
+        .table-details {
+            margin-bottom: 6px;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+        .table-details > tbody > tr > th,
+        .table-details > tbody > tr > td {
+            padding: 4px 6px;
+            vertical-align: middle;
+        }
+        .table-details > tbody > tr > th {
+            width: 42%;
+            font-weight: 600;
+            font-size: 9.5px;
         }
         .table > thead > tr > th,
         .table > tbody > tr > th,
@@ -147,7 +166,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
         }
         .notes-cell {
             font-size: 12px;
-            min-height: 72px;
+            min-height: 56px;
             vertical-align: top !important;
         }
         .table-processing tr.notes-row > th,
@@ -161,9 +180,8 @@ if (($claim['status'] ?? '') === 'PENDING') {
                 padding: 0;
                 max-width: none;
                 min-height: 273mm;
-                height: 273mm;
             }
-            .print-page { min-height: 273mm; height: 100%; }
+            .print-page { min-height: 265mm; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -192,7 +210,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
         <div class="row details-row">
             <div class="col-xs-4">
                 <h4 class="section-title">Member & Beneficiary</h4>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-details">
                     <tr><th>Claim ID</th><td><?php echo htmlspecialchars($claim['id'] ?? '-'); ?></td></tr>
                     <tr><th>Member</th><td><?php echo htmlspecialchars($member_name); ?></td></tr>
                     <tr><th>Cell Number</th><td><?php echo htmlspecialchars($member_cell); ?></td></tr>
@@ -205,7 +223,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
 
             <div class="col-xs-4">
                 <h4 class="section-title">Burial Information</h4>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-details">
                     <tr><th>Place of Burial</th><td><?php echo htmlspecialchars($claim['place_of_burial'] ?? '-'); ?></td></tr>
                     <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
                     <tr><th>Nominee</th><td><?php echo htmlspecialchars($nominee_name); ?></td></tr>
@@ -215,12 +233,12 @@ if (($claim['status'] ?? '') === 'PENDING') {
 
             <div class="col-xs-4">
                 <h4 class="section-title">Mortuary</h4>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-details">
                     <tr><th>Mortuary</th><td><?php echo htmlspecialchars($claim['mortuary'] ?? '-'); ?></td></tr>
                     <tr><th>Date of Entry</th><td><?php echo !empty($claim['date_of_entry']) ? date('d-m-Y', strtotime($claim['date_of_entry'])) : '-'; ?></td></tr>
                 </table>
                 <h4 class="section-title">Payment</h4>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-details">
                     <tr><th>Amount</th><td><strong><?php echo isset($claim['amount']) ? number_format($claim['amount'], 2) : '-'; ?></strong></td></tr>
                     <tr><th>Bank</th><td><?php echo htmlspecialchars($claim['bank'] ?? '-'); ?></td></tr>
                     <tr><th>Account</th><td><?php echo htmlspecialchars($claim['account'] ?? '-'); ?></td></tr>
