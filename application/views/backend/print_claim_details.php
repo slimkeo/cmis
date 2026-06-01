@@ -44,80 +44,126 @@ if (($claim['status'] ?? '') === 'PENDING') {
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/vendor/bootstrap/css/bootstrap.css"/>
     <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/vendor/font-awesome/css/font-awesome.css"/>
     <style>
-        @page { size: A4 portrait; margin: 10mm; }
+        @page { size: A4 portrait; margin: 12mm; }
         html, body {
-            font-size: 11px;
-            line-height: 1.25;
+            font-size: 13px;
+            line-height: 1.45;
             padding: 0;
             margin: 0;
         }
         .print-sheet {
-            max-width: 190mm;
+            width: 100%;
+            max-width: 186mm;
+            min-height: 273mm;
             margin: 0 auto;
-            padding: 8px 10px;
+            padding: 4mm 2mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
+        .print-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 265mm;
+        }
+        .print-top { flex: 0 0 auto; }
+        .print-middle { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; padding: 10mm 0; }
+        .print-bottom { flex: 0 0 auto; margin-top: auto; }
         .header {
-            border-bottom: 1px solid #333;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
+            border-bottom: 2px solid #333;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
         }
-        .logo { max-height: 48px; }
-        .header h3 { font-size: 16px; margin: 0 0 2px; }
-        .header small { font-size: 10px; }
+        .logo { max-height: 72px; }
+        .header h3 { font-size: 22px; margin: 0 0 6px; font-weight: 700; }
+        .header small { font-size: 12px; }
         .section-title {
-            margin: 8px 0 4px;
-            font-size: 11px;
+            margin: 14px 0 8px;
+            font-size: 14px;
             font-weight: 700;
         }
+        .details-row { margin-bottom: 8px; }
         .table {
-            margin-bottom: 6px;
-            font-size: 10.5px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
         }
         .table > thead > tr > th,
         .table > tbody > tr > th,
         .table > tbody > tr > td {
-            padding: 3px 6px;
+            padding: 9px 10px;
             vertical-align: middle;
         }
         .table > tbody > tr > th {
             width: 38%;
             font-weight: 600;
         }
+        .table-processing {
+            margin-top: 6px;
+        }
         .table-processing > thead > tr > th {
-            background: #f5f5f5;
+            background: #f0f0f0;
             font-weight: 700;
-            font-size: 10px;
+            font-size: 13px;
+            padding: 12px 10px;
+        }
+        .table-processing > tbody > tr > th,
+        .table-processing > tbody > tr > td {
+            padding: 14px 10px;
         }
         .table-processing .col-details { width: 42%; }
         .table-processing .col-signature { width: 38%; }
+        .table-processing .signature-line {
+            min-height: 40px;
+        }
         .signature-line {
-            border-bottom: 1px dotted #333;
-            min-height: 22px;
-            margin: 2px 0;
+            border-bottom: 2px dotted #333;
+            min-height: 36px;
+            margin: 6px 0;
         }
         .signatures-approved {
-            margin-top: 10px;
             page-break-inside: avoid;
+            padding-top: 16px;
         }
         .approved-heading {
-            margin: 0 0 6px;
+            margin: 0 0 20px;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 14px;
             text-transform: uppercase;
-            border-top: 1px solid #ccc;
-            padding-top: 8px;
+            border-top: 2px solid #333;
+            padding-top: 14px;
         }
-        .signature-block { margin-bottom: 0; }
+        .signature-block { padding: 0 12px; }
+        .signatures-approved .signature-line {
+            min-height: 52px;
+            margin-bottom: 10px;
+        }
         .signature-label {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            margin-top: 2px;
+            letter-spacing: 0.5px;
         }
-        .notes-cell { font-size: 10px; max-height: 36px; overflow: hidden; }
+        .notes-cell {
+            font-size: 12px;
+            min-height: 72px;
+            vertical-align: top !important;
+        }
+        .table-processing tr.notes-row > th,
+        .table-processing tr.notes-row > td {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
         @media print {
             .no-print { display: none !important; }
-            .print-sheet { padding: 0; max-width: none; }
+            .print-sheet {
+                padding: 0;
+                max-width: none;
+                min-height: 273mm;
+                height: 273mm;
+            }
+            .print-page { min-height: 273mm; height: 100%; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -131,6 +177,8 @@ if (($claim['status'] ?? '') === 'PENDING') {
             <a href="<?php echo base_url('index.php?burial/claims'); ?>" class="btn btn-default btn-sm">Back</a>
         </div>
 
+        <div class="print-page">
+        <div class="print-top">
         <div class="header row">
             <div class="col-xs-2">
                 <img src="<?php echo base_url('uploads/logo.png'); ?>" alt="SNAT Logo" class="logo">
@@ -141,10 +189,10 @@ if (($claim['status'] ?? '') === 'PENDING') {
             </div>
         </div>
 
-        <div class="row">
+        <div class="row details-row">
             <div class="col-xs-4">
                 <h4 class="section-title">Member & Beneficiary</h4>
-                <table class="table table-bordered table-condensed">
+                <table class="table table-bordered">
                     <tr><th>Claim ID</th><td><?php echo htmlspecialchars($claim['id'] ?? '-'); ?></td></tr>
                     <tr><th>Member</th><td><?php echo htmlspecialchars($member_name); ?></td></tr>
                     <tr><th>Cell Number</th><td><?php echo htmlspecialchars($member_cell); ?></td></tr>
@@ -157,7 +205,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
 
             <div class="col-xs-4">
                 <h4 class="section-title">Burial Information</h4>
-                <table class="table table-bordered table-condensed">
+                <table class="table table-bordered">
                     <tr><th>Place of Burial</th><td><?php echo htmlspecialchars($claim['place_of_burial'] ?? '-'); ?></td></tr>
                     <tr><th>Date of Burial</th><td><?php echo !empty($claim['date_of_burial']) ? date('d-m-Y', strtotime($claim['date_of_burial'])) : '-'; ?></td></tr>
                     <tr><th>Nominee</th><td><?php echo htmlspecialchars($nominee_name); ?></td></tr>
@@ -167,12 +215,12 @@ if (($claim['status'] ?? '') === 'PENDING') {
 
             <div class="col-xs-4">
                 <h4 class="section-title">Mortuary</h4>
-                <table class="table table-bordered table-condensed">
+                <table class="table table-bordered">
                     <tr><th>Mortuary</th><td><?php echo htmlspecialchars($claim['mortuary'] ?? '-'); ?></td></tr>
                     <tr><th>Date of Entry</th><td><?php echo !empty($claim['date_of_entry']) ? date('d-m-Y', strtotime($claim['date_of_entry'])) : '-'; ?></td></tr>
                 </table>
                 <h4 class="section-title">Payment</h4>
-                <table class="table table-bordered table-condensed">
+                <table class="table table-bordered">
                     <tr><th>Amount</th><td><strong><?php echo isset($claim['amount']) ? number_format($claim['amount'], 2) : '-'; ?></strong></td></tr>
                     <tr><th>Bank</th><td><?php echo htmlspecialchars($claim['bank'] ?? '-'); ?></td></tr>
                     <tr><th>Account</th><td><?php echo htmlspecialchars($claim['account'] ?? '-'); ?></td></tr>
@@ -185,9 +233,11 @@ if (($claim['status'] ?? '') === 'PENDING') {
                 </table>
             </div>
         </div>
+        </div>
 
+        <div class="print-middle">
         <h4 class="section-title">Processing Information</h4>
-        <table class="table table-bordered table-condensed table-processing">
+        <table class="table table-bordered table-processing">
             <thead>
                 <tr>
                     <th>Role</th>
@@ -211,13 +261,15 @@ if (($claim['status'] ?? '') === 'PENDING') {
                     <td><?php echo htmlspecialchars($approved_by_name); ?></td>
                     <td><div class="signature-line"></div></td>
                 </tr>
-                <tr>
+                <tr class="notes-row">
                     <th>Notes</th>
                     <td colspan="2" class="notes-cell"><?php echo nl2br(htmlspecialchars($claim['notes'] ?? '-')); ?></td>
                 </tr>
             </tbody>
         </table>
+        </div>
 
+        <div class="print-bottom">
         <div class="signatures-approved">
             <div class="approved-heading">Approved Signatures</div>
             <div class="row">
@@ -240,6 +292,8 @@ if (($claim['status'] ?? '') === 'PENDING') {
                     </div>
                 </div>
             </div>
+        </div>
+        </div>
         </div>
 
         <div class="no-print" style="margin-top: 12px;">
