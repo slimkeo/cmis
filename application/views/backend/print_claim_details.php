@@ -220,7 +220,7 @@ if (($claim['status'] ?? '') === 'PENDING') {
                 <h4 class="section-title">Member & Beneficiary</h4>
                 <table class="table table-bordered table-details">
                     <tr><th>Claim ID</th><td><?php echo htmlspecialchars($claim['id'] ?? '-'); ?></td></tr>
-                    <tr><th>Member</th><td><?php echo htmlspecialchars($member_name); ?></td></tr>
+                    <tr><th>Member</th><td><?php echo htmlspecialchars($member_name.''.$member_id); ?></td></tr>
                     <tr><th>Cell Number</th><td><?php echo htmlspecialchars($member_cell); ?></td></tr>
                     <tr><th>School Code</th><td><?php echo htmlspecialchars($member_school); ?></td></tr>
                     <tr><th>Residence</th><td><?php echo htmlspecialchars($member_resident); ?></td></tr>
