@@ -207,7 +207,7 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
                     <tr class="<?php echo $row_class; ?>">
                         <td><?php echo $k++; ?></td>
                         <td><?php echo htmlspecialchars($b['fullname'] ?? 'N/A'); ?></td>
-                        <td><?php echo !empty($b['is_spouse']) ? 'Spouse' : 'Member/Child'; ?></td>
+                        <td><?php echo !empty($b['is_spouse']) ? 'Spouse' : 'Beneficiary'; ?></td>
                         <td><?php echo !empty($b['gender']) ? htmlspecialchars($b['gender']) : 'N/A'; ?></td>
                         <td><?php echo !empty($b['dob']) ? htmlspecialchars($b['dob']) : 'N/A'; ?></td>
                         <td><?php echo !empty($b['submission_date']) ? htmlspecialchars($b['submission_date']) : 'N/A'; ?></td>
