@@ -177,15 +177,41 @@ $payable_spouses_count = count(array_filter($payable_list, function ($b) {
         </thead>
         <tbody>
             <?php if (!empty($beneficiaries)): ?>
-                <?php $k = 1; foreach ($beneficiaries as $b): ?>
-                    <tr>
+                <?php $k = 1; foreach ($beneficiaries as $b):
+                    
+                    $today = strtotime(date('Y-m-d'));
+                    $one_year_ago = strtotime('-1 year', $today);
+                    $is_matured = ($submission_timestamp && $submission_timestamp <= $one_year_ago);
+                    
+                    // Determine maturity status text and badge class
+                    if ($b['status'] == 'BENEFITTED' || $b['status'] == 'BENEFITTED - REPLACED'| $b['status'] == 'DECEASED - REPLACED'| $b['status'] == 'DELETED') {
+                        $maturity_status = $b['status'];
+                        $maturity_badge = 'label-danger';
+                        $row_class = 'danger';
+                    }// elseif ($b['status'] == 'REPLACEE') {
+                    //	$maturity_status = 'Matured';
+                    //	$maturity_badge = 'label-success';
+                    //	$row_class = 'success';
+                    //} 
+                    elseif ($is_matured) {
+                        $maturity_status = 'Matured';
+                        $maturity_badge = 'label-success';
+                        $row_class = 'success';
+                    } else {
+                        $maturity_status = 'Waiting';
+                        $maturity_badge = 'label-warning';
+                        $row_class = 'warning';
+                    }
+                ?>
+                    
+                    <tr class="<?php echo $row_class; ?>">
                         <td><?php echo $k++; ?></td>
                         <td><?php echo htmlspecialchars($b['fullname'] ?? 'N/A'); ?></td>
                         <td><?php echo !empty($b['is_spouse']) ? 'Spouse' : 'Member/Child'; ?></td>
                         <td><?php echo !empty($b['gender']) ? htmlspecialchars($b['gender']) : 'N/A'; ?></td>
                         <td><?php echo !empty($b['dob']) ? htmlspecialchars($b['dob']) : 'N/A'; ?></td>
                         <td><?php echo !empty($b['submission_date']) ? htmlspecialchars($b['submission_date']) : 'N/A'; ?></td>
-                        <td><?php echo !empty($b['status']) ? htmlspecialchars($b['status']) : 'N/A'; ?></td>
+                        <td><span class="label <?php echo $maturity_badge; ?>"><?php echo $maturity_status; ?></span></td>
                         <td><?php echo !empty($b['status_date']) ? htmlspecialchars($b['status_date']) : 'N/A'; ?></td>
                     </tr>
                 <?php endforeach; ?>
