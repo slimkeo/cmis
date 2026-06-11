@@ -208,7 +208,7 @@
 					</label>
 
 					<div class="col-md-7">
-													<div class="input-daterange input-group" data-plugin-datepicker>
+													<div class="input-daterange input-group">
 														<span class="input-group-addon">
 															<i class="fa fa-calendar"></i>
 														</span>
