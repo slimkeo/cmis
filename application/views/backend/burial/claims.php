@@ -208,8 +208,8 @@
 					</label>
 
 					<div class="col-md-7">
-													<div class="input-daterange input-group">
-														<span class="input-group-addon">
+													<div class="form-control">
+														<span>
 															<i class="fa fa-calendar"></i>
 														</span>
 														<input type="text" class="form-control" name="claim_date" value="<?php echo date('Y-m-d') ?>" readonly>
