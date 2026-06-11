@@ -208,12 +208,7 @@
 					</label>
 
 					<div class="col-md-7">
-													<div class="input-daterange">
-														<span class="input-group-addon">
-															<i class="fa fa-calendar"></i>
-														</span>
-														<input type="text" class="form-control" name="claim_date" value="<?php echo date('Y-m-d') ?>" readonly>
-													</div>
+						<input type="text" class="form-control" name="claim_date" value="<?php echo date('Y-m-d') ?>" readonly>
 					</div>
 				</div>
 
