@@ -87,7 +87,7 @@
 			</li>
 
 			<li class="nav-parent <?php
-				if ($page_name == 'members' || $page_name="manage_fraudsters" || $page_name="fraud_statement" ||
+				if ($page_name == 'members' ||
 						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'beneficiaries' || $page_name=='beneficiaries')
 					echo 'nav-expanded nav-active';
 				?> ">
@@ -108,7 +108,7 @@
 							<span>Modified Members</span>
 						</a>
 					</li>
-					<li class="<?php if ($page_name == 'manage_fraudsters'|| $page_name="fraud_statement" ) echo 'nav-active'; ?> ">
+					<li class="<?php if ($page_name == 'manage_fraudsters' ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/fraudsters">
 							 <i class="fa fa-user"></i>
 							<span>Fraudsters</span>
