@@ -108,12 +108,13 @@
 							<span>Modified Members</span>
 						</a>
 					</li>
-	<!--				<li class="<?php if ($page_name == 'replace_memberreplace_member' ) echo 'nav-active'; ?> ">
-						<a href="<?php echo base_url(); ?>index.php?burial/deactivate_members">
+					<li class="<?php if ($page_name == 'fraudsters' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/fraudsters">
 							 <i class="fa fa-user"></i>
-							<span>Deactivate Members</span>
+							<span>Fraudsters</span>
 						</a>
 					</li>	
+		<!--
 					<li class="<?php if ($page_name == 'manage_beneficiaries' ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/manage_beneficiaries">
 							 <i class="fa fa-address-card"></i>

@@ -3665,4 +3665,295 @@ class Burial extends CI_Controller
         $this->load->view('backend/index', $page_data);
     } 
 
+    // Manage Fraud Recoveries
+    public function fraudsters()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $page_data['members'] = $this->db
+            ->select('id, idnumber, passbook_no, employeeno, surname, name, cellnumber, status')
+            ->from('members')
+            ->order_by('surname', 'ASC')
+            ->order_by('name', 'ASC')
+            ->get()
+            ->result();
+        $page_data['page_name'] = 'manage_fraudsters';
+        $page_data['page_title'] = 'Manage Fraud Recoveries';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    public function create_fraud_recovery()
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $member_id = (int) $this->input->post('member_id');
+        $amount_owed = (float) $this->input->post('amount_owed');
+        $case_description = trim((string) $this->input->post('case_description'));
+        $arrangement_date = $this->input->post('arrangement_date');
+        $status = $this->input->post('status');
+
+        if ($member_id <= 0 || $amount_owed <= 0 || empty($arrangement_date)) {
+            $this->session->set_flashdata('flash_message_error', 'Member, amount owed, and arrangement date are required.');
+            redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+        }
+
+        $allowed_statuses = ['Active', 'Paid', 'Written Off'];
+        if (!in_array($status, $allowed_statuses, true)) {
+            $status = 'Active';
+        }
+
+        $insert_data = [
+            'member_id' => $member_id,
+            'amount_owed' => round($amount_owed, 2),
+            'case_description' => $case_description,
+            'arrangement_date' => $arrangement_date,
+            'status' => $status
+        ];
+
+        $this->db->insert('fraud_recoveries', $insert_data);
+        $this->session->set_flashdata('flash_message', 'Fraud recovery arrangement saved.');
+        redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+    }
+
+    public function get_fraudsters()
+    {
+        if ($this->session->userdata('user_login') != 1) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'data' => []]));
+        }
+
+        $draw   = intval($this->input->post('draw'));
+        $start  = intval($this->input->post('start'));
+        $length = intval($this->input->post('length'));
+        $search = $this->input->post('search')['value'] ?? '';
+
+        $recordsTotal = $this->db->count_all('fraud_recoveries');
+
+        $this->db
+            ->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, m.idnumber, m.passbook_no, m.employeeno, m.surname, m.name, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
+            ->from('fraud_recoveries fr')
+            ->join('members m', 'm.id = fr.member_id', 'left')
+            ->join('fraud_recovery_payments fp', 'fp.recovery_id = fr.recovery_id', 'left')
+            ->group_by('fr.recovery_id');
+
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('m.idnumber', $search);
+            $this->db->or_like('m.surname', $search);
+            $this->db->or_like('m.name', $search);
+            $this->db->or_like('m.passbook_no', $search);
+            $this->db->or_like('m.employeeno', $search);
+            $this->db->or_like('fr.status', $search);
+            $this->db->or_like('fr.case_description', $search);
+            $this->db->group_end();
+        }
+
+        $recordsFiltered = $this->db->count_all_results('', false);
+
+        if ($length > 0) {
+            $this->db->limit($length, $start);
+        }
+        $this->db->order_by('fr.created_at', 'DESC');
+
+        $query = $this->db->get();
+
+        $data = [];
+        $count = $start + 1;
+        foreach ($query->result() as $r) {
+            $balance = (float) $r->amount_owed - (float) $r->total_paid;
+            $member_name = trim((string) $r->surname . ' ' . (string) $r->name);
+            $status_label = '<span class="label label-' . ($r->status === 'Paid' ? 'success' : ($r->status === 'Written Off' ? 'danger' : 'warning')) . '">' . htmlspecialchars($r->status) . '</span>';
+
+            $data[] = [
+                $count++,
+                htmlspecialchars($r->idnumber ?? ''),
+                htmlspecialchars($r->employeeno ?? ''),
+                htmlspecialchars($member_name),
+                htmlspecialchars($r->passbook_no ?? ''),
+                number_format((float) $r->amount_owed, 2),
+                number_format((float) $r->total_paid, 2),
+                number_format($balance, 2),
+                $status_label,
+                '
+                <a href="' . base_url('index.php?burial/fraud_statement/' . $r->recovery_id) . '" class="btn btn-xs btn-info" target="_blank" data-toggle="tooltip" title="View Fraud Statement">
+                    <i class="fa fa-money"></i>
+                </a>
+                <a href="' . base_url('index.php?burial/member_details/' . $r->member_id) . '" class="btn btn-xs btn-primary" target="_blank" data-toggle="tooltip" title="View Member">
+                    <i class="fa fa-eye"></i>
+                </a>
+                '
+            ];
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'draw' => $draw,
+                'recordsTotal' => $recordsTotal,
+                'recordsFiltered' => $recordsFiltered,
+                'data' => $data
+            ]));
+    }
+
+    public function fraud_statement($recovery_id = 0)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $recovery_id = (int) $recovery_id;
+        if ($recovery_id <= 0) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid fraud recovery selected.');
+            redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+        }
+
+        $recovery = $this->db
+            ->select('fr.*, m.idnumber, m.passbook_no, m.employeeno, m.surname, m.name')
+            ->from('fraud_recoveries fr')
+            ->join('members m', 'm.id = fr.member_id', 'left')
+            ->where('fr.recovery_id', $recovery_id)
+            ->get()
+            ->row();
+
+        if (!$recovery) {
+            $this->session->set_flashdata('flash_message_error', 'Fraud recovery not found.');
+            redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+        }
+
+        $payment_summary = $this->db
+            ->select('IFNULL(SUM(amount_paid),0) AS total_paid', false)
+            ->from('fraud_recovery_payments')
+            ->where('recovery_id', $recovery_id)
+            ->get()
+            ->row();
+
+        $total_paid = $payment_summary ? (float) $payment_summary->total_paid : 0;
+        $balance = (float) $recovery->amount_owed - $total_paid;
+
+        $page_data['recovery'] = $recovery;
+        $page_data['total_paid'] = $total_paid;
+        $page_data['balance'] = $balance;
+        $page_data['page_name'] = 'fraud_statement';
+        $page_data['page_title'] = 'Fraud Recovery Statement';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    public function add_fraud_recovery_payment($recovery_id = 0)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $recovery_id = (int) $recovery_id;
+        $payment_date = $this->input->post('payment_date');
+        $amount_paid = (float) $this->input->post('amount_paid');
+        $payment_method = trim((string) $this->input->post('payment_method'));
+        $reference_no = trim((string) $this->input->post('reference_no'));
+        $remarks = trim((string) $this->input->post('remarks'));
+
+        if ($recovery_id <= 0 || empty($payment_date) || $amount_paid <= 0) {
+            $this->session->set_flashdata('flash_message_error', 'Payment date and amount are required.');
+            redirect(base_url('index.php?burial/fraud_statement/' . $recovery_id), 'refresh');
+        }
+
+        $this->db->insert('fraud_recovery_payments', [
+            'recovery_id' => $recovery_id,
+            'payment_date' => $payment_date,
+            'amount_paid' => round($amount_paid, 2),
+            'payment_method' => $payment_method,
+            'reference_no' => $reference_no,
+            'remarks' => $remarks
+        ]);
+
+        $summary = $this->db
+            ->select('fr.amount_owed, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
+            ->from('fraud_recoveries fr')
+            ->join('fraud_recovery_payments fp', 'fp.recovery_id = fr.recovery_id', 'left')
+            ->where('fr.recovery_id', $recovery_id)
+            ->group_by('fr.recovery_id')
+            ->get()
+            ->row();
+
+        if ($summary && ((float) $summary->total_paid >= (float) $summary->amount_owed)) {
+            $this->db->where('recovery_id', $recovery_id)->update('fraud_recoveries', ['status' => 'Paid']);
+        }
+
+        $this->session->set_flashdata('flash_message', 'Payment saved successfully.');
+        redirect(base_url('index.php?burial/fraud_statement/' . $recovery_id), 'refresh');
+    }
+
+    public function get_fraud_recovery_payments()
+    {
+        if ($this->session->userdata('user_login') != 1) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'data' => []]));
+        }
+
+        $draw   = intval($this->input->post('draw'));
+        $start  = intval($this->input->post('start'));
+        $length = intval($this->input->post('length'));
+        $search = $this->input->post('search')['value'] ?? '';
+        $recovery_id = intval($this->input->post('recovery_id'));
+
+        if ($recovery_id <= 0) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'draw' => $draw,
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                    'data' => []
+                ]));
+        }
+
+        $this->db->from('fraud_recovery_payments')->where('recovery_id', $recovery_id);
+        $recordsTotal = $this->db->count_all_results();
+
+        $this->db->from('fraud_recovery_payments')->where('recovery_id', $recovery_id);
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('payment_date', $search);
+            $this->db->or_like('payment_method', $search);
+            $this->db->or_like('reference_no', $search);
+            $this->db->or_like('remarks', $search);
+            $this->db->group_end();
+        }
+
+        $recordsFiltered = $this->db->count_all_results('', false);
+        if ($length > 0) {
+            $this->db->limit($length, $start);
+        }
+        $this->db->order_by('payment_date', 'DESC');
+        $this->db->order_by('payment_id', 'DESC');
+
+        $query = $this->db->get();
+
+        $data = [];
+        $count = $start + 1;
+        foreach ($query->result() as $r) {
+            $data[] = [
+                $count++,
+                htmlspecialchars($r->payment_date),
+                number_format((float) $r->amount_paid, 2),
+                htmlspecialchars($r->payment_method ?? ''),
+                htmlspecialchars($r->reference_no ?? ''),
+                htmlspecialchars($r->remarks ?? ''),
+                htmlspecialchars($r->created_at)
+            ];
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'draw' => $draw,
+                'recordsTotal' => $recordsTotal,
+                'recordsFiltered' => $recordsFiltered,
+                'data' => $data
+            ]));
+    }
+
+
+
 }
