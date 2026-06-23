@@ -3688,7 +3688,10 @@ class Burial extends CI_Controller
         if ($this->session->userdata('user_login') != 1)
             redirect(base_url(), 'refresh');
 
-        $member_id = (int) $this->input->post('member_id');
+        $member_id = (int) $this->input->post('selected_member_id');
+        if ($member_id <= 0) {
+            $member_id = (int) $this->input->post('member_id');
+        }
         $amount_owed = (float) $this->input->post('amount_owed');
         $case_description = trim((string) $this->input->post('case_description'));
         $arrangement_date = $this->input->post('arrangement_date');
@@ -3713,6 +3716,9 @@ class Burial extends CI_Controller
         ];
 
         $this->db->insert('fraud_recoveries', $insert_data);
+        if ($this->db->affected_rows() > 0) {
+            $this->db->where('id', $member_id)->update('members', ['status' => 0]);
+        }
         $this->session->set_flashdata('flash_message', 'Fraud recovery arrangement saved.');
         redirect(base_url('index.php?burial/fraudsters'), 'refresh');
     }

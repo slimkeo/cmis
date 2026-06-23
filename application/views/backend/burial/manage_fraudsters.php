@@ -35,16 +35,23 @@
                 <div class="tab-pane box" id="add" style="padding: 10px;">
                     <?php echo form_open(base_url('index.php?burial/create_fraud_recovery'), array('class' => 'form-horizontal form-bordered validate')); ?>
                     <div class="form-group">
-                        <label class="col-md-3 control-label">Member</label>
+                        <label class="col-md-3 control-label">Search Member <span style="color: red;">*</span></label>
                         <div class="col-md-7">
-                            <select class="form-control" name="member_id" required>
-                                <option value="">Select member</option>
-                                <?php foreach (($members ?? []) as $m): ?>
-                                    <option value="<?php echo (int) $m->id; ?>">
-                                        <?php echo htmlspecialchars(trim($m->surname . ' ' . $m->name) . ' | ID: ' . ($m->idnumber ?? '') . ' | Emp: ' . ($m->employeeno ?? '') . ' | Passbook: ' . ($m->passbook_no ?? '')); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div style="position: relative;">
+                                <input type="text" class="form-control" id="member_search"
+                                       placeholder="Search by ID Number, Name, Passbook No, or Employee No" required>
+                                <small class="form-text text-muted">Start typing to search for member</small>
+
+                                <div id="member_search_results" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                </div>
+                            </div>
+                            <div class="alert alert-info" id="member_info" style="display: none; margin-top: 10px;">
+                                <strong>ID Number:</strong> <span id="member_idnumber"></span><br>
+                                <strong>Name:</strong> <span id="member_name"></span><br>
+                                <strong>Passbook No:</strong> <span id="member_passbook"></span><br>
+                                <strong>Cell Number:</strong> <span id="member_cell"></span>
+                            </div>
+                            <input type="hidden" id="selected_member_id" name="selected_member_id" value="">
                         </div>
                     </div>
 
@@ -111,6 +118,99 @@ $(document).ready(function() {
             { extend: 'pdf', text: 'PDF' },
             { extend: 'print', text: 'Print' }
         ]
+    });
+
+    // Member search with dropdown results (same UX as payments screen)
+    $('#member_search').keyup(function() {
+        var search = $(this).val();
+
+        if (search.length < 2) {
+            $('#member_search_results').hide();
+            $('#member_info').hide();
+            $('#selected_member_id').val('');
+            return;
+        }
+
+        $.ajax({
+            url: "<?php echo base_url('index.php?burial/search_members');?>",
+            method: 'POST',
+            data: {search: search},
+            dataType: 'json',
+            success: function(response) {
+                if (response.success && response.members.length > 0) {
+                    display_search_results(response.members);
+                } else {
+                    $('#member_search_results').html('<div style="padding: 10px; text-align: center; color: #999;">No members found</div>').show();
+                    $('#member_info').hide();
+                    $('#selected_member_id').val('');
+                }
+            },
+            error: function() {
+                $('#member_search_results').html('<div style="padding: 10px; text-align: center; color: #d32f2f;">Error loading members</div>').show();
+            }
+        });
+    });
+
+    function display_search_results(members) {
+        var resultsHtml = '';
+
+        $.each(members, function(index, member) {
+            var displayName = member.surname + ' ' + member.name;
+            var displayId = member.idnumber;
+            var displayPassbook = member.passbook_no || 'N/A';
+            var displayEmployee = member.employeeno || 'N/A';
+
+            resultsHtml += '<div class="member-search-result" style="padding: 10px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;" ' +
+                'data-member-id="' + member.id + '" ' +
+                'data-member-idnumber="' + member.idnumber + '" ' +
+                'data-member-surname="' + member.surname + '" ' +
+                'data-member-name="' + member.name + '" ' +
+                'data-member-passbook="' + (member.passbook_no || '') + '" ' +
+                'data-member-cell="' + (member.cellnumber || '') + '">' +
+                '<div style="flex-grow: 1;">' +
+                '<strong style="display: block; margin-bottom: 3px;">' + displayName + '</strong>' +
+                '<small style="color: #666; display: block;">ID: ' + displayId + ' | Passbook: ' + displayPassbook + ' | Employee: ' + displayEmployee + '</small>' +
+                '</div>' +
+                '<div style="margin-left: 10px; color: #007bff;">→</div>' +
+                '</div>';
+        });
+
+        $('#member_search_results').html(resultsHtml).show();
+
+        $('.member-search-result').click(function() {
+            var member = {
+                id: $(this).data('member-id'),
+                idnumber: $(this).data('member-idnumber'),
+                surname: $(this).data('member-surname'),
+                name: $(this).data('member-name'),
+                passbook_no: $(this).data('member-passbook'),
+                cellnumber: $(this).data('member-cell')
+            };
+
+            $('#member_search').val(member.surname + ' ' + member.name);
+            $('#member_idnumber').text(member.idnumber || '');
+            $('#member_name').text(member.surname + ' ' + member.name);
+            $('#member_passbook').text(member.passbook_no || 'N/A');
+            $('#member_cell').text(member.cellnumber || 'N/A');
+            $('#selected_member_id').val(member.id);
+            $('#member_info').show();
+            $('#member_search_results').hide();
+        });
+    }
+
+    // Close dropdown when clicking outside
+    $(document).click(function(e) {
+        if (!$(e.target).closest('#member_search, #member_search_results').length) {
+            $('#member_search_results').hide();
+        }
+    });
+
+    // Enforce selecting member from search results
+    $('form').on('submit', function(e) {
+        if (!$('#selected_member_id').val()) {
+            e.preventDefault();
+            alert('Please search and select a member.');
+        }
     });
 });
 </script>
