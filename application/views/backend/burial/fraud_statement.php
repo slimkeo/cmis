@@ -97,6 +97,7 @@ $memberName = trim(($recovery->surname ?? '') . ' ' . ($recovery->name ?? ''));
                     <th>Reference</th>
                     <th>Remarks</th>
                     <th>Captured At</th>
+                    <th>Receipt</th>
                 </tr>
             </thead>
             <tbody></tbody>

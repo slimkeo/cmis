@@ -44,6 +44,7 @@
                     <th>Gender</th>
                     <th>School Code</th>
 					<th><?php echo get_phrase('options');?></th>
+                    <th>Status</th>
 				</tr>
 			</thead>
 
@@ -244,6 +245,14 @@ $(document).ready(function() {
         "ajax": {
             "url": "<?php echo base_url('index.php?burial/get_members');?>",
             "type": "POST"
+        },
+        "columnDefs": [
+            { "targets": [10], "visible": false, "searchable": false }
+        ],
+        "createdRow": function(row, data) {
+            if (parseInt(data[10], 10) === 0) {
+                $(row).addClass('danger');
+            }
         },
 
         // ADD THIS ↓↓↓

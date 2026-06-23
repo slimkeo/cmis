@@ -1075,7 +1075,8 @@ class Burial extends CI_Controller
         onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
             <i class="fa fa-trash"></i>
         </a>
-        '
+        ',
+        (int) $r->status
     ];
         }
 
@@ -3946,7 +3947,8 @@ class Burial extends CI_Controller
                 htmlspecialchars($r->payment_method ?? ''),
                 htmlspecialchars($r->reference_no ?? ''),
                 htmlspecialchars($r->remarks ?? ''),
-                htmlspecialchars($r->created_at)
+                htmlspecialchars($r->created_at),
+                '<a href="' . base_url('index.php?burial/print_fraudulent_reciept/' . (int) $r->payment_id) . '" class="btn btn-xs btn-info" target="_blank" data-toggle="tooltip" title="Print Receipt"><i class="fa fa-print"></i></a>'
             ];
         }
 
@@ -3958,6 +3960,47 @@ class Burial extends CI_Controller
                 'recordsFiltered' => $recordsFiltered,
                 'data' => $data
             ]));
+    }
+
+    public function print_fraudulent_reciept($payment_id = 0)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url() . 'index.php?login', 'refresh');
+
+        $payment_id = (int) $payment_id;
+        if ($payment_id <= 0) {
+            $this->session->set_flashdata('flash_message_error', 'Invalid payment selected.');
+            redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+        }
+
+        $payment = $this->db
+            ->select('fp.*, fr.amount_owed, fr.case_description, fr.status AS recovery_status, fr.arrangement_date, fr.member_id, m.idnumber, m.passbook_no, m.employeeno, m.surname, m.name, m.cellnumber')
+            ->from('fraud_recovery_payments fp')
+            ->join('fraud_recoveries fr', 'fr.recovery_id = fp.recovery_id', 'inner')
+            ->join('members m', 'm.id = fr.member_id', 'left')
+            ->where('fp.payment_id', $payment_id)
+            ->get()
+            ->row();
+
+        if (!$payment) {
+            $this->session->set_flashdata('flash_message_error', 'Payment not found.');
+            redirect(base_url('index.php?burial/fraudsters'), 'refresh');
+        }
+
+        $summary = $this->db
+            ->select('IFNULL(SUM(amount_paid),0) AS total_paid', false)
+            ->from('fraud_recovery_payments')
+            ->where('recovery_id', (int) $payment->recovery_id)
+            ->get()
+            ->row();
+
+        $total_paid = $summary ? (float) $summary->total_paid : 0.00;
+        $remaining_balance = max(0, (float) $payment->amount_owed - $total_paid);
+
+        $page_data['payment'] = $payment;
+        $page_data['total_paid'] = $total_paid;
+        $page_data['remaining_balance'] = $remaining_balance;
+        $this->load->view('backend/print_fraudulent_reciept.php', $page_data);
     }
 
 
