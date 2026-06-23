@@ -2306,7 +2306,7 @@ class Burial extends CI_Controller
                 'claim_type'      => $claim_type,
                 'national_id'     => $this->input->post('national_id'),
                 'amount'          => $this->input->post('amount'),
-                'claim_date'      => $this->Date_model->normalize_date($this->input->post('claim_date'));,
+                'claim_date'      => $this->Date_model->normalize_date($this->input->post('claim_date')),
                 'bank'            => $this->input->post('bank'),
                 'account'         => $this->input->post('account'),
                 'mortuary'        => $this->input->post('mortuary'),
