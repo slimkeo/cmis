@@ -3884,6 +3884,12 @@ class Burial extends CI_Controller
             'remarks' => $remarks
         ]);
 
+        $payment_id = (int) $this->db->insert_id();
+        if ($payment_id <= 0) {
+            $this->session->set_flashdata('flash_message_error', 'Payment could not be saved.');
+            redirect(base_url('index.php?burial/fraud_statement/' . $recovery_id), 'refresh');
+        }
+
         $summary = $this->db
             ->select('fr.amount_owed, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
             ->from('fraud_recoveries fr')
@@ -3898,7 +3904,7 @@ class Burial extends CI_Controller
         }
 
         $this->session->set_flashdata('flash_message', 'Payment saved successfully.');
-        redirect(base_url('index.php?burial/fraud_statement/' . $recovery_id), 'refresh');
+        redirect(base_url('index.php?burial/print_fraudulent_reciept/' . $payment_id), 'refresh');
     }
 
     public function get_fraud_recovery_payments()
