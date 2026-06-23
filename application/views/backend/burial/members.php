@@ -249,14 +249,6 @@ $(document).ready(function() {
         "columnDefs": [
             { "targets": [10], "visible": false, "searchable": false }
         ],
-        "rowCallback": function(row, data) {
-            var statusValue = (data && data.length > 10) ? String(data[10]).trim() : '';
-            if (statusValue === '0') {
-                $(row).addClass('danger');
-            } else {
-                $(row).removeClass('danger');
-            }
-        },
 
         // ADD THIS ↓↓↓
         dom: 'Bfrtip',
