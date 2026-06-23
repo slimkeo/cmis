@@ -111,6 +111,7 @@ class Burial extends CI_Controller
             $data['gender']      = $this->input->post('gender');
             $data['resident']    = $this->input->post('resident');
             $data['schoolcode']  = $this->input->post('schoolcode');
+            $data['status']      = 1;
 
             // Format cellnumber (append 268 if not present)
             if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
@@ -1019,65 +1020,74 @@ class Burial extends CI_Controller
 
         $data = [];
         foreach($query->result() as $r){
-    $data[] = [
-        $r->id,
-        $r->idnumber,
-        $r->employeeno,
-        $r->surname,
-        $r->name,
-        $r->passbook_no,
-        $r->cellnumber,
-        $r->gender,
-        $r->schoolcode,
+            $member_status = $r->status;
+            $is_flagged_fraudster = ($member_status === 0 || $member_status === '0');
 
-        '
-        <a href="'.base_url('index.php?burial/member_statement/'.$r->id).'"
-        class="btn btn-xs btn-info"
-        target="_blank"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="View Statement">
-            <i class="fa fa-money"></i>
-        </a>
+            $row = [
+                $r->id,
+                $r->idnumber,
+                $r->employeeno,
+                $r->surname,
+                $r->name,
+                $r->passbook_no,
+                $r->cellnumber,
+                $r->gender,
+                $r->schoolcode,
 
-        <a href="'.base_url('index.php?burial/member_details/'.$r->id).'"
-        class="btn btn-xs btn-info"
-        target="_blank"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="View Member">
-            <i class="fa fa-eye"></i>
-        </a>
+                '
+                <a href="'.base_url('index.php?burial/member_statement/'.$r->id).'"
+                class="btn btn-xs btn-info"
+                target="_blank"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="View Statement">
+                    <i class="fa fa-money"></i>
+                </a>
 
-        <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
-        class="btn btn-xs btn-warning"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="View Beneficiaries">
-            <i class="fa fa-users"></i>
-        </a>
+                <a href="'.base_url('index.php?burial/member_details/'.$r->id).'"
+                class="btn btn-xs btn-info"
+                target="_blank"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="View Member">
+                    <i class="fa fa-eye"></i>
+                </a>
 
-        <!-- EDIT (AJAX MODAL) -->
-        <a href="#"
-        class="btn btn-xs btn-primary"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Edit Member"
-        onclick="showAjaxModal(\''.base_url('index.php?modal/popup/modal_edit_member/'.$r->id).'\')">
-            <i class="fa fa-edit"></i>
-        </a>
+                <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
+                class="btn btn-xs btn-warning"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="View Beneficiaries">
+                    <i class="fa fa-users"></i>
+                </a>
 
-        <a href="#"
-        class="btn btn-xs btn-danger"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Delete Member"
-        onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
-            <i class="fa fa-trash"></i>
-        </a>
-        ',
-        (int) $r->status
-    ];
+                <!-- EDIT (AJAX MODAL) -->
+                <a href="#"
+                class="btn btn-xs btn-primary"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Edit Member"
+                onclick="showAjaxModal(\''.base_url('index.php?modal/popup/modal_edit_member/'.$r->id).'\')">
+                    <i class="fa fa-edit"></i>
+                </a>
+
+                <a href="#"
+                class="btn btn-xs btn-danger"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Delete Member"
+                onclick="confirm_modal(\''.base_url('index.php?burial/members/delete/'.$r->id).'\')">
+                    <i class="fa fa-trash"></i>
+                </a>
+                ',
+                $member_status
+            ];
+
+            if ($is_flagged_fraudster) {
+                $row['DT_RowClass'] = 'danger';
+            }
+
+            $data[] = $row;
         }
 
         return $this->output
@@ -2851,6 +2861,7 @@ class Burial extends CI_Controller
                 'last_login'    => null,
                 'login_attempts'=> 0,
                 'is_alive'      => 1,
+                'status'        => 1,
             ];
 
             $this->db->insert('members', $member_data);
