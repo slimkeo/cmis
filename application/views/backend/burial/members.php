@@ -249,6 +249,12 @@ $(document).ready(function() {
         "columnDefs": [
             { "targets": [10], "visible": false, "searchable": false }
         ],
+        "createdRow": function(row, data) {
+            // Match beneficiaries-style row highlighting: status 0 => red row.
+            if (String(data[10]) === '0') {
+                $(row).addClass('danger');
+            }
+        },
 
         // ADD THIS ↓↓↓
         dom: 'Bfrtip',
