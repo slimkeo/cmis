@@ -87,7 +87,7 @@
 			</li>
 
 			<li class="nav-parent <?php
-				if ($page_name == 'members' || $page_name == 'manage_fraudsters' || $page_name =='fraud_statement' ||
+				if ($page_name == 'members' || $page_name == 'manage_fraudsters' ||
 						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'beneficiaries' || $page_name=='beneficiaries')
 					echo 'nav-expanded nav-active';
 				?> ">
