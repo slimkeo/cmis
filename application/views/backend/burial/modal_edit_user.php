@@ -12,7 +12,7 @@ foreach ( $edit_data as $row ):
         <div class="panel-heading">
           <h4 class="panel-title">
                 <i class="fa fa-pencil-square"></i>
-          <?php echo " User : ".$row['description'];?>
+          <?php echo " User : ".$row['fullname'];?>
               </h4>
         
         </div>
@@ -31,7 +31,7 @@ foreach ( $edit_data as $row ):
               FULL NAME
             </label>
             <div class="col-md-7">
-              <input type="text" class="form-control" required name="name" value="<?php echo $row['name'];?>"/>
+              <input type="text" class="form-control" required name="name" value="<?php echo $row['fullname'];?>"/>
             </div>
           </div>  
           <div class="form-group">
