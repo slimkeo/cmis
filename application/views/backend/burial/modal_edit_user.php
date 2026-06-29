@@ -31,7 +31,7 @@ foreach ( $edit_data as $row ):
               FULL NAME
             </label>
             <div class="col-md-7">
-              <input type="text" class="form-control" required name="name" value="<?php echo $row['fullname'];?>"/>
+              <input type="text" class="form-control" required name="name" value="<?php echo $row['name'];?>"/>
             </div>
           </div>  
           <div class="form-group">
