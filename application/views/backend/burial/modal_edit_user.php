@@ -43,13 +43,30 @@ foreach ( $edit_data as $row ):
             </div>
           </div>          
           <div class="form-group">
-            <label class="col-md-3 control-label">
-              USER PRIVEGES
-            </label>
-            <div class="col-md-7">
-              <input type="text" class="form-control" required name="email" value="<?php echo $row['email'];?>"/>
-            </div>
-          </div>           
+					<label class="col-md-3 control-label">
+						<?php echo get_phrase('admin_previleges');?>
+					</label>
+
+					<div class="col-md-7">
+          <select name="level" data-plugin-selectTwo data-minimum-results-for-search="Infinity" data-width="100%" class="form-control populate" required>
+            <option value=""><?php echo get_phrase('select'); ?></option>
+            
+            <?php
+            // Fetch levels from database
+            $levels = $this->db->get('admin_privileges')->result_array(); // Adjust table name if needed
+            
+            foreach ($levels as $level) {
+                $selected = ($row['level'] == $level['id']) ? 'selected' : '';
+                ?>
+                <option value="<?php echo $level['id']; ?>" <?php echo $selected; ?>>
+                    <?php echo get_phrase($level['name']); ?>   <!-- or just echo $level['name'] if not using phrases -->
+                </option>
+                <?php
+            }
+            ?>
+         </select>
+					</div>	
+				</div>           
 
         </div>
         <footer class="panel-footer">
