@@ -128,7 +128,7 @@
 				<div class="profile-info" data-lock-name="<?php echo $this->session->userdata('name');?>" data-lock-email="info@pvssystem.com">
 					<span class="name"><?php echo $this->session->userdata('name');?></span>
 					<span class="role"><?php 
-					if ($this->session->userdata('level') == 1) { $level="Admin"; } else { $level="User";}
+					if $admin_prevelege=$this->db->get_where('admin_privileges' , array('id'=>$this->session->userdata('level')))->row()->description;}
 					echo ucfirst($level);?></span>
 				</div>
 
