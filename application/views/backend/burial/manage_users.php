@@ -92,7 +92,7 @@
 						<?php echo $row['phone'];?>
 					</td>
 					<td>
-						<?php echo  $row['level']; ?>
+						<?php echo  $this->db->get_where('admin_privileges' , array('id'=>$row['level']))->row()->description; ?>
 					</td>
 					<td>
 						<?php echo $row['createdate'];?>
