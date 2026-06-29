@@ -12,7 +12,7 @@ foreach ( $edit_data as $row ):
         <div class="panel-heading">
           <h4 class="panel-title">
                 <i class="fa fa-pencil-square"></i>
-          <?php echo " User : ".$row['fullname'];?>
+          <?php echo " User : ".$row['name'];?>
               </h4>
         
         </div>
@@ -59,7 +59,7 @@ foreach ( $edit_data as $row ):
                 $selected = ($row['level'] == $level['id']) ? 'selected' : '';
                 ?>
                 <option value="<?php echo $level['id']; ?>" <?php echo $selected; ?>>
-                    <?php echo get_phrase($level['name']); ?>   <!-- or just echo $level['name'] if not using phrases -->
+                    <?php echo $level['description']; ?> 
                 </option>
                 <?php
             }
