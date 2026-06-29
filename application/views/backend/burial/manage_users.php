@@ -92,14 +92,7 @@
 						<?php echo $row['phone'];?>
 					</td>
 					<td>
-						<?php if ($row['level']==1) {
-							echo "Admin";
-						} elseif($row['level']==2){
-							echo "Clerk";
-						} elseif ($row['level']==3) {
-							echo "Accountant";
-						}
-						;?>
+						<?php echo  $this->db->get_where('admin' , array('level'=>$row['level']))->row()->description; ?>
 					</td>
 					<td>
 						<?php echo $row['createdate'];?>
