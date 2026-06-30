@@ -86,6 +86,7 @@
 				</ul>
 			</li>
 
+			<?php } ?>				
 			<li class="nav-parent <?php
 				if ($page_name == 'members' || $page_name == 'manage_fraudsters' ||
 						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'beneficiaries' || $page_name=='beneficiaries')
@@ -122,8 +123,7 @@
 						</a>
 					</li> -->									
 				</ul>
-			</li>			
-			<?php } ?>
+			</li>	
 			<!-- ADMIN MANAGEMENT PANEL -->
 			<?php if ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 3  ) { ?>		
 			<li class="nav-parent <?php
