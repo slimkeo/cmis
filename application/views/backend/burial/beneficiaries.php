@@ -61,6 +61,11 @@ foreach ($member_data as $member_row):
 					Batch Add Beneficiaries
 				</a>
 			</li>
+			<li>
+				<a href="#replacing" data-toggle="tab"><i class="fa fa-plus-circle"></i>
+					Replacing
+				</a>
+			</li>
 		</ul>
 		<!---CONTROL TABS END-->
 
@@ -372,6 +377,74 @@ foreach ($member_data as $member_row):
 			<div class="tab-pane box" id="batch_add" style="padding: 15px">
 				<div class="box-content">
 					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/add_batch_beneficiaries',
+			        array('class' => 'form-horizontal form-bordered','enctype'=>'multipart/form-data'));?>
+
+						<!-- Submission Date -->
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Date of Submission</label>
+							<div class="col-sm-3">
+							<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="batch_submission_date"
+											id="batch-submission-date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+											>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+							</div>
+						</div>
+
+						<!-- Beneficiaries Table -->
+						<div style="overflow-x: auto; margin-top: 20px;">
+							<table class="table table-bordered table-striped table-condensed" id="batch-beneficiaries-table">
+								<thead>
+									<tr style="background-color: #f5f5f5;">
+										<th style="width: 3%;">#</th>
+										<th style="width: 25%;">Full Name <span style="color:red;">*</span></th>
+										<th style="width: 8%;">Gender <span style="color:red;">*</span></th>
+										<th style="width: 12%;">DOB (Optional)</th>
+										<th style="width: 12%;">Spouse?</th>
+										<th style="width: 12%;">Status <span style="color:red;">*</span></th>
+										<th style="width: 12%;">Status Date</th>
+										<th style="width: 8%; text-align: center;">Action</th>
+									</tr>
+								</thead>
+								<tbody id="beneficiaries-container">
+									<!-- Rows will be added here -->
+								</tbody>
+							</table>
+						</div>
+
+						<!-- Add More Button -->
+						<div style="margin-top: 15px;">
+							<button type="button" class="btn btn-info" id="add-beneficiary-row">
+								<i class="fa fa-plus"></i> Add Row
+							</button>
+						</div>
+
+						<!-- Submit -->
+						<div style="margin-top: 20px;">
+							<button type="submit" class="btn btn-primary">
+								<i class="fa fa-save"></i> Add Batch Beneficiaries
+							</button>
+							<button type="reset" class="btn btn-default">
+								<i class="fa fa-refresh"></i> Clear
+							</button>
+						</div>
+				</form>                
+				</div>                
+			</div>
+			<!--BATCH CREATION FORM ENDS-->
+
+			<!--BATCH CREATION FORM STARTS-->
+			<div class="tab-pane box" id="replacing" style="padding: 15px">
+				<div class="box-content">
+					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/replacing',
 			        array('class' => 'form-horizontal form-bordered','enctype'=>'multipart/form-data'));?>
 
 						<!-- Submission Date -->
