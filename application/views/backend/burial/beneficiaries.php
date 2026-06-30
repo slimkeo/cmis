@@ -66,6 +66,12 @@ foreach ($member_data as $member_row):
 					Replacing
 				</a>
 			</li>
+			<li>
+				<a href="<?php echo base_url('index.php?burial/member_details/'.$member_row['id']); ?>" 
+						class="btn btn-xs btn-info">
+							<i class="fa fa-users"></i>  Return to Profile
+						</a>
+			</li>
 		</ul>
 		<!---CONTROL TABS END-->
 
