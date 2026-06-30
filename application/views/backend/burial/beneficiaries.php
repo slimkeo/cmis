@@ -62,14 +62,14 @@ foreach ($member_data as $member_row):
 				</a>
 			</li>
 			<li>
-				<a href="#replacing" data-toggle="tab"><i class="fa fa-plus-circle"></i>
+				<a href="#replacing" data-toggle="tab"><i class="fa fa-recycle"></i>
 					Replacing
 				</a>
 			</li>
 			<li>
 				<a href="<?php echo base_url('index.php?burial/member_details/'.$member_row['id']); ?>" 
 						class="btn btn-xs btn-info">
-							<i class="fa fa-users"></i>  Return to Profile
+							<i class="fa fa-user"></i>  Return to Profile
 						</a>
 			</li>
 		</ul>
