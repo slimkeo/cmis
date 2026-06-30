@@ -125,7 +125,7 @@
 				</ul>
 			</li>	
 			<!-- ADMIN MANAGEMENT PANEL -->
-			<?php if ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 3  ) { ?>		
+			<?php if ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 2  ) { ?>		
 			<li class="nav-parent <?php
 				if ($page_name == 'momo_agm' ||
 						$page_name == 'detailed_meetings' || $page_name == 'detailed_meetings')
@@ -133,7 +133,7 @@
 				?> ">
 					<a href="#">
 						<i class="fa fa-calendar-check-o"></i>
-						<span>Manage AGMs</span>
+						<span>Manage Events</span>
 					</a>
 				<ul class="nav nav-children">
 					<li class="<?php if ($page_name == 'detailed_meetings' ) echo 'nav-active'; ?> ">
