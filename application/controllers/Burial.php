@@ -520,8 +520,8 @@ class Burial extends CI_Controller
     /********** BENEFICIARIES ********************/
     function beneficiaries($param1 = '', $param2 = '', $param3 = '')
     {
-        if ($this->session->userdata('user_login') != 1)
-            redirect(base_url(), 'refresh');
+        //if ($this->session->userdata('user_login') != 1)
+        //    redirect(base_url(), 'refresh');
 
         /********** ADD BENEFICIARY **********/
         if ($param2 == 'add_beneficiary') {
