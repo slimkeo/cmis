@@ -604,12 +604,19 @@ class Burial extends CI_Controller
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                     }
                 }
-                else if($old_was_benefitted && time() >  strtotime('+12 months', $death_ts) )
-                {
-                        $this->session->set_flashdata('flash_message_error', 'Replacement must be done after 10 yeares for Benefitted beneficiaries');
-                        redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');                
-                }
-            }
+            } else {
+
+                    $ten_year_anniversary = date('Y-m-d', strtotime('+10 years', $death_ts));
+                    $today = date('Y-m-d');
+                    
+                    if ($today != $ten_year_anniversary) {
+                        $this->session->set_flashdata(
+                            'flash_message_error',
+                            'A benefitted beneficiary can only be replaced exactly 10 years after the date of death.'
+                        );
+                        redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                    }
+                 }
 
             // Prevent duplicate names
             $this->db->where('memberid', $param1);
