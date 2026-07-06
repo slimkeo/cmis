@@ -582,14 +582,14 @@ class Burial extends CI_Controller
                 // Submission date must match replaced beneficiary
                 $data['submission_date'] = $this->Date_model->normalize_date($old['submission_date']);
 
-                // If old was NOT benefitted → require death cert & 2-month rule
+                // Determine old beneficiary status
                 $old_status = $old['status'] ?? '';
                 $old_was_benefitted = in_array($old_status, ['BENEFITTED', 'BENEFITTED - REPLACED']);
 
                 $death_ts = $this->_parse_date_to_ts($status_date_input);
 
                 if (!$old_was_benefitted) {
-
+                    // === Case 1: Not yet benefitted → 2-month rule applies ===
                     if (!$status_date_input) {
                         $this->session->set_flashdata('flash_message_error', 'Death Certificate Date is required');
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
@@ -603,20 +603,31 @@ class Burial extends CI_Controller
                         $this->session->set_flashdata('flash_message_error', 'Replacement must be done within 2 months from date of death');
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                     }
-                }
-                else if ($old_was_benefitted) {
+                } 
+                else {
+                    // === Case 2: Already benefitted → 10-year rule applies ===
+                    if (!$status_date_input) {
+                        $this->session->set_flashdata('flash_message_error', 'Death Certificate Date is required');
+                        redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                    }
+                    if (!$death_ts) {
+                        $this->session->set_flashdata('flash_message_error', 'Invalid Death Certificate Date');
+                        redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                    }
 
-                    $ten_year_anniversary = date('Y-m-d', strtotime('+10 years', $death_ts));
-                    $today = date('Y-m-d');
-                    
-                    if ($today >= $ten_year_anniversary) {
+                    $ten_year_anniversary = strtotime('+10 years', $death_ts);
+                    $today = time();
+
+                    if ($today < $ten_year_anniversary) {
+                        $years_passed = floor(($today - $death_ts) / (365.25 * 24 * 60 * 60));
                         $this->session->set_flashdata(
                             'flash_message_error',
-                            'Benefitted beneficiary can only be replaced  10 years after the date of death.'.$status_date_input
+                            "Benefitted beneficiary can only be replaced 10 years after the date of death. 
+                            Only {$years_passed} years have passed."
                         );
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                     }
-                 }
+                }
             }
 
             // Prevent duplicate names
