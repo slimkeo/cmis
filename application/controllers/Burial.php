@@ -604,8 +604,7 @@ class Burial extends CI_Controller
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                     }
                 }
-            }
-             else if (old_was_benefitted) {
+                else if ($old_was_benefitted) {
 
                     $ten_year_anniversary = date('Y-m-d', strtotime('+10 years', $death_ts));
                     $today = date('Y-m-d');
@@ -618,6 +617,7 @@ class Burial extends CI_Controller
                         redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                     }
                  }
+            }
 
             // Prevent duplicate names
             $this->db->where('memberid', $param1);
