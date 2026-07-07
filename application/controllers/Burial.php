@@ -776,167 +776,119 @@ class Burial extends CI_Controller
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
         }
 
-        /********** ADD BATCH BENEFICIARIES **********/
-        if ($param2 == 'replacing') {
+        /********** REPLACEMENT BENEFICIARIES **********/
+        if ($param2 == 'beneficiary_replacement') {
 
-            $batch_submission_date = $this->Date_model->normalize_date($this->input->post('batch_submission_date'));
-            $batch_fullnames = $this->input->post('batch_fullname');
-            $batch_dobs = $this->input->post('batch_dob');
-            $batch_genders = $this->input->post('batch_gender');
-            $batch_is_spouses = $this->input->post('batch_is_spouse');
-            $batch_statuses = $this->input->post('batch_status');
-            $batch_status_dates = $this->input->post('batch_status_date');
+            $replaced_with_id = $this->input->post('replaced_with');
+            $replacement_reason = trim((string) $this->input->post('replacement_reason'));
+            $replacement_fullname = trim((string) $this->input->post('fullname'));
+            $replacement_dob = $this->Date_model->normalize_date($this->input->post('dob'));
+            $replacement_gender = $this->input->post('gender');
+            $replacement_is_spouse = (int) $this->input->post('is_spouse');
+            $replacement_status_date = $this->Date_model->normalize_date($this->input->post('status_date'));
+            $memberid1 = trim((string) ($this->input->post('memberid1') ?: $this->input->post('member1')));
+            $memberid2 = trim((string) ($this->input->post('memberid2') ?: $this->input->post('member2')));
 
-            $added_count = 0;
-            $errors = [];
-
-            if (is_array($batch_fullnames) && count($batch_fullnames) > 0) {
-                
-                for ($i = 0; $i < count($batch_fullnames); $i++) {
-                    
-                    $fullname = $batch_fullnames[$i] ?? '';
-                    
-                    // Skip empty rows
-                    if (empty($fullname)) continue;
-                    
-                    $gender = $batch_genders[$i] ?? '';
-                    $dob = $batch_dobs[$i] ?? '';
-                    $is_spouse = (int) ($batch_is_spouses[$i] ?? 0);
-                    $status = $batch_statuses[$i] ?? 'ACTIVE';
-                    $status_date = $batch_status_dates[$i] ?? '';
-                    
-                    // Validate required fields
-                    if (empty($gender)) {
-                        $errors[] = "Row " . ($i + 1) . ": Gender is required";
-                        continue;
-                    }
-                    
-                    if (empty($status)) {
-                        $errors[] = "Row " . ($i + 1) . ": Status is required";
-                        continue;
-                    }
-                    
-                    // Validate status_date for BENEFITTED and DELETED
-                    if (($status === 'BENEFITTED' || $status === 'DELETED') && empty($status_date)) {
-                        $errors[] = "Row " . ($i + 1) . ": Status Date is required for " . $status;
-                        continue;
-                    }
-
-                    // BENEFITTED rows must carry submission date as well.
-                    if ($status === 'BENEFITTED' && empty($batch_submission_date)) {
-                        $errors[] = "Row " . ($i + 1) . ": Submission Date is required for BENEFITTED";
-                        continue;
-                    }
-                    
-                    // Check for duplicates
-                    $this->db->where('memberid', $param1);
-                    $this->db->where('fullname', $fullname);
-                    if ($this->db->get('beneficiaries')->num_rows() > 0) {
-                        $errors[] = "Row " . ($i + 1) . ": Beneficiary '$fullname' already exists";
-                        continue;
-                    }
-                    
-                    // Prepare beneficiary data
-                    $data = [
-                        'memberid' => $param1,
-                        'fullname' => $fullname,
-                        'gender' => $gender,
-                        'dob' => $this->Date_model->normalize_date($dob),
-                        'is_spouse' => $is_spouse,
-                        'status' => $status,
-                        'submission_date' => $batch_submission_date,
-                        'status_date' => !empty($status_date) ? $status_date : date('Y-m-d'),
-                        'replaced' => 0,
-                        'replaced_with' => null
-                    ];
-                    
-                    // Insert beneficiary
-                    if ($this->db->insert('beneficiaries', $data)) {
-                        $added_count++;
-                    } else {
-                        $errors[] = "Row " . ($i + 1) . ": Error inserting beneficiary";
-                    }
-                }
+            if (empty($replaced_with_id)) {
+                $this->session->set_flashdata('flash_message_error', 'Please select beneficiary to replace');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
-            
-            // Set flash messages
-            if ($added_count > 0) {
-                $this->session->set_flashdata('flash_message', $added_count . ' beneficiar' . ($added_count > 1 ? 'ies' : 'y') . ' added successfully');
-            }
-            
-            if (!empty($errors)) {
-                $this->session->set_flashdata('flash_message_error', implode(' | ', $errors));
-            }
-            
-            if ($added_count == 0 && empty($errors)) {
-                $this->session->set_flashdata('flash_message_error', 'No valid beneficiaries to add');
-            }
-            
-            redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
-        }
 
-        /********** EDIT BENEFICIARY **********/
-        if ($param2 == 'edit_beneficiary') {
-
-            // Get current beneficiary record
-            $beneficiary = $this->db->get_where('beneficiaries', [
-                'id' => $param3,
+            $old = $this->db->get_where('beneficiaries', [
+                'id' => $replaced_with_id,
                 'memberid' => $param1
             ])->row_array();
 
-            if (!$beneficiary) {
-                $this->session->set_flashdata('flash_message_error', 'Beneficiary not found');
+            if (!$old) {
+                $this->session->set_flashdata('flash_message_error', 'Selected beneficiary to replace was not found');
                 redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
 
-            $update_data['fullname']        = $this->input->post('fullname');
-            $update_data['gender']          = $this->input->post('gender');
-            $update_data['dob']             = $this->Date_model->normalize_date($this->input->post('dob'));
-            $update_data['submission_date'] = $this->Date_model->normalize_date($this->input->post('submission_date'));
-            $update_data['status']          = $this->input->post('status');
-            $update_data['status']          = $this->input->post('status');
-            $update_data['is_spouse']       = (int) $this->input->post('is_spouse');
-            $status_date_input              = $this->Date_model->normalize_date($this->input->post('status_date'));
-            $replaced_with_input            = $this->input->post('replaced_with');
-
-            // Handle status_date based on status
-            if (
-                ($update_data['status'] === 'BENEFITTED' || $update_data['status'] === 'BENEFITTED - REPLACED') &&
-                $status_date_input
-            ) {
-                $update_data['status_date'] = $status_date_input;
-            } elseif ($update_data['status'] === 'REPLACEE' && $status_date_input) {
-                $update_data['status_date'] = $status_date_input; // death certificate date
-            } elseif (!in_array($update_data['status'], ['BENEFITTED', 'BENEFITTED - REPLACED', 'REPLACEE'])) {
-                // Clear status_date for other statuses
-                $update_data['status_date'] = null;
-            }
-
-            // Handle replace_with (only for REPLACEE status)
-            if ($update_data['status'] === 'REPLACEE' && !empty($replaced_with_input)) {
-                $update_data['replaced_with'] = $replaced_with_input;
-            } else {
-                $update_data['replaced_with'] = null;
-            }
-
-            // Validate fullname doesn't duplicate (except current record)
-            $duplicate_check = $this->db
-                ->where('memberid', $param1)
-                ->where('fullname', $update_data['fullname'])
-                ->where('id !=', $param3)
-                ->get('beneficiaries');
-
-            if ($duplicate_check->num_rows() > 0) {
-                $this->session->set_flashdata('flash_message_error', 'Beneficiary with this name already exists');
+            if (empty($replacement_fullname) || empty($replacement_gender) || empty($replacement_dob)) {
+                $this->session->set_flashdata('flash_message_error', 'Full Name, Gender and Date of Birth are required');
                 redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
 
-            // Update beneficiary
-            $this->db->where('id', $param3);
+            $allowed_reasons = ['10 years benefitted', 'Not Matured', 'Passbook Replacement'];
+            if (!in_array($replacement_reason, $allowed_reasons, true)) {
+                $this->session->set_flashdata('flash_message_error', 'Please select a valid reason for replacement');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            if ($replacement_reason === 'Not Matured') {
+                if (empty($replacement_status_date)) {
+                    $this->session->set_flashdata('flash_message_error', 'Death Certificate Date is required for Not Matured replacement');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                $death_ts = $this->_parse_date_to_ts($replacement_status_date);
+                if (!$death_ts) {
+                    $this->session->set_flashdata('flash_message_error', 'Invalid Death Certificate Date');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                if (time() > strtotime('+2 months', $death_ts)) {
+                    $this->session->set_flashdata('flash_message_error', 'Replacement must be done within 2 months from date of death');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+            }
+
+            if ($replacement_reason === 'Passbook Replacement' && (empty($memberid1) || empty($memberid2))) {
+                $this->session->set_flashdata('flash_message_error', 'Please provide both member references for Passbook Replacement');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            // Prevent duplicate names
             $this->db->where('memberid', $param1);
-            $this->db->update('beneficiaries', $update_data);
+            $this->db->where('fullname', $replacement_fullname);
+            if ($this->db->get('beneficiaries')->num_rows() > 0) {
+                $this->session->set_flashdata('flash_message_error', "Beneficiary '{$replacement_fullname}' already exists");
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
 
-            $this->session->set_flashdata('flash_message', 'Beneficiary updated successfully');
+            // New replacement beneficiary is always REPLACEE.
+            $data = [
+                'memberid' => $param1,
+                'fullname' => $replacement_fullname,
+                'gender' => $replacement_gender,
+                'dob' => $replacement_dob,
+                'is_spouse' => $replacement_is_spouse,
+                'submission_date' => $this->Date_model->normalize_date($old['submission_date']),
+                'status' => 'REPLACEE',
+                'replaced' => 0,
+                'replaced_with' => null
+            ];
+
+            if (!empty($replacement_status_date)) {
+                $data['status_date'] = $replacement_status_date;
+            }
+
+            if ($replacement_reason === 'Passbook Replacement') {
+                $data['passbook'] = $memberid1 . ' & ' . $memberid2;
+            }
+
+            $this->db->insert('beneficiaries', $data);
+            $new_beneficiary_id = $this->db->insert_id();
+
+            // Update old beneficiary as replaced.
+            $old_status = $old['status'] ?? '';
+            $old_was_benefitted = in_array($old_status, ['BENEFITTED', 'BENEFITTED - REPLACED'], true);
+
+            $update_old = [
+                'replaced' => 1,
+                'replaced_with' => $new_beneficiary_id,
+                'status' => $old_was_benefitted ? 'BENEFITTED - REPLACED' : 'LATE NOT BENEFITTED - REPLACED'
+            ];
+
+            if (!$old_was_benefitted && !empty($replacement_status_date)) {
+                $update_old['status_date'] = $replacement_status_date;
+            }
+
+            $this->db->where('id', $replaced_with_id);
+            $this->db->where('memberid', $param1);
+            $this->db->update('beneficiaries', $update_old);
+
+            $this->session->set_flashdata('flash_message', 'Beneficiary replaced successfully');
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
         }
 

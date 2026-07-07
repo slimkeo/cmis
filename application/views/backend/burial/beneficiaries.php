@@ -448,11 +448,101 @@ foreach ($member_data as $member_row):
 			</div>
 			<!--BATCH CREATION FORM ENDS-->
 
-			<!--BATCH CREATION FORM STARTS-->
+			<!-- REPLACING  TAB-->
 			<div class="tab-pane box" id="replacing" style="padding: 15px">
 			<div class="box-content">
-					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/add_beneficiary',
+					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/beneficiary_replacement',
 			        array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
+
+
+
+							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
+							<div class="form-group" id="replacing-replace-with-group">
+								<label class="col-sm-3 control-label">Replace</label>
+								<div class="col-sm-7">
+									<select name="replaced_with" id="replacing-replaced-with-select" class="form-control" required>
+										<option value="">-- Select Beneficiary to Replace --</option>
+										<?php
+										// List replaceable beneficiaries for this member (exclude deleted and already replaced)
+										$this->db->where('memberid', $member_row['id']);
+										// Exclude deleted; allow REPLACEE too
+										$this->db->where('status !=', 'DELETED');
+										// Do not allow already-replaced beneficiaries to be selected again
+										$this->db->where('status !=', 'BENEFITTED - REPLACED');
+										$this->db->group_start();
+										// include unreplaced
+										$this->db->where('replaced', 0);
+										$this->db->or_where('replaced IS NULL', null, false);
+										// also include REPLACEE even if marked replaced
+										$this->db->or_where('status', 'REPLACEE');
+										$this->db->group_end();
+										$existing_beneficiaries = $this->db->get('beneficiaries')->result_array();
+
+										if (!empty($existing_beneficiaries)):
+											foreach ($existing_beneficiaries as $eb):
+												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
+										?>
+											<option
+												value="<?php echo $eb['id']; ?>"
+												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
+												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
+												<?php
+													$displayDate = ($eb['status'] === 'ACTIVE')
+														? $eb['submission_date']
+														: $eb['status_date'];
+													echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $displayDate . ')';
+												?>
+											</option>
+										<?php
+											endforeach;
+										else:
+										?>
+											<option value="" disabled>No beneficiaries available to replace</option>
+										<?php endif; ?>
+									</select>
+								</div>
+							</div>
+
+							<!-- Replacement Reason -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Reason for Replacing</label>
+								<div class="col-sm-7">
+									<select name="replacement_reason" id="replacement-reason" class="form-control" required>
+										<option value="">-- Select Reason --</option>
+										<option value="10 years benefitted">10 years benefitted</option>
+										<option value="Not Matured">Not Matured</option>
+										<option value="Passbook Replacement">Passbook Replacement</option>
+									</select>
+								</div>
+							</div>
+
+							<div id="passbook-replacement-group" style="display: none;">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">Member 1</label>
+									<div class="col-sm-7">
+										<div style="position: relative;">
+											<input type="text" class="form-control" id="replacement-member-search-1"
+												placeholder="Search by ID Number, Name, Passbook No, or Employee No">
+											<small class="form-text text-muted">Select first member reference</small>
+											<div id="replacement-member-search-results-1" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+										</div>
+										<input type="hidden" name="memberid1" id="replacement-memberid1">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-sm-3 control-label">Member 2</label>
+									<div class="col-sm-7">
+										<div style="position: relative;">
+											<input type="text" class="form-control" id="replacement-member-search-2"
+												placeholder="Search by ID Number, Name, Passbook No, or Employee No">
+											<small class="form-text text-muted">Select second member reference</small>
+											<div id="replacement-member-search-results-2" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+										</div>
+										<input type="hidden" name="memberid2" id="replacement-memberid2">
+									</div>
+								</div>
+							</div>
 
 							<!-- Full Name -->
 							<div class="form-group">
@@ -498,24 +588,6 @@ foreach ($member_data as $member_row):
 								</div>
 							</div>
 
-							<!-- Submission Date -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Submission Date</label>
-								<div class="col-sm-7">
-									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
-										<input type="text"
-											class="form-control"
-											name="submission_date"
-											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
-											placeholder="yyyy-mm-dd"
-											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
-											required>
-										<span class="input-group-addon">
-											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
-										</span>
-									</div>
-								</div>
-							</div>
 						<!-- Spouse? -->
 						<div class="form-group">
 							<label class="col-sm-3 control-label">Is Spouse?</label>
@@ -530,73 +602,9 @@ foreach ($member_data as $member_row):
 								</div>
 							</div>
 						</div>
-							<!-- Status -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Status</label>
-								<div class="col-sm-7">
-								<select name="status" id="beneficiary-status" class="form-control" required>
-									<option value="">-- Select Status --</option>
-										<?php foreach ($status_enum as $value): ?>
-											<option value="<?= $value ?>">
-												<?= ucfirst($value) ?>
-											</option>
-										<?php endforeach; ?>
-									</select>
-								</div>
-							</div>
-
-
-
-							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
-							<div class="form-group" id="replace-with-group" style="display: none;">
-								<label class="col-sm-3 control-label">Replace</label>
-								<div class="col-sm-7">
-									<select name="replaced_with" id="replaced-with-select" class="form-control">
-										<option value="">-- Select Beneficiary to Replace --</option>
-										<?php
-										// List replaceable beneficiaries for this member (exclude deleted and already replaced)
-										$this->db->where('memberid', $member_row['id']);
-										// Exclude deleted; allow REPLACEE too
-										$this->db->where('status !=', 'DELETED');
-										// Do not allow already-replaced beneficiaries to be selected again
-										$this->db->where('status !=', 'BENEFITTED - REPLACED');
-										$this->db->group_start();
-										// include unreplaced
-										$this->db->where('replaced', 0);
-										$this->db->or_where('replaced IS NULL', null, false);
-										// also include REPLACEE even if marked replaced
-										$this->db->or_where('status', 'REPLACEE');
-										$this->db->group_end();
-										$existing_beneficiaries = $this->db->get('beneficiaries')->result_array();
-
-										if (!empty($existing_beneficiaries)):
-											foreach ($existing_beneficiaries as $eb):
-												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
-										?>
-											<option
-												value="<?php echo $eb['id']; ?>"
-												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
-												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
-												<?php
-													$displayDate = ($eb['status'] === 'ACTIVE')
-														? $eb['submission_date']
-														: $eb['status_date'];
-													echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $displayDate . ')';
-												?>
-											</option>
-										<?php
-											endforeach;
-										else:
-										?>
-											<option value="" disabled>No beneficiaries available to replace</option>
-										<?php endif; ?>
-									</select>
-								</div>
-							</div>
-							
-							<!-- Status Date (status_date in DB) - BENEFITTED date or Death Certificate date -->
-							<div class="form-group" id="status-date-group" style="display: none;">
-								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
+							<!-- Status Date (for Not Matured) -->
+							<div class="form-group" id="replacement-status-date-group" style="display: none;">
+								<label class="col-sm-3 control-label" id="replacement-status-date-label">Death Certificate Date</label>
 								<div class="col-sm-7">
 									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"
@@ -604,8 +612,7 @@ foreach ($member_data as $member_row):
 											name="status_date"
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
-											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
-											required>
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)">
 										<span class="input-group-addon">
 											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
 										</span>
@@ -735,6 +742,100 @@ foreach ($member_data as $member_row):
         });
     }
     toggleStatusFields(); // Initialize on load
+})();
+
+// Replacement tab: reason-driven fields + searchable member references
+(function() {
+    var reasonSelect = document.getElementById('replacement-reason');
+    var statusDateGroup = document.getElementById('replacement-status-date-group');
+    var statusDateInput = statusDateGroup ? statusDateGroup.querySelector('input[name="status_date"]') : null;
+    var passbookGroup = document.getElementById('passbook-replacement-group');
+
+    function bindMemberSearch(inputId, resultsId, hiddenId) {
+        var input = jQuery('#' + inputId);
+        var results = jQuery('#' + resultsId);
+        var hidden = jQuery('#' + hiddenId);
+
+        input.on('keyup', function() {
+            var search = jQuery(this).val();
+            if (!search || search.length < 2) {
+                results.hide().empty();
+                hidden.val('');
+                return;
+            }
+
+            jQuery.ajax({
+                url: "<?php echo base_url('index.php?burial/search_members');?>",
+                method: 'POST',
+                data: {search: search},
+                dataType: 'json',
+                success: function(response) {
+                    if (!(response && response.success && response.members && response.members.length > 0)) {
+                        results.html('<div style="padding: 10px; text-align: center; color: #999;">No members found</div>').show();
+                        hidden.val('');
+                        return;
+                    }
+
+                    var resultsHtml = '';
+                    jQuery.each(response.members, function(index, member) {
+                        var fullName = (member.surname || '') + ' ' + (member.name || '');
+                        var idNo = member.idnumber || 'N/A';
+                        var passbook = member.passbook_no || 'N/A';
+                        var employee = member.employeeno || 'N/A';
+                        resultsHtml += '<div class="replacement-member-result" style="padding: 10px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer;" ' +
+                            'data-member-id="' + member.id + '" ' +
+                            'data-display="' + fullName.trim() + ' | ID: ' + idNo + ' | PB: ' + passbook + '">' +
+                            '<strong style="display: block; margin-bottom: 3px;">' + fullName + '</strong>' +
+                            '<small style="color: #666;">ID: ' + idNo + ' | Passbook: ' + passbook + ' | Employee: ' + employee + '</small>' +
+                            '</div>';
+                    });
+                    results.html(resultsHtml).show();
+                },
+                error: function() {
+                    results.html('<div style="padding: 10px; text-align: center; color: #d32f2f;">Error loading members</div>').show();
+                }
+            });
+        });
+
+        results.on('click', '.replacement-member-result', function() {
+            var memberId = jQuery(this).data('member-id');
+            var display = jQuery(this).data('display');
+            hidden.val(memberId);
+            input.val(display);
+            results.hide();
+        });
+    }
+
+    function toggleReplacementReasonFields() {
+        if (!reasonSelect) return;
+        var reason = reasonSelect.value;
+        var isNotMatured = reason === 'Not Matured';
+        var isPassbookReplacement = reason === 'Passbook Replacement';
+
+        if (statusDateGroup && statusDateInput) {
+            statusDateGroup.style.display = isNotMatured ? 'block' : 'none';
+            statusDateInput.required = isNotMatured;
+            if (!isNotMatured) {
+                statusDateInput.value = '';
+            }
+        }
+
+        if (passbookGroup) {
+            passbookGroup.style.display = isPassbookReplacement ? 'block' : 'none';
+            if (!isPassbookReplacement) {
+                jQuery('#replacement-member-search-1, #replacement-member-search-2').val('');
+                jQuery('#replacement-memberid1, #replacement-memberid2').val('');
+                jQuery('#replacement-member-search-results-1, #replacement-member-search-results-2').hide().empty();
+            }
+        }
+    }
+
+    if (!reasonSelect) return;
+
+    bindMemberSearch('replacement-member-search-1', 'replacement-member-search-results-1', 'replacement-memberid1');
+    bindMemberSearch('replacement-member-search-2', 'replacement-member-search-results-2', 'replacement-memberid2');
+    reasonSelect.addEventListener('change', toggleReplacementReasonFields);
+    toggleReplacementReasonFields();
 })();
 
 // ────────────────────────────────────────────────
