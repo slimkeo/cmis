@@ -534,15 +534,13 @@ foreach ($member_data as $member_row):
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Status</label>
 								<div class="col-sm-7">
-									<select name="status" id="beneficiary-status" class="form-control" required>
-										<option value="">-- Select Status --</option>
-										<option value="ACTIVE">ACTIVE</option>
-										<option value="WAITING">WAITING</option>
-										<option value="BENEFITTED">BENEFITTED</option>
-										<option value="REPLACED">REPLACED</option>
-										<option value="BENEFITTED - REPLACED">BENEFITTED - REPLACED</option>
-										<option value="DELETED">DELETED</option>
-										<option value="REPLACEE">REPLACEE</option>
+								<select name="status" id="beneficiary-status" class="form-control" required>
+									<option value="">-- Select Status --</option>
+										<?php foreach ($status_enum as $value): ?>
+											<option value="<?= $value ?>">
+												<?= ucfirst($value) ?>
+											</option>
+										<?php endforeach; ?>
 									</select>
 								</div>
 							</div>

@@ -317,15 +317,6 @@ if (($claim['status'] ?? '') === 'PENDING') {
         </div>
         </div>
         </div>
-
-        <div class="no-print" style="margin-top: 12px;">
-            <?php if (($claim['status'] ?? '') === 'PENDING'): ?>
-                <a href="<?php echo base_url('index.php?burial/claims/approve/' . ($claim['id'] ?? '')); ?>" class="btn btn-success btn-sm">Approve</a>
-                <a href="<?php echo base_url('index.php?burial/claims/reject/' . ($claim['id'] ?? '')); ?>" class="btn btn-danger btn-sm">Reject</a>
-            <?php elseif (($claim['status'] ?? '') === 'APPROVED'): ?>
-                <a href="<?php echo base_url('index.php?burial/approved_claims/pay/' . ($claim['id'] ?? '')); ?>" class="btn btn-primary btn-sm">Pay</a>
-            <?php endif; ?>
-        </div>
     </div>
 </body>
 </html>

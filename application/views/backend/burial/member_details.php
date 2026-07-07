@@ -40,6 +40,8 @@ $member_fee = $fees['member_fee'];
 $non_payable_statuses = array(
     'BENEFITTED - REPLACED',
     'DECEASED - REPLACED',
+    'LATE NOT BENEFITTED - REPLACED',
+    'LATE NOT BENEFITTED',
     'DELETED'
 );
 

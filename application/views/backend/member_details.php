@@ -23,6 +23,8 @@ $spouse_fee    = $fees['spouse_fee'];
 $non_payable_statuses = [
     'BENEFITTED - REPLACED',
     'DECEASED - REPLACED',
+    'LATE NOT BENEFITTED - REPLACED',
+    'LATE NOT BENEFITTED',
     'DELETED'
 ];
 
