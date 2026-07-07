@@ -842,8 +842,14 @@ class Burial extends CI_Controller
             }
 
             if ($replacement_reason === 'Not Matured') {
-                if ($old_was_benefitted) {
-                    $this->session->set_flashdata('flash_message_error', 'Not Matured replacement applies only to beneficiaries who are not yet benefitted');
+                $submission_ts = $this->_parse_date_to_ts($old['submission_date'] ?? '');
+                if (!$submission_ts) {
+                    $this->session->set_flashdata('flash_message_error', 'Selected beneficiary has an invalid submission date');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                if (time() >= strtotime('+1 year', $submission_ts)) {
+                    $this->session->set_flashdata('flash_message_error', 'Not Matured replacement applies only to beneficiaries whose submission date is less than 12 months old');
                     redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                 }
 

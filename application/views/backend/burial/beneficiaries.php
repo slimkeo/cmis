@@ -489,8 +489,20 @@ foreach ($member_data as $member_row):
 											foreach ($existing_beneficiaries as $eb):
 												$status = $eb['status'] ?? '';
 												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
+												$submission_date = $eb['submission_date'] ?? '';
 												$is_benefitted = ($status === 'BENEFITTED');
-												$is_not_benefitted = !in_array($status, ['BENEFITTED', 'BENEFITTED - REPLACED'], true);
+												$submission_timestamp = false;
+												if (!empty($submission_date) && strpos($submission_date, '-') !== false) {
+													$date_parts = explode('-', $submission_date);
+													if (count($date_parts) == 3 && intval($date_parts[0]) > 12) {
+														$submission_timestamp = strtotime($submission_date);
+													} else {
+														$submission_timestamp = strtotime($date_parts[2] . '-' . $date_parts[1] . '-' . $date_parts[0]);
+													}
+												} elseif (!empty($submission_date)) {
+													$submission_timestamp = strtotime($submission_date);
+												}
+												$is_not_matured = ($submission_timestamp && time() < strtotime('+1 year', $submission_timestamp));
 												$ten_years_eligible = false;
 												if ($is_benefitted && !empty($status_date)) {
 													$benefitted_ts = strtotime($status_date);
@@ -505,7 +517,7 @@ foreach ($member_data as $member_row):
 												data-status="<?php echo htmlspecialchars($status, ENT_QUOTES, 'UTF-8'); ?>"
 												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
 												data-ten-years="<?php echo $ten_years_eligible ? '1' : '0'; ?>"
-												data-not-benefitted="<?php echo $is_not_benefitted ? '1' : '0'; ?>"
+												data-not-matured="<?php echo $is_not_matured ? '1' : '0'; ?>"
 												data-passbook-eligible="1"
 												hidden>
 												<?php echo $eb['fullname'] . ' (' . $status . ' | ' . $displayDate . ')'; ?>
@@ -791,7 +803,7 @@ foreach ($member_data as $member_row):
             if (reason === '10 years benefitted') {
                 show = option.getAttribute('data-ten-years') === '1';
             } else if (reason === 'Not Matured') {
-                show = option.getAttribute('data-not-benefitted') === '1';
+                show = option.getAttribute('data-not-matured') === '1';
             } else if (reason === 'Passbook Replacement') {
                 show = option.getAttribute('data-passbook-eligible') === '1';
             }
@@ -816,7 +828,7 @@ foreach ($member_data as $member_row):
             } else if (reason === '10 years benefitted') {
                 beneficiaryHint.textContent = 'Showing BENEFITTED beneficiaries whose benefitted date is at least 10 years ago.';
             } else if (reason === 'Not Matured') {
-                beneficiaryHint.textContent = 'Showing beneficiaries who are not yet benefitted.';
+                beneficiaryHint.textContent = 'Showing beneficiaries whose submission date is less than 12 months old (not yet matured).';
             } else if (reason === 'Passbook Replacement') {
                 beneficiaryHint.textContent = 'Select the beneficiary being replaced.';
             }
