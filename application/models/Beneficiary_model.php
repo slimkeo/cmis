@@ -9,7 +9,9 @@ class Beneficiary_model extends CI_Model
     private $non_payable_statuses = [
         'BENEFITTED - REPLACED',
         'DECEASED - REPLACED',
-        'DELETED'
+        'DELETED',
+        'LATE NOT BENEFITTED',
+        'LATE NOT BENEFITTED - REPLACED'
     ];
 
     public function get_by_member($member_id)

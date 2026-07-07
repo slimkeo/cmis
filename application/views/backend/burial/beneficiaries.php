@@ -1,4 +1,5 @@
 <?php
+$status_enum = $this->Enum_model->get_enum_values('beneficiaries', 'status');
 $member_data = $this->db->get_where('members', array('id' => $memberid))->result_array();
 foreach ($member_data as $member_row):
 
@@ -22,7 +23,9 @@ foreach ($member_data as $member_row):
 		$non_payable_statuses = [
 			'BENEFITTED - REPLACED',
 			'DECEASED - REPLACED',
-			'DELETED'
+			'DELETED',
+			'LATE NOT BENEFITTED',
+			'LATE NOT BENEFITTED - REPLACED'
 		];
 
 		$payable_list = array_filter($beneficiaries, function($b) use ($non_payable_statuses) {
@@ -289,14 +292,12 @@ foreach ($member_data as $member_row):
 								<label class="col-sm-3 control-label">Status</label>
 								<div class="col-sm-7">
 									<select name="status" id="beneficiary-status" class="form-control" required>
-										<option value="">-- Select Status --</option>
-										<option value="ACTIVE">ACTIVE</option>
-										<option value="WAITING">WAITING</option>
-										<option value="BENEFITTED">BENEFITTED</option>
-										<option value="REPLACED">REPLACED</option>
-										<option value="BENEFITTED - REPLACED">BENEFITTED - REPLACED</option>
-										<option value="DELETED">DELETED</option>
-										<option value="REPLACEE">REPLACEE</option>
+									<option value="">-- Select Status --</option>
+										<?php foreach ($status_enum as $value): ?>
+											<option value="<?= $value ?>">
+												<?= ucfirst($value) ?>
+											</option>
+										<?php endforeach; ?>
 									</select>
 								</div>
 							</div>
@@ -449,19 +450,43 @@ foreach ($member_data as $member_row):
 
 			<!--BATCH CREATION FORM STARTS-->
 			<div class="tab-pane box" id="replacing" style="padding: 15px">
-				<div class="box-content">
-					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/replacing',
-			        array('class' => 'form-horizontal form-bordered','enctype'=>'multipart/form-data'));?>
+			<div class="box-content">
+					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/add_beneficiary',
+			        array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
 
-						<!-- Submission Date -->
-						<div class="form-group">
-							<label class="col-sm-3 control-label">Date of Submission</label>
-							<div class="col-sm-3">
-							<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+							<!-- Full Name -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Full Name</label>
+								<div class="col-sm-7">
+									<input
+										type="text"
+										name="fullname"
+										class="form-control"
+										placeholder="Enter beneficiary full name"
+										required>
+								</div>
+							</div>
+
+							<!-- Gender -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Gender</label>
+								<div class="col-sm-7">
+									<select name="gender" class="form-control" required>
+										<option value="">-- Select Gender --</option>
+										<option value="M">Male</option>
+										<option value="F">Female</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Date of Birth -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Date of Birth</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"
 											class="form-control"
-											name="batch_submission_date"
-											id="batch-submission-date"
+											name="dob"
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
@@ -470,47 +495,132 @@ foreach ($member_data as $member_row):
 											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
 										</span>
 									</div>
+								</div>
+							</div>
+
+							<!-- Submission Date -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Submission Date</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="submission_date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+								</div>
+							</div>
+						<!-- Spouse? -->
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Is Spouse?</label>
+							<div class="col-sm-7">
+								<div>
+									<label style="display: inline; margin-right: 20px;">
+										<input type="radio" name="is_spouse" value="0" checked> No
+									</label>
+									<label style="display: inline;">
+										<input type="radio" name="is_spouse" value="1"> Yes
+									</label>
+								</div>
 							</div>
 						</div>
+							<!-- Status -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Status</label>
+								<div class="col-sm-7">
+									<select name="status" id="beneficiary-status" class="form-control" required>
+										<option value="">-- Select Status --</option>
+										<option value="ACTIVE">ACTIVE</option>
+										<option value="WAITING">WAITING</option>
+										<option value="BENEFITTED">BENEFITTED</option>
+										<option value="REPLACED">REPLACED</option>
+										<option value="BENEFITTED - REPLACED">BENEFITTED - REPLACED</option>
+										<option value="DELETED">DELETED</option>
+										<option value="REPLACEE">REPLACEE</option>
+									</select>
+								</div>
+							</div>
 
-						<!-- Beneficiaries Table -->
-						<div style="overflow-x: auto; margin-top: 20px;">
-							<table class="table table-bordered table-striped table-condensed" id="batch-beneficiaries-table">
-								<thead>
-									<tr style="background-color: #f5f5f5;">
-										<th style="width: 3%;">#</th>
-										<th style="width: 25%;">Full Name <span style="color:red;">*</span></th>
-										<th style="width: 8%;">Gender <span style="color:red;">*</span></th>
-										<th style="width: 12%;">DOB (Optional)</th>
-										<th style="width: 12%;">Spouse?</th>
-										<th style="width: 12%;">Status <span style="color:red;">*</span></th>
-										<th style="width: 12%;">Status Date</th>
-										<th style="width: 8%; text-align: center;">Action</th>
-									</tr>
-								</thead>
-								<tbody id="beneficiaries-container">
-									<!-- Rows will be added here -->
-								</tbody>
-							</table>
-						</div>
 
-						<!-- Add More Button -->
-						<div style="margin-top: 15px;">
-							<button type="button" class="btn btn-info" id="add-beneficiary-row">
-								<i class="fa fa-plus"></i> Add Row
-							</button>
-						</div>
 
-						<!-- Submit -->
-						<div style="margin-top: 20px;">
-							<button type="submit" class="btn btn-primary">
-								<i class="fa fa-save"></i> Add Batch Beneficiaries
-							</button>
-							<button type="reset" class="btn btn-default">
-								<i class="fa fa-refresh"></i> Clear
-							</button>
-						</div>
-				</form>                
+							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
+							<div class="form-group" id="replace-with-group" style="display: none;">
+								<label class="col-sm-3 control-label">Replace</label>
+								<div class="col-sm-7">
+									<select name="replaced_with" id="replaced-with-select" class="form-control">
+										<option value="">-- Select Beneficiary to Replace --</option>
+										<?php
+										// List replaceable beneficiaries for this member (exclude deleted and already replaced)
+										$this->db->where('memberid', $member_row['id']);
+										// Exclude deleted; allow REPLACEE too
+										$this->db->where('status !=', 'DELETED');
+										// Do not allow already-replaced beneficiaries to be selected again
+										$this->db->where('status !=', 'BENEFITTED - REPLACED');
+										$this->db->group_start();
+										// include unreplaced
+										$this->db->where('replaced', 0);
+										$this->db->or_where('replaced IS NULL', null, false);
+										// also include REPLACEE even if marked replaced
+										$this->db->or_where('status', 'REPLACEE');
+										$this->db->group_end();
+										$existing_beneficiaries = $this->db->get('beneficiaries')->result_array();
+
+										if (!empty($existing_beneficiaries)):
+											foreach ($existing_beneficiaries as $eb):
+												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
+										?>
+											<option
+												value="<?php echo $eb['id']; ?>"
+												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
+												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
+												<?php
+													$displayDate = ($eb['status'] === 'ACTIVE')
+														? $eb['submission_date']
+														: $eb['status_date'];
+													echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $displayDate . ')';
+												?>
+											</option>
+										<?php
+											endforeach;
+										else:
+										?>
+											<option value="" disabled>No beneficiaries available to replace</option>
+										<?php endif; ?>
+									</select>
+								</div>
+							</div>
+							
+							<!-- Status Date (status_date in DB) - BENEFITTED date or Death Certificate date -->
+							<div class="form-group" id="status-date-group" style="display: none;">
+								<label class="col-sm-3 control-label" id="status-date-label">Status Date</label>
+								<div class="col-sm-7">
+									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
+										<input type="text"
+											class="form-control"
+											name="status_date"
+											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
+											placeholder="yyyy-mm-dd"
+											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
+											required>
+										<span class="input-group-addon">
+											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-sm-offset-3 col-sm-5">
+									<button type="submit" class="btn btn-primary"><?php echo get_phrase('add_beneficiary');?></button>
+								</div>
+							</div>
+					</form>                
 				</div>                
 			</div>
 			<!--BATCH CREATION FORM ENDS-->
@@ -686,7 +796,9 @@ foreach ($member_data as $member_row):
                     <select name="batch_status[]" class="batch-status-select form-control" data-index="${index}" required style="width: 100%; margin: 0;">
                         <option value="ACTIVE">ACTIVE</option>
                         <option value="BENEFITTED">BENEFITTED</option>
-                        <option value="DELETED">DELETED</option>
+						<option value="DELETED">DELETED</option>
+                        <option value="LATE NOT BENEFITTED">LATE NOT BENEFITTED</option>
+                        <option value="LATE NOT BENEFITTED - REPLACED">LATE NOT BENEFITTED - REPLACED</option>
                     </select>
                 </td>
                 <td>

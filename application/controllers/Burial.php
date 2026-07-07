@@ -663,7 +663,7 @@ class Burial extends CI_Controller
                     if ($old_was_benefitted) {
                         $update_old['status'] = 'BENEFITTED - REPLACED';
                     } else {
-                        $update_old['status'] = 'DECEASED - REPLACED';
+                        $update_old['status'] = 'LATE NOT BENEFITTED - REPLACED';
                         $update_old['status_date'] = $status_date_input;
                     }
 
@@ -3303,7 +3303,7 @@ class Burial extends CI_Controller
         foreach ($all as $b) {
             $status = trim($b['status']);
             // Exclude deleted, benefittted or already replaced beneficiaries
-            if (in_array($status, ['DELETED', 'DECEASED - REPLACED', 'BENEFITTED', 'BENEFITTED - REPLACED'], true)) continue;
+            if (in_array($status, ['DELETED', 'LATE NOT BENEFITTED','DECEASED - REPLACED', 'LATE NOT BENEFITTED - REPLACED', 'BENEFITTED', 'BENEFITTED - REPLACED'], true)) continue;
 
             // Parse submission_date similar to beneficiaries.php view
             $submission_ts = $this->_parse_date_to_ts($b['submission_date'] ?? '');
