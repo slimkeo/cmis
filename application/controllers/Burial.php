@@ -785,9 +785,10 @@ class Burial extends CI_Controller
             $replacement_dob = $this->Date_model->normalize_date($this->input->post('dob'));
             $replacement_gender = $this->input->post('gender');
             $replacement_is_spouse = (int) $this->input->post('is_spouse');
-            $replacement_status_date = $this->Date_model->normalize_date($this->input->post('status_date'));
+            $death_certificate_date = $this->Date_model->normalize_date($this->input->post('death_certificate_date'));
             $memberid1 = trim((string) ($this->input->post('memberid1') ?: $this->input->post('member1')));
             $memberid2 = trim((string) ($this->input->post('memberid2') ?: $this->input->post('member2')));
+            $today = date('Y-m-d');
 
             if (empty($replaced_with_id)) {
                 $this->session->set_flashdata('flash_message_error', 'Please select beneficiary to replace');
@@ -815,13 +816,43 @@ class Burial extends CI_Controller
                 redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
 
+            $old_status = $old['status'] ?? '';
+            $old_was_benefitted = in_array($old_status, ['BENEFITTED', 'BENEFITTED - REPLACED'], true);
+
+            if ($replacement_reason === '10 years benefitted') {
+                if ($old_status !== 'BENEFITTED') {
+                    $this->session->set_flashdata('flash_message_error', 'Only BENEFITTED beneficiaries can be replaced under 10 years benefitted');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                $benefitted_ts = $this->_parse_date_to_ts($old['status_date'] ?? '');
+                if (!$benefitted_ts) {
+                    $this->session->set_flashdata('flash_message_error', 'Selected beneficiary has an invalid benefitted date');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                if (time() < strtotime('+10 years', $benefitted_ts)) {
+                    $years_passed = floor((time() - $benefitted_ts) / (365.25 * 24 * 60 * 60));
+                    $this->session->set_flashdata(
+                        'flash_message_error',
+                        "Benefitted beneficiary can only be replaced 10 years after the benefitted date. Only {$years_passed} years have passed."
+                    );
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+            }
+
             if ($replacement_reason === 'Not Matured') {
-                if (empty($replacement_status_date)) {
+                if ($old_was_benefitted) {
+                    $this->session->set_flashdata('flash_message_error', 'Not Matured replacement applies only to beneficiaries who are not yet benefitted');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                if (empty($death_certificate_date)) {
                     $this->session->set_flashdata('flash_message_error', 'Death Certificate Date is required for Not Matured replacement');
                     redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
                 }
 
-                $death_ts = $this->_parse_date_to_ts($replacement_status_date);
+                $death_ts = $this->_parse_date_to_ts($death_certificate_date);
                 if (!$death_ts) {
                     $this->session->set_flashdata('flash_message_error', 'Invalid Death Certificate Date');
                     redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
@@ -855,33 +886,28 @@ class Burial extends CI_Controller
                 'is_spouse' => $replacement_is_spouse,
                 'submission_date' => $this->Date_model->normalize_date($old['submission_date']),
                 'status' => 'REPLACEE',
+                'status_date' => $today,
                 'replaced' => 0,
-                'replaced_with' => null
+                'replaced_with' => null,
+                'user' => $this->session->userdata('user_id')
             ];
 
-            if (!empty($replacement_status_date)) {
-                $data['status_date'] = $replacement_status_date;
-            }
-
             if ($replacement_reason === 'Passbook Replacement') {
-                $data['notes'] = $memberid1 . ' & ' . $memberid2;
+                $data['passbook'] = $memberid1 . ' & ' . $memberid2;
             }
 
             $this->db->insert('beneficiaries', $data);
             $new_beneficiary_id = $this->db->insert_id();
 
             // Update old beneficiary as replaced.
-            $old_status = $old['status'] ?? '';
-            $old_was_benefitted = in_array($old_status, ['BENEFITTED', 'BENEFITTED - REPLACED'], true);
-
             $update_old = [
                 'replaced' => 1,
                 'replaced_with' => $new_beneficiary_id,
                 'status' => $old_was_benefitted ? 'BENEFITTED - REPLACED' : 'LATE NOT BENEFITTED - REPLACED'
             ];
 
-            if (!$old_was_benefitted && !empty($replacement_status_date)) {
-                $update_old['status_date'] = $replacement_status_date;
+            if (!$old_was_benefitted && $replacement_reason === 'Not Matured' && !empty($death_certificate_date)) {
+                $update_old['status_date'] = $death_certificate_date;
             }
 
             $this->db->where('id', $replaced_with_id);

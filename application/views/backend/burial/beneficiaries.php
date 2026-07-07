@@ -454,55 +454,6 @@ foreach ($member_data as $member_row):
 					<?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$member_row['id'].'/beneficiary_replacement',
 			        array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
 
-
-
-							<!-- Replace With Dropdown - shown only when status is REPLACEE -->
-							<div class="form-group" id="replacing-replace-with-group">
-								<label class="col-sm-3 control-label">Replace</label>
-								<div class="col-sm-7">
-									<select name="replaced_with" id="replacing-replaced-with-select" class="form-control" required>
-										<option value="">-- Select Beneficiary to Replace --</option>
-										<?php
-										// List replaceable beneficiaries for this member (exclude deleted and already replaced)
-										$this->db->where('memberid', $member_row['id']);
-										// Exclude deleted; allow REPLACEE too
-										$this->db->where('status !=', 'DELETED');
-										// Do not allow already-replaced beneficiaries to be selected again
-										$this->db->where('status !=', 'BENEFITTED - REPLACED');
-										$this->db->group_start();
-										// include unreplaced
-										$this->db->where('replaced', 0);
-										$this->db->or_where('replaced IS NULL', null, false);
-										// also include REPLACEE even if marked replaced
-										$this->db->or_where('status', 'REPLACEE');
-										$this->db->group_end();
-										$existing_beneficiaries = $this->db->get('beneficiaries')->result_array();
-
-										if (!empty($existing_beneficiaries)):
-											foreach ($existing_beneficiaries as $eb):
-												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
-										?>
-											<option
-												value="<?php echo $eb['id']; ?>"
-												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
-												data-status="<?php echo htmlspecialchars($eb['status'], ENT_QUOTES, 'UTF-8'); ?>">
-												<?php
-													$displayDate = ($eb['status'] === 'ACTIVE')
-														? $eb['submission_date']
-														: $eb['status_date'];
-													echo $eb['fullname'] . ' (' . $eb['status'] . ' | ' . $displayDate . ')';
-												?>
-											</option>
-										<?php
-											endforeach;
-										else:
-										?>
-											<option value="" disabled>No beneficiaries available to replace</option>
-										<?php endif; ?>
-									</select>
-								</div>
-							</div>
-
 							<!-- Replacement Reason -->
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Reason for Replacing</label>
@@ -515,6 +466,59 @@ foreach ($member_data as $member_row):
 									</select>
 								</div>
 							</div>
+
+							<!-- Replace With Dropdown -->
+							<div class="form-group" id="replacing-replace-with-group" style="display: none;">
+								<label class="col-sm-3 control-label">Replace</label>
+								<div class="col-sm-7">
+									<select name="replaced_with" id="replacing-replaced-with-select" class="form-control" required disabled>
+										<option value="">-- Select Beneficiary to Replace --</option>
+										<?php
+										$this->db->where('memberid', $member_row['id']);
+										$this->db->where('status !=', 'DELETED');
+										$this->db->where('status !=', 'BENEFITTED - REPLACED');
+										$this->db->where('status !=', 'LATE NOT BENEFITTED - REPLACED');
+										$this->db->group_start();
+										$this->db->where('replaced', 0);
+										$this->db->or_where('replaced IS NULL', null, false);
+										$this->db->or_where('status', 'REPLACEE');
+										$this->db->group_end();
+										$existing_beneficiaries = $this->db->get('beneficiaries')->result_array();
+
+										if (!empty($existing_beneficiaries)):
+											foreach ($existing_beneficiaries as $eb):
+												$status = $eb['status'] ?? '';
+												$status_date = isset($eb['status_date']) ? $eb['status_date'] : '';
+												$is_benefitted = ($status === 'BENEFITTED');
+												$is_not_benefitted = !in_array($status, ['BENEFITTED', 'BENEFITTED - REPLACED'], true);
+												$ten_years_eligible = false;
+												if ($is_benefitted && !empty($status_date)) {
+													$benefitted_ts = strtotime($status_date);
+													if ($benefitted_ts && time() >= strtotime('+10 years', $benefitted_ts)) {
+														$ten_years_eligible = true;
+													}
+												}
+												$displayDate = ($status === 'ACTIVE') ? $eb['submission_date'] : $status_date;
+										?>
+											<option
+												value="<?php echo $eb['id']; ?>"
+												data-status="<?php echo htmlspecialchars($status, ENT_QUOTES, 'UTF-8'); ?>"
+												data-status-date="<?php echo htmlspecialchars($status_date, ENT_QUOTES, 'UTF-8'); ?>"
+												data-ten-years="<?php echo $ten_years_eligible ? '1' : '0'; ?>"
+												data-not-benefitted="<?php echo $is_not_benefitted ? '1' : '0'; ?>"
+												data-passbook-eligible="1"
+												hidden>
+												<?php echo $eb['fullname'] . ' (' . $status . ' | ' . $displayDate . ')'; ?>
+											</option>
+										<?php
+											endforeach;
+										endif;
+										?>
+									</select>
+									<small class="form-text text-muted" id="replacing-beneficiary-hint"></small>
+								</div>
+							</div>
+
 
 							<div id="passbook-replacement-group" style="display: none;">
 								<div class="form-group">
@@ -602,21 +606,23 @@ foreach ($member_data as $member_row):
 								</div>
 							</div>
 						</div>
-							<!-- Status Date (for Not Matured) -->
-							<div class="form-group" id="replacement-status-date-group" style="display: none;">
-								<label class="col-sm-3 control-label" id="replacement-status-date-label">Death Certificate Date</label>
+							<!-- Death Certificate Date (for Not Matured) -->
+							<div class="form-group" id="replacement-death-cert-group" style="display: none;">
+								<label class="col-sm-3 control-label">Death Certificate Date</label>
 								<div class="col-sm-7">
 									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"
 											class="form-control"
-											name="status_date"
+											name="death_certificate_date"
+											id="replacement-death-certificate-date"
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)">
 										<span class="input-group-addon">
-											<i class="glyphicon glyphicon-calendar"></i>   <!-- or font-awesome etc. -->
+											<i class="glyphicon glyphicon-calendar"></i>
 										</span>
 									</div>
+									<small class="form-text text-muted">Replacement must be done within 2 months from date of death</small>
 								</div>
 							</div>
 
@@ -747,9 +753,79 @@ foreach ($member_data as $member_row):
 // Replacement tab: reason-driven fields + searchable member references
 (function() {
     var reasonSelect = document.getElementById('replacement-reason');
-    var statusDateGroup = document.getElementById('replacement-status-date-group');
-    var statusDateInput = statusDateGroup ? statusDateGroup.querySelector('input[name="status_date"]') : null;
+    var replaceWithGroup = document.getElementById('replacing-replace-with-group');
+    var replacedWithSelect = document.getElementById('replacing-replaced-with-select');
+    var beneficiaryHint = document.getElementById('replacing-beneficiary-hint');
+    var deathCertGroup = document.getElementById('replacement-death-cert-group');
+    var deathCertInput = document.getElementById('replacement-death-certificate-date');
     var passbookGroup = document.getElementById('passbook-replacement-group');
+    var replacementForm = replaceWithGroup ? replaceWithGroup.closest('form') : null;
+
+    function parseDateToTs(dateStr) {
+        if (!dateStr) return null;
+        var parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+        var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        return isNaN(d.getTime()) ? null : d.getTime();
+    }
+
+    function isWithinTwoMonthsOfDeath(deathDateStr) {
+        var deathTs = parseDateToTs(deathDateStr);
+        if (!deathTs) return false;
+        var twoMonthsAfter = new Date(deathTs);
+        twoMonthsAfter.setMonth(twoMonthsAfter.getMonth() + 2);
+        return Date.now() <= twoMonthsAfter.getTime();
+    }
+
+    function filterBeneficiaryOptions() {
+        if (!reasonSelect || !replacedWithSelect) return;
+
+        var reason = reasonSelect.value;
+        var visibleCount = 0;
+        var selectedStillVisible = false;
+
+        Array.prototype.forEach.call(replacedWithSelect.options, function(option) {
+            if (!option.value) return;
+
+            var show = false;
+            if (reason === '10 years benefitted') {
+                show = option.getAttribute('data-ten-years') === '1';
+            } else if (reason === 'Not Matured') {
+                show = option.getAttribute('data-not-benefitted') === '1';
+            } else if (reason === 'Passbook Replacement') {
+                show = option.getAttribute('data-passbook-eligible') === '1';
+            }
+
+            option.hidden = !show;
+            option.disabled = !show;
+            if (show) {
+                visibleCount++;
+                if (replacedWithSelect.value === option.value) {
+                    selectedStillVisible = true;
+                }
+            }
+        });
+
+        if (!selectedStillVisible) {
+            replacedWithSelect.value = '';
+        }
+
+        if (beneficiaryHint) {
+            if (!reason) {
+                beneficiaryHint.textContent = '';
+            } else if (reason === '10 years benefitted') {
+                beneficiaryHint.textContent = 'Showing BENEFITTED beneficiaries whose benefitted date is at least 10 years ago.';
+            } else if (reason === 'Not Matured') {
+                beneficiaryHint.textContent = 'Showing beneficiaries who are not yet benefitted.';
+            } else if (reason === 'Passbook Replacement') {
+                beneficiaryHint.textContent = 'Select the beneficiary being replaced.';
+            }
+
+            if (reason && visibleCount === 0) {
+                beneficiaryHint.textContent += ' No eligible beneficiaries found for this reason.';
+            }
+        }
+    }
 
     function bindMemberSearch(inputId, resultsId, hiddenId) {
         var input = jQuery('#' + inputId);
@@ -812,11 +888,18 @@ foreach ($member_data as $member_row):
         var isNotMatured = reason === 'Not Matured';
         var isPassbookReplacement = reason === 'Passbook Replacement';
 
-        if (statusDateGroup && statusDateInput) {
-            statusDateGroup.style.display = isNotMatured ? 'block' : 'none';
-            statusDateInput.required = isNotMatured;
+        if (replaceWithGroup && replacedWithSelect) {
+            replaceWithGroup.style.display = reason ? 'block' : 'none';
+            replacedWithSelect.disabled = !reason;
+            replacedWithSelect.required = !!reason;
+            filterBeneficiaryOptions();
+        }
+
+        if (deathCertGroup && deathCertInput) {
+            deathCertGroup.style.display = isNotMatured ? 'block' : 'none';
+            deathCertInput.required = isNotMatured;
             if (!isNotMatured) {
-                statusDateInput.value = '';
+                deathCertInput.value = '';
             }
         }
 
@@ -836,6 +919,32 @@ foreach ($member_data as $member_row):
     bindMemberSearch('replacement-member-search-2', 'replacement-member-search-results-2', 'replacement-memberid2');
     reasonSelect.addEventListener('change', toggleReplacementReasonFields);
     toggleReplacementReasonFields();
+
+    if (replacementForm) {
+        replacementForm.addEventListener('submit', function(e) {
+            var reason = reasonSelect.value;
+
+            if (reason === 'Not Matured' && deathCertInput) {
+                if (!deathCertInput.value) {
+                    e.preventDefault();
+                    alert('Death Certificate Date is required for Not Matured replacement.');
+                    return;
+                }
+                if (!isWithinTwoMonthsOfDeath(deathCertInput.value)) {
+                    e.preventDefault();
+                    alert('Replacement must be done within 2 months from date of death.');
+                    return;
+                }
+            }
+
+            if (reason === 'Passbook Replacement') {
+                if (!jQuery('#replacement-memberid1').val() || !jQuery('#replacement-memberid2').val()) {
+                    e.preventDefault();
+                    alert('Please select both member references for Passbook Replacement.');
+                }
+            }
+        });
+    }
 })();
 
 // ────────────────────────────────────────────────
