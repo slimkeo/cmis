@@ -864,7 +864,7 @@ class Burial extends CI_Controller
             }
 
             if ($replacement_reason === 'Passbook Replacement') {
-                $data['passbook'] = $memberid1 . ' & ' . $memberid2;
+                $data['notes'] = $memberid1 . ' & ' . $memberid2;
             }
 
             $this->db->insert('beneficiaries', $data);
