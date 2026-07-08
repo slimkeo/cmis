@@ -67,6 +67,19 @@
 							</div>
 						</div>
 					</div>
+
+
+					<!-- SEARCH MEMBER -->
+					<div class="form-group">
+						<label class="col-md-3 control-label">Search Member <span class="required">*</span></label>
+						<div class="col-md-7">
+							<div style="position: relative;">
+								<input type="text" class="form-control" id="member_search" placeholder="Search by ID, Name, Passbook, Employee No" required>
+								<small class="form-text text-muted">Start typing to search for member</small>
+								<div id="member_search_results" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+							</div>
+						</div>
+					</div>					
 					
 					<!-- NOMINEE SELECTION (hidden by default) -->
 					<div class="form-group" id="nominee_group" style="display: none;">
@@ -90,17 +103,6 @@
 						</div>
 					</div>
 
-					<!-- SEARCH MEMBER -->
-					<div class="form-group">
-						<label class="col-md-3 control-label">Search Member <span class="required">*</span></label>
-						<div class="col-md-7">
-							<div style="position: relative;">
-								<input type="text" class="form-control" id="member_search" placeholder="Search by ID, Name, Passbook, Employee No" required>
-								<small class="form-text text-muted">Start typing to search for member</small>
-								<div id="member_search_results" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
-							</div>
-						</div>
-					</div>
 
 					<!-- SELECTED MEMBER INFO -->
 					<div class="form-group">
@@ -343,31 +345,47 @@ $(document).ready(function() {
 						// ==============================================
 
 						$('#member_info').show();
-						
-						// Load nominees if member claim type is selected
-						if ($('#claim_type_member').is(':checked')) {
+
+						// Follow the selected claim type (selected before searching member)
+						var claimType = $('input[name="claim_type"]:checked').val();
+						if (claimType === 'NOMINEE') {
+							$('#nominee_group').show();
+							$('#beneficiary_select').closest('.form-group').hide();
+							
+							// Disable beneficiary to avoid validating hidden/irrelevant fields
+							$('#beneficiary_select')
+								.prop('disabled', true)
+								.prop('required', false)
+								.html('<option value="">-- Select Beneficiary --</option>');
+							$('#nominee_select').prop('required', true);
+
+							// Populate nominees for this member
 							loadNominees(member.id);
-						}
-						
-						// Fetch matured beneficiaries
-						$.ajax({
-							url: '<?php echo base_url('index.php?burial/get_matured_beneficiaries');?>',
-							method: 'POST',
-							data: {member_id: member.id},
-							dataType: 'json',
-							success: function(resp) {
-								var options = '<option value="">-- Select Beneficiary --</option>';
-								if (resp.success && resp.beneficiaries.length > 0) {
-									$.each(resp.beneficiaries, function(i, ben) {
-										options += '<option value="' + ben.id + '">' + ben.fullname + ' (' + ben.idnumber + ')</option>';
-									});
+						} else {
+							// BENEFICIARY claim
+							$('#nominee_group').hide();
+							$('#beneficiary_select').closest('.form-group').show();
+
+							$('#nominee_select').prop('required', false);
+							$('#beneficiary_select').prop('disabled', false).prop('required', true);
+
+							// Populate matured beneficiaries for this member
+							$.ajax({
+								url: '<?php echo base_url('index.php?burial/get_matured_beneficiaries');?>',
+								method: 'POST',
+								data: {member_id: member.id},
+								dataType: 'json',
+								success: function(resp) {
+									var options = '<option value="">-- Select Beneficiary --</option>';
+									if (resp.success && resp.beneficiaries.length > 0) {
+										$.each(resp.beneficiaries, function(i, ben) {
+											options += '<option value="' + ben.id + '">' + ben.fullname + ' (' + ben.idnumber + ')</option>';
+										});
+									}
+									$('#beneficiary_select').html(options);
 								}
-								
-								// Enable only if current claim type is "Beneficiary Claim"
-								var shouldEnableBeneficiary = $('#claim_type_beneficiary').is(':checked');
-								$('#beneficiary_select').prop('disabled', !shouldEnableBeneficiary).html(options);
-							}
-						});
+							});
+						}
 						$('#member_search_results').hide();
 					});
 				} else {
