@@ -79,7 +79,21 @@
 								<div id="member_search_results" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
 							</div>
 						</div>
-					</div>					
+					</div>	
+
+					<!-- SELECTED MEMBER INFO -->
+					<div class="form-group">
+						<label class="col-md-3 control-label">Selected Member</label>
+						<div class="col-md-7">
+							<div class="alert alert-info" id="member_info" style="display: none;">
+								<strong>ID Number:</strong> <span id="member_idnumber"></span> <br>
+								<strong>Name:</strong> <span id="member_name"></span> <br>
+								<strong>Passbook No:</strong> <span id="member_passbook"></span> <br>
+								<strong>Cell Number:</strong> <span id="member_cell"></span>
+							</div>
+							<input type="hidden" id="selected_member_id" name="member_id" value="">
+						</div>
+					</div>
 					
 					<!-- NOMINEE SELECTION (hidden by default) -->
 					<div class="form-group" id="nominee_group" style="display: none;">
@@ -103,20 +117,6 @@
 						</div>
 					</div>
 
-
-					<!-- SELECTED MEMBER INFO -->
-					<div class="form-group">
-						<label class="col-md-3 control-label">Selected Member</label>
-						<div class="col-md-7">
-							<div class="alert alert-info" id="member_info" style="display: none;">
-								<strong>ID Number:</strong> <span id="member_idnumber"></span> <br>
-								<strong>Name:</strong> <span id="member_name"></span> <br>
-								<strong>Passbook No:</strong> <span id="member_passbook"></span> <br>
-								<strong>Cell Number:</strong> <span id="member_cell"></span>
-							</div>
-							<input type="hidden" id="selected_member_id" name="member_id" value="">
-						</div>
-					</div>
 
 					<!-- Other form fields remain unchanged -->
 					<div class="form-group">
