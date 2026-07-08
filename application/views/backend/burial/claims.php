@@ -49,6 +49,47 @@
 					<?php echo form_open(base_url() . 'index.php?burial/claims/create' , array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
 					
 
+					<!-- CLAIM TYPE SELECTION (first) -->
+					<div class="form-group">
+						<label class="col-md-3 control-label">Claim Type <span class="required">*</span></label>
+						<div class="col-md-7">
+							<div class="radio">
+								<label>
+									<input type="radio" name="claim_type" id="claim_type_beneficiary" value="BENEFICIARY" checked required> 
+									Beneficiary Claim
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="claim_type" id="claim_type_member" value="NOMINEE" required> 
+									Member/Policy Holder Claim (Nominee)
+								</label>
+							</div>
+						</div>
+					</div>
+					
+					<!-- NOMINEE SELECTION (hidden by default) -->
+					<div class="form-group" id="nominee_group" style="display: none;">
+						<label class="col-md-3 control-label">Nominee <span class="required">*</span></label>
+						<div class="col-md-7">
+							<select class="form-control" id="nominee_select" name="nominee_id">
+								<option value="">-- Select Nominee --</option>
+							</select>
+							<small class="form-text text-muted">Select a nominee for this member claim</small>
+						</div>
+					</div>
+					
+					<!-- BENEFICIARY SEARCHABLE DROPDOWN -->
+					<div class="form-group">
+						<label class="col-md-3 control-label">Beneficiary <span class="required">*</span></label>
+						<div class="col-md-7">
+							<select class="form-control" id="beneficiary_select" name="beneficiary_id" required disabled>
+								<option value="">-- Select Beneficiary --</option>
+							</select>
+							<small class="form-text text-muted">Only matured, payable beneficiaries are shown</small>
+						</div>
+					</div>
+
 					<!-- SEARCH MEMBER -->
 					<div class="form-group">
 						<label class="col-md-3 control-label">Search Member <span class="required">*</span></label>
@@ -72,47 +113,6 @@
 								<strong>Cell Number:</strong> <span id="member_cell"></span>
 							</div>
 							<input type="hidden" id="selected_member_id" name="member_id" value="">
-						</div>
-					</div>
-
-					<!-- CLAIM TYPE SELECTION -->
-					<div class="form-group">
-						<label class="col-md-3 control-label">Claim Type <span class="required">*</span></label>
-						<div class="col-md-7">
-							<div class="radio">
-								<label>
-									<input type="radio" name="claim_type" id="claim_type_beneficiary" value="BENEFICIARY" checked required> 
-									Beneficiary Claim
-								</label>
-							</div>
-							<div class="radio">
-								<label>
-									<input type="radio" name="claim_type" id="claim_type_member" value="NOMINEE" required> 
-									Member/Policy Holder Claim (Nominee)
-								</label>
-							</div>
-						</div>
-					</div>
-
-					<!-- NOMINEE SELECTION (hidden by default) -->
-					<div class="form-group" id="nominee_group" style="display: none;">
-						<label class="col-md-3 control-label">Nominee <span class="required">*</span></label>
-						<div class="col-md-7">
-							<select class="form-control" id="nominee_select" name="nominee_id">
-								<option value="">-- Select Nominee --</option>
-							</select>
-							<small class="form-text text-muted">Select a nominee for this member claim</small>
-						</div>
-					</div>
-
-					<!-- BENEFICIARY SEARCHABLE DROPDOWN -->
-					<div class="form-group">
-						<label class="col-md-3 control-label">Beneficiary <span class="required">*</span></label>
-						<div class="col-md-7">
-							<select class="form-control" id="beneficiary_select" name="beneficiary_id" required disabled>
-								<option value="">-- Select Beneficiary --</option>
-							</select>
-							<small class="form-text text-muted">Only matured, payable beneficiaries are shown</small>
 						</div>
 					</div>
 
@@ -361,10 +361,11 @@ $(document).ready(function() {
 									$.each(resp.beneficiaries, function(i, ben) {
 										options += '<option value="' + ben.id + '">' + ben.fullname + ' (' + ben.idnumber + ')</option>';
 									});
-									$('#beneficiary_select').prop('disabled', false).html(options);
-								} else {
-									$('#beneficiary_select').prop('disabled', true).html(options);
 								}
+								
+								// Enable only if current claim type is "Beneficiary Claim"
+								var shouldEnableBeneficiary = $('#claim_type_beneficiary').is(':checked');
+								$('#beneficiary_select').prop('disabled', !shouldEnableBeneficiary).html(options);
 							}
 						});
 						$('#member_search_results').hide();
@@ -379,17 +380,28 @@ $(document).ready(function() {
 		});
 	});
 
-	// Claim type change handler (unchanged)
+	// Claim type change handler
 	$('input[name="claim_type"]').on('change', function() {
 		var claimType = $(this).val();
 		var memberId = $('#selected_member_id').val();
-		
-		if (claimType === 'NOMINEE' && memberId) {
+
+		if (claimType === 'NOMINEE') {
+			// Show nominee section immediately; nominee options will load after member selection.
 			$('#nominee_group').show();
 			$('#beneficiary_select').closest('.form-group').hide();
+			
+			// Prevent hidden required validation
+			$('#beneficiary_select').prop('disabled', true).prop('required', false);
+			$('#nominee_select').prop('required', true);
 		} else {
 			$('#nominee_group').hide();
 			$('#beneficiary_select').closest('.form-group').show();
+			
+			$('#nominee_select').prop('required', false);
+			$('#beneficiary_select').prop('required', true);
+			
+			// Keep beneficiary disabled until a member is selected.
+			$('#beneficiary_select').prop('disabled', !memberId);
 		}
 	});
 
