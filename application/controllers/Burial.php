@@ -924,6 +924,81 @@ class Burial extends CI_Controller
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
         }
 
+        /********** EDIT BENEFICIARY **********/
+        if ($param2 == 'edit_beneficiary') {
+            $beneficiary_id = (int) $param3;
+            $current = $this->db->get_where('beneficiaries', [
+                'id' => $beneficiary_id,
+                'memberid' => $param1
+            ])->row_array();
+
+            if (!$current) {
+                $this->session->set_flashdata('flash_message_error', 'Beneficiary not found');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            $fullname = trim((string) $this->input->post('fullname'));
+            $gender = trim((string) $this->input->post('gender'));
+            $dob = $this->Date_model->normalize_date($this->input->post('dob'));
+            $submission_date = $this->Date_model->normalize_date($this->input->post('submission_date'));
+            $status = trim((string) $this->input->post('status'));
+            $status_date = $this->Date_model->normalize_date($this->input->post('status_date'));
+            $is_spouse = (int) $this->input->post('is_spouse');
+            $replaced_with = (int) $this->input->post('replaced_with');
+
+            if ($fullname === '' || $gender === '' || $submission_date === '' || $status === '') {
+                $this->session->set_flashdata('flash_message_error', 'Full Name, Gender, Submission Date and Status are required');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            if (in_array($status, ['BENEFITTED', 'BENEFITTED - REPLACED', 'REPLACEE'], true) && empty($status_date)) {
+                $this->session->set_flashdata('flash_message_error', 'Status Date is required for selected status');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            if ($status === 'REPLACEE') {
+                if (empty($replaced_with)) {
+                    $this->session->set_flashdata('flash_message_error', 'Please select beneficiary to replace');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+
+                if ($replaced_with === $beneficiary_id) {
+                    $this->session->set_flashdata('flash_message_error', 'A beneficiary cannot replace itself');
+                    redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+                }
+            } else {
+                $replaced_with = null;
+            }
+
+            // Prevent duplicate names (excluding current record)
+            $this->db->where('memberid', $param1);
+            $this->db->where('fullname', $fullname);
+            $this->db->where('id !=', $beneficiary_id);
+            if ($this->db->get('beneficiaries')->num_rows() > 0) {
+                $this->session->set_flashdata('flash_message_error', "Beneficiary '{$fullname}' already exists");
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            $update_data = [
+                'fullname' => $fullname,
+                'gender' => $gender,
+                'dob' => $dob,
+                'submission_date' => $submission_date,
+                'is_spouse' => $is_spouse,
+                'status' => $status,
+                'status_date' => $status_date ?: null,
+                'replaced_with' => $replaced_with,
+                'user' => $this->session->userdata('user_id')
+            ];
+
+            $this->db->where('id', $beneficiary_id);
+            $this->db->where('memberid', $param1);
+            $this->db->update('beneficiaries', $update_data);
+
+            $this->session->set_flashdata('flash_message', 'Beneficiary updated successfully');
+            redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+        }
+
         /********** DELETE BENEFICIARY **********/
         if ($param2 == 'delete_beneficiary') {
 

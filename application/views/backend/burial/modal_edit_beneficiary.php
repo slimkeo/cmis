@@ -1,4 +1,5 @@
 <?php
+$status_enum = $this->Enum_model->get_enum_values('beneficiaries', 'status');
 $edit_data = $this->db->get_where('beneficiaries', array('id' => $param3))->result_array();
 foreach ($edit_data as $row):
 ?>
@@ -6,7 +7,7 @@ foreach ($edit_data as $row):
     <div class="col-md-12">
         <section class="panel">
             
-            <?php echo form_open(base_url() . "index.php?burial/beneficiaries/'".$param2."'/edit_beneficiary/'".$row['id'], 
+            <?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$param2.'/edit_beneficiary/'.$row['id'], 
                 array('class' => 'form-horizontal form-bordered','target'=>'_top', 'id' => 'form', 'enctype' => 'multipart/form-data'));?>
             
             <div class="panel-heading">
@@ -98,13 +99,11 @@ foreach ($edit_data as $row):
                     <div class="col-md-7">
                         <select name="status" id="beneficiary-status-edit" class="form-control" required>
                             <option value="">-- Select Status --</option>
-                            <option value="ACTIVE" <?php echo ($row['status'] == 'ACTIVE') ? 'selected' : ''; ?>>ACTIVE</option>
-                            <option value="WAITING" <?php echo ($row['status'] == 'WAITING') ? 'selected' : ''; ?>>WAITING</option>
-                            <option value="BENEFITTED" <?php echo ($row['status'] == 'BENEFITTED') ? 'selected' : ''; ?>>BENEFITTED</option>
-                            <option value="REPLACED" <?php echo ($row['status'] == 'REPLACED') ? 'selected' : ''; ?>>REPLACED</option>
-                            <option value="BENEFITTED - REPLACED" <?php echo ($row['status'] == 'BENEFITTED - REPLACED') ? 'selected' : ''; ?>>BENEFITTED - REPLACED</option>
-                            <option value="DELETED" <?php echo ($row['status'] == 'DELETED') ? 'selected' : ''; ?>>DELETED</option>
-                            <option value="REPLACEE" <?php echo ($row['status'] == 'REPLACEE') ? 'selected' : ''; ?>>REPLACEE</option>
+                            <?php foreach ($status_enum as $value): ?>
+                                <option value="<?= $value ?>" <?php echo ($row['status'] == $value) ? 'selected' : ''; ?>>
+                                    <?= ucfirst($value) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
