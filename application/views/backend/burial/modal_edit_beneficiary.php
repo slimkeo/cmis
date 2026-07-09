@@ -1,5 +1,10 @@
 <?php
-$status_enum = $this->Enum_model->get_enum_values('beneficiaries', 'status');
+if (isset($this->Enum_model) && method_exists($this->Enum_model, 'get_enum_values')) {
+    $status_enum = $this->Enum_model->get_enum_values('beneficiaries', 'status');
+} else {
+    // Fallback for modal contexts where Enum_model is not loaded.
+    $status_enum = ['ACTIVE', 'BENEFITTED', 'BENEFITTED - REPLACED', 'REPLACEE', 'LATE NOT BENEFITTED - REPLACED', 'DELETED'];
+}
 $edit_data = $this->db->get_where('beneficiaries', array('id' => $param3))->result_array();
 foreach ($edit_data as $row):
 ?>
