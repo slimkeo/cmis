@@ -587,7 +587,7 @@ foreach ($member_data as $member_row):
 
 							<!-- Date of Birth -->
 							<div class="form-group">
-								<label class="col-sm-3 control-label">Date of Birth</label>
+								<label class="col-sm-3 control-label">Date of Birth(optionak)</label>
 								<div class="col-sm-7">
 									<div class="input-group date" data-provide="datepicker"data-date-format="yyyy-mm-dd">
 										<input type="text"

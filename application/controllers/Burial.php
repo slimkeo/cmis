@@ -805,7 +805,7 @@ class Burial extends CI_Controller
                 redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
 
-            if (empty($replacement_fullname) || empty($replacement_gender) || empty($replacement_dob)) {
+            if (empty($replacement_fullname) || empty($replacement_gender)) {
                 $this->session->set_flashdata('flash_message_error', 'Full Name, Gender and Date of Birth are required');
                 redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
             }
