@@ -2765,7 +2765,7 @@ class Burial extends CI_Controller
 
         $recordsFiltered = $this->db->count_all_results('', false);
 
-        $order_column_index = $this->input->post('order')[0]['column'] ?? 6;
+        $order_column_index = $this->input->post('order')[0]['column'] ?? 7;
         $order_direction    = $this->input->post('order')[0]['dir'] ?? 'desc';
 
         $columns = [
@@ -2829,7 +2829,7 @@ class Burial extends CI_Controller
                 . '<a href="#" class="btn btn-xs btn-danger" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('delete') . '" onClick="confirm_modal(\'' . base_url('index.php?burial/claims/delete/' . $claim_id) . '\');"><i class="fa fa-trash"></i></a>';
 
             $data[] = [
-                $i++,
+                $row['id'],
                 htmlspecialchars($row['member_id']),
                 htmlspecialchars($member_name),
                 $national_id,

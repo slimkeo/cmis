@@ -263,7 +263,7 @@ $(document).ready(function() {
 		serverSide: true,
 		pageLength: 25,
 		lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-		order: [[6, 'desc']],
+		order: [[7, 'desc']],
 		columnDefs: [
 			{ orderable: false, targets: [0, 8] }
 		],
