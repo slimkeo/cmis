@@ -116,17 +116,40 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                 <?php endif; ?>
 
                 <div style="margin-top:20px;">
-                    <?php if (($claim['status'] ?? '') == 'PENDING'): ?>
-                        <a href="<?php echo base_url('index.php?burial/claims/approve/' . ($claim['id'] ?? '')); ?>" class="btn btn-success" id="approve_btn">Approve</a>
-                        <a href="<?php echo base_url('index.php?burial/claims/reject/' . ($claim['id'] ?? '')); ?>" class="btn btn-danger" id="reject_btn">Reject</a>
-                    <?php elseif (($claim['status'] ?? '') == 'APPROVED'): ?>
-                        <a href="<?php echo base_url('index.php?burial/approved_claims/pay/' . ($claim['id'] ?? '')); ?>" class="btn btn-primary" id="pay_btn">Pay</a>
+                    <?php 
+                    $user_level = $this->session->userdata('level');
+                    $status = $claim['status'] ?? '';
+                    $claim_id = $claim['id'] ?? '';
+                    ?>
+
+                    <?php if ($status == 'PENDING'): ?>
+                        <!-- Only Level 1 can Approve/Reject -->
+                        <?php if ($user_level == 1): ?>
+                            <a href="<?php echo base_url('index.php?burial/claims/approve/' . $claim_id); ?>" 
+                            class="btn btn-success" id="approve_btn">Approve</a>
+                            
+                            <a href="<?php echo base_url('index.php?burial/claims/reject/' . $claim_id); ?>" 
+                            class="btn btn-danger" id="reject_btn">Reject</a>
+                        <?php endif; ?>
+
+                    <?php elseif ($status == 'APPROVED'): ?>
+                        <!-- Only Level 2 can Pay -->
+                        <?php if ($user_level == 2): ?>
+                            <a href="<?php echo base_url('index.php?burial/approved_claims/pay/' . $claim_id); ?>" 
+                            class="btn btn-primary" id="pay_btn">Pay</a>
+                        <?php endif; ?>
+                        
                         <span class="label label-success" style="margin-left:10px;">Status: APPROVED</span>
+
                     <?php else: ?>
-                        <span class="label label-default">Status: <?php echo htmlspecialchars($claim['status'] ?? '-'); ?></span>
+                        <span class="label label-default">Status: <?php echo htmlspecialchars($status); ?></span>
                     <?php endif; ?>
+
+                    <!-- Always visible buttons -->
                     <a href="<?php echo base_url('index.php?burial/claims'); ?>" class="btn btn-default">Back to Claims</a>
-                    <a href="<?php echo base_url('index.php?burial/print_claims_details/'.$claim['id']); ?>"><i class="fa fa-print">Print Claim</i></a>
+                    <a href="<?php echo base_url('index.php?burial/print_claims_details/'.$claim_id); ?>">
+                        <i class="fa fa-print"></i> Print Claim
+                    </a>
                 </div>
             </div>
         </section>
