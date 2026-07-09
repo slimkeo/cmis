@@ -23,9 +23,33 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                 
                 <!-- Back Button in Header -->
                 <div class="pull-right">
-                    <a href="<?php echo base_url('index.php?burial/claims'); ?>" 
-                    class="btn btn-warning btn-sm">
-                        <i class="fa fa-arrow-left"></i> Back to Claims
+                <?php 
+                    $user_level = $this->session->userdata('level');
+                    $status = $claim['status'] ?? '';
+                    $claim_id = $claim['id'] ?? '';
+                    ?>
+
+                    <?php if ($status == 'PENDING'): ?>
+                        <!-- Only Level 1 can Approve/Reject -->
+                        <?php if ($user_level == 1): ?>
+                            <a href="<?php echo base_url('index.php?burial/claims/approve/' . $claim_id); ?>" 
+                            class="btn btn-success" id="approve_btn">Approve</a>
+                            
+                            <a href="<?php echo base_url('index.php?burial/claims/reject/' . $claim_id); ?>" 
+                            class="btn btn-danger" id="reject_btn">Reject</a>
+                        <?php endif; ?>
+
+                    <?php elseif ($status == 'APPROVED'): ?>
+                        <!-- Only Level 2 can Pay -->
+                        <?php if ($user_level == 2): ?>
+                            <a href="<?php echo base_url('index.php?burial/approved_claims/pay/' . $claim_id); ?>" 
+                            class="btn btn-primary" id="pay_btn">Pay</a>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <span class="label label-default">Status: <?php echo htmlspecialchars($status); ?></span>
+                    <?php endif; ?>
+                    <a href="<?php echo base_url('index.php?burial/claims'); ?>" class="btn btn-warning btn-sm"><i class="fa fa-arrow-left"></i> Back to Claims
                     </a>
                 </div>
             </header>
