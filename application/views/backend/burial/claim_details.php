@@ -24,7 +24,7 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                 <!-- Back Button in Header -->
                 <div class="pull-right">
                     <a href="<?php echo base_url('index.php?burial/claims'); ?>" 
-                    class="btn btn-default btn-sm">
+                    class="btn btn-warning btn-sm">
                         <i class="fa fa-arrow-left"></i> Back to Claims
                     </a>
                 </div>
