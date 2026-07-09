@@ -18,9 +18,16 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
         <section class="panel">
-            <header class="panel-heading">
+                <header class="panel-heading">
                 <h4 class="panel-title">Claim Details #<?php echo htmlspecialchars($claim['id'] ?? '-'); ?></h4>
-                <a href="<?php echo base_url('index.php?burial/claims'); ?>" class="btn btn-default">Back to Claims</a>
+                
+                <!-- Back Button in Header -->
+                <div class="pull-right">
+                    <a href="<?php echo base_url('index.php?burial/claims'); ?>" 
+                    class="btn btn-default btn-sm">
+                        <i class="fa fa-arrow-left"></i> Back to Claims
+                    </a>
+                </div>
             </header>
             <div class="panel-body">
                 <div class="row">
@@ -147,6 +154,7 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                     <?php endif; ?>
 
                     <!-- Always visible buttons -->
+                    <a href="<?php echo base_url('index.php?burial/claims'); ?>" class="btn btn-default">Back to Claims</a>
                     <a href="<?php echo base_url('index.php?burial/print_claims_details/'.$claim_id); ?>">
                         <i class="fa fa-print"></i> Print Claim</a>
                 </div>

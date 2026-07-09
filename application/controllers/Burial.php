@@ -2823,8 +2823,8 @@ class Burial extends CI_Controller
             }
 
             $claim_id = (int) $row['id'];
-            $options = '<a href="' . base_url('index.php?burial/claims/view/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('view_claim') . '" target="_blank"><i class="fa fa-eye"></i></a> '
-                . '<a href="' . base_url('index.php?burial/print_claims_details/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="Print Claim" target="_blank"><i class="fa fa-print"></i></a> '
+            $options = '<a href="' . base_url('index.php?burial/claims/view/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('view_claim') . '"><i class="fa fa-eye"></i></a> '
+                . '<a href="' . base_url('index.php?burial/print_claims_details/' . $claim_id) . '" class="btn btn-xs btn-info" data-placement="top" data-toggle="tooltip" data-original-title="Print Claim"><i class="fa fa-print"></i></a> '
                 . '<a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('edit') . '" onClick="showAjaxModal(\'' . base_url('index.php?modal/popup/modal_claim_edit/' . $claim_id) . '\');"><i class="fa fa-pencil"></i></a> '
                 . '<a href="#" class="btn btn-xs btn-danger" data-placement="top" data-toggle="tooltip" data-original-title="' . get_phrase('delete') . '" onClick="confirm_modal(\'' . base_url('index.php?burial/claims/delete/' . $claim_id) . '\');"><i class="fa fa-trash"></i></a>';
 
