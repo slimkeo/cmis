@@ -6,7 +6,7 @@ foreach ($edit_data as $row):
     <div class="col-md-12">
         <section class="panel">
             
-            <?php echo form_open(base_url() . 'index.php?burial/beneficiaries/'.$param2.'/edit_beneficiary/'.$row['id'], 
+            <?php echo form_open(base_url() . "index.php?burial/beneficiaries/'".$param2."'/edit_beneficiary/'".$row['id'], 
                 array('class' => 'form-horizontal form-bordered','target'=>'_top', 'id' => 'form', 'enctype' => 'multipart/form-data'));?>
             
             <div class="panel-heading">
