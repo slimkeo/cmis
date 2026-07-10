@@ -75,6 +75,13 @@ foreach ($member_data as $member_row):
 							<i class="fa fa-user"></i>  Return to Profile
 						</a>
 			</li>
+			<li>
+				<a href="#"
+						class="btn btn-xs btn-warning"
+						onclick="if (confirm('This will reset all beneficiary submission dates to today (<?php echo date('Y-m-d'); ?>). Are you sure you want to continue?')) { window.location.href = '<?php echo base_url('index.php?burial/beneficiaries/'.$member_row['id'].'/member_rejoining'); ?>'; } return false;">
+							<i class="fa fa-refresh"></i> Member Re-joining
+						</a>
+			</li>
 		</ul>
 		<!---CONTROL TABS END-->
 

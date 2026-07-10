@@ -999,6 +999,40 @@ class Burial extends CI_Controller
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
         }
 
+        /********** MEMBER RE-JOINING **********/
+        if ($param2 == 'member_rejoining') {
+            $member = $this->db->get_where('members', ['id' => $param1])->row_array();
+
+            if (!$member) {
+                $this->session->set_flashdata('flash_message_error', 'Member not found');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            $today = date('Y-m-d');
+
+            $this->db->where('memberid', $param1);
+            $this->db->where('status !=', 'DELETED');
+            $beneficiary_count = $this->db->count_all_results('beneficiaries');
+
+            if ($beneficiary_count === 0) {
+                $this->session->set_flashdata('flash_message_error', 'No beneficiaries found to update');
+                redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+            }
+
+            $this->db->where('memberid', $param1);
+            $this->db->where('status !=', 'DELETED');
+            $this->db->update('beneficiaries', [
+                'submission_date' => $today,
+                'user' => $this->session->userdata('user_id')
+            ]);
+
+            $this->session->set_flashdata(
+                'flash_message',
+                $beneficiary_count . ' beneficiar' . ($beneficiary_count > 1 ? 'ies' : 'y') . ' submission date' . ($beneficiary_count > 1 ? 's' : '') . ' reset to ' . $today . ' for member re-joining'
+            );
+            redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+        }
+
         /********** DELETE BENEFICIARY **********/
         if ($param2 == 'delete_beneficiary') {
 
