@@ -3967,7 +3967,7 @@ class Burial extends CI_Controller
         $recordsTotal = $this->db->count_all('fraud_recoveries');
 
         $this->db
-            ->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, m.idnumber, m.passbook_no, m.employeeno, m.surname, m.name, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
+            ->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, m.idnumber, m.passbook_no,m.cellnumber, m.employeeno, m.surname, m.name, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
             ->from('fraud_recoveries fr')
             ->join('members m', 'm.id = fr.member_id', 'left')
             ->join('fraud_recovery_payments fp', 'fp.recovery_id = fr.recovery_id', 'left')
@@ -3979,6 +3979,7 @@ class Burial extends CI_Controller
             $this->db->or_like('m.surname', $search);
             $this->db->or_like('m.name', $search);
             $this->db->or_like('m.passbook_no', $search);
+            $this->db->or_like('m.cellnumber', $search);
             $this->db->or_like('m.employeeno', $search);
             $this->db->or_like('fr.status', $search);
             $this->db->or_like('fr.case_description', $search);
@@ -4007,6 +4008,7 @@ class Burial extends CI_Controller
                 htmlspecialchars($r->employeeno ?? ''),
                 htmlspecialchars($member_name),
                 htmlspecialchars($r->passbook_no ?? ''),
+                htmlspecialchars($r->cellnumber ?? ''),
                 number_format((float) $r->amount_owed, 2),
                 number_format((float) $r->total_paid, 2),
                 number_format($balance, 2),

@@ -21,6 +21,7 @@
                                 <th>Emp No</th>
                                 <th>Member Name</th>
                                 <th>Passbook</th>
+                                <th>Contact</th>
                                 <th>Amount Owed</th>
                                 <th>Total Paid</th>
                                 <th>Balance</th>
