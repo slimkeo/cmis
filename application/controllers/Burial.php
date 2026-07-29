@@ -1036,12 +1036,15 @@ class Burial extends CI_Controller
         /********** DELETE BENEFICIARY **********/
         if ($param2 == 'delete_beneficiary') {
 
-            $update_data = [
-                'status' => 'DELETED',
-                'status_date' => date('Y-m-d')
-            ];
+           // $update_data = [
+           //     'status' => 'DELETED',
+           //     'status_date' => date('Y-m-d')
+            //];
+           // $this->db->where('id', $param3);
+            //$this->db->update('beneficiaries', $update_data);
+
             $this->db->where('id', $param3);
-            $this->db->update('beneficiaries', $update_data);
+            $this->db->delete('beneficiaries');
 
             $this->session->set_flashdata('flash_message', 'Beneficiary deleted successfully');
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
