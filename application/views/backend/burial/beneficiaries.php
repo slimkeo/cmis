@@ -162,12 +162,12 @@ foreach ($member_data as $member_row):
 								</span>
 							</td>
 							<td>
-							<?php if ($this->session->userdata('level')==1) { ?>
+
 								<!-- EDITING LINK -->
 								<a href="#" class="btn btn-primary btn-xs" data-placement="top" data-toggle="tooltip" data-original-title="<?php echo get_phrase('edit');?>" onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_edit_beneficiary/<?php echo $member_row['id']; ?>/<?php echo $b['id']; ?>');">
 									<i class="fa fa-pencil"></i>
 								</a>
-
+								<?php if ($this->session->userdata('level')==1) { ?>
 								<!-- PERMANENT DELETION LINK -->
 								<a href="#" class="btn btn-danger btn-xs" data-placement="top" data-toggle="tooltip" data-original-title="<?php echo get_phrase('delete');?>" onClick="confirm_modal('<?php echo base_url();?>index.php?burial/beneficiaries/<?php echo $member_row['id']; ?>/remove_beneficiary/<?php echo $b['id']; ?>');">
 									<i class="fa fa-trash"></i>
