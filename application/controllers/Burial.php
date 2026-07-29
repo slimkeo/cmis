@@ -1036,19 +1036,33 @@ class Burial extends CI_Controller
         /********** DELETE BENEFICIARY **********/
         if ($param2 == 'delete_beneficiary') {
 
-           // $update_data = [
-           //     'status' => 'DELETED',
-           //     'status_date' => date('Y-m-d')
-            //];
-           // $this->db->where('id', $param3);
-            //$this->db->update('beneficiaries', $update_data);
-
+            $update_data = [
+                'status' => 'DELETED',
+                'status_date' => date('Y-m-d')
+            ];
             $this->db->where('id', $param3);
-            $this->db->delete('beneficiaries');
+            $this->db->update('beneficiaries', $update_data);
 
             $this->session->set_flashdata('flash_message', 'Beneficiary deleted successfully');
             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
         }
+        /********** PERMANENT DELETE BENEFICIARY **********/
+        if ($param2 == 'remove_beneficiary') {
+
+            // $update_data = [
+            //     'status' => 'DELETED',
+            //     'status_date' => date('Y-m-d')
+             //];
+            // $this->db->where('id', $param3);
+             //$this->db->update('beneficiaries', $update_data);
+ 
+             $this->db->where('id', $param3);
+             $this->db->delete('beneficiaries');
+ 
+             $this->session->set_flashdata('flash_message', 'Beneficiary deleted successfully');
+             redirect(base_url() . 'index.php?burial/beneficiaries/' . $param1, 'refresh');
+         }
+
 
         /********** LOAD PAGE **********/
         $page_data['memberid']   = $param1;
@@ -1176,7 +1190,11 @@ class Burial extends CI_Controller
                 <a href="#" class="btn btn-xs btn-success" onClick="showAjaxModal(\''.base_url().'index.php?modal/popup/modal_edit_beneficiary/'.$memberid.'/'.$r->id.'\');">
                     <i class="fa fa-pencil"></i>
                 </a>
-                <a href="#" class="btn btn-xs btn-danger" onClick="confirm_modal(\''.base_url().'index.php?burial/beneficiaries/'.$memberid.'/delete_beneficiary/'.$r->id.'\');">
+                <a href="#" class="btn btn-xs btn-warning" onClick="confirm_modal(\''.base_url().'index.php?burial/beneficiaries/'.$memberid.'/delete_beneficiary/'.$r->id.'\');">
+                    <i class="fa fa-trash"></i>
+                </a>
+                
+                <a href="#" class="btn btn-xs btn-danger" onClick="confirm_modal(\''.base_url().'index.php?burial/beneficiaries/'.$memberid.'/remove_beneficiary/'.$r->id.'\');">
                     <i class="fa fa-trash"></i>
                 </a>
                 '
