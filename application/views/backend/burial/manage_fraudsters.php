@@ -26,7 +26,7 @@ $fraudsters = $this->db->get()->result_array();
                 <br>
 			<!--TABLE LISTING STARTS-->
 			<div class="tab-pane box active" id="list">
-				<table class="table table-bordered table-striped table-condensed mb-none" id="datatable-tabletools">
+				<table class="table table-bordered table-striped table-condensed mb-none" id="datatable-tabletools1">
 					<thead>
 						<tr>
 							<th><div><?php echo get_phrase('idnumber');?></div></th>
