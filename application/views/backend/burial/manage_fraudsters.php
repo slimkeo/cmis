@@ -1,15 +1,3 @@
-<?php 
-
-$this->db
-->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, m.idnumber, m.passbook_no,m.cellnumber, m.employeeno, m.surname, m.name, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
-->from('fraud_recoveries fr')
-->join('members m', 'm.id = fr.member_id', 'left')
-->join('fraud_recovery_payments fp', 'fp.recovery_id = fr.recovery_id', 'left')
-->group_by('fr.recovery_id');
-
-$fraudsters = $this->db->get()->result_array();
-
-?>
 <div class="row">
     <div class="col-md-12">
         <div class="tabs">
@@ -24,52 +12,26 @@ $fraudsters = $this->db->get()->result_array();
 
             <div class="tab-content">
                 <br>
-			<!--TABLE LISTING STARTS-->
-			<div class="tab-pane box active" id="list">
-				<table class="table table-bordered table-striped table-condensed mb-none" id="datatable-tabletools1">
-					<thead>
-						<tr>
-							<th><div><?php echo get_phrase('idnumber');?></div></th>
-							<th><div><?php echo get_phrase('passbook_no');?></div></th>
-							<th><div><?php echo get_phrase('name');?></div></th>
-							<th><div><?php echo get_phrase('cellnumber');?></div></th>
-							<th><div><?php echo get_phrase('employeeno');?></div></th>
-							<th><div><?php echo get_phrase('amount_owed');?></div></th>
-							<th><div><?php echo get_phrase('status');?></div></th>
-							<th><div><?php echo get_phrase('arrangement_date');?></div></th>
-							<th><div><?php echo get_phrase('total_paid');?></div></th>
-							<th><div><?php echo get_phrase('options');?></div></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach($fraudsters as $row):?>
-						<tr>
-							<td><?php echo $row['idnumber'];?></td>
-							<td><?php echo $row['passbook_no'];?></td>
-							<td><?php echo $row['name'];?></td>
-							<td><?php echo $row['cellnumber'];?></td>
-							<td><?php echo $row['employeeno'];?></td>
-							<td><?php echo $row['amount_owed'];?></td>
-							<td><?php echo $row['status'];?></td>
-							<td><?php echo date('d-m-Y', strtotime($row['arrangement_date'])) ?? '-';?></td>
-							<td><?php echo $row['total_paid'];?></td>
-							<td>
-
-									<!-- VIEW LINK -->
-                                    <a href="<?php echo base_url('index.php?burial/fraud_statement/' . $row['recovery_id']);?>" class="btn btn-xs btn-info" target="_blank" data-toggle="tooltip" title="View Fraud Statement">
-                                        <i class="fa fa-money"></i>
-                                    </a>
-                                    <a href="<?php echo base_url('index.php?burial/member_details/' . $row['member_id']);?>" class="btn btn-xs btn-primary" target="_blank" data-toggle="tooltip" title="View Member">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-
-							</td>
-						</tr>
-						<?php endforeach;?>
-					</tbody>
-				</table>
-			</div>
-			<!--TABLE LISTING ENDS-->
+                <div class="tab-pane box active" id="list">
+                    <table class="table table-bordered table-striped mb-none" id="datatable-tabletools1" width="100%">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ID Number</th>
+                                <th>Emp No</th>
+                                <th>Member Name</th>
+                                <th>Passbook</th>
+                                <th>Contact</th>
+                                <th>Amount Owed</th>
+                                <th>Total Paid</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th>Options</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
 
                 <div class="tab-pane box" id="add" style="padding: 10px;">
                     <?php echo form_open(base_url('index.php?burial/create_fraud_recovery'), array('class' => 'form-horizontal form-bordered validate')); ?>
@@ -155,8 +117,67 @@ $fraudsters = $this->db->get()->result_array();
 <script>
 $(document).ready(function() {
 
+    var table = $('#datatable-tabletools1').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "<?php echo base_url('index.php?burial/get_fraudsters'); ?>",
+            type: "POST"
+        },
+        order: [[0, 'desc']],
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-default btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] // exclude Options column
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                title: 'Fraud Recoveries - ' + new Date().toISOString().slice(0,10),
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                title: 'Fraud Recoveries',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                },
+                customize: function (doc) {
+                    doc.styles.tableHeader.alignment = 'left';
+                    doc.defaultStyle.fontSize = 8;
+                    doc.styles.tableHeader.fontSize = 9;
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-info btn-sm',
+                title: 'Fraud Recoveries',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                }
+            }
+        ],
+        columnDefs: [
+            { orderable: false, targets: [10] } // Options column not sortable
+        ]
+    });
 
-    // ===== Member search (unchanged) =====
+    // Member search with dropdown results
     $('#member_search').keyup(function() {
         var search = $(this).val();
 
@@ -234,12 +255,14 @@ $(document).ready(function() {
         });
     }
 
+    // Close dropdown when clicking outside
     $(document).click(function(e) {
         if (!$(e.target).closest('#member_search, #member_search_results').length) {
             $('#member_search_results').hide();
         }
     });
 
+    // Enforce selecting member from search results
     $('form').on('submit', function(e) {
         if (!$('#selected_member_id').val()) {
             e.preventDefault();
