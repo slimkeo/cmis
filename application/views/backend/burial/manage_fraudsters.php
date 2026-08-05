@@ -130,54 +130,114 @@ $(document).ready(function() {
         dom: 'Bfrtip',
         buttons: [
             {
-                extend: 'copyHtml5',
-                text: '<i class="fa fa-copy"></i> Copy',
-                className: 'btn btn-default btn-sm',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] // exclude Options column
-                }
+                extend: 'copy',
+                text: 'Copy'
             },
             {
                 extend: 'excelHtml5',
-                text: '<i class="fa fa-file-excel-o"></i> Excel',
-                className: 'btn btn-success btn-sm',
+                text: 'Excel',
                 title: 'Fraud Recoveries - ' + new Date().toISOString().slice(0,10),
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] // exclude Options
+                },
+                action: function (e, dt, button, config) {
+                    var self = this;
+
+                    // Force request of ALL records
+                    dt.one('preXhr', function (e, s, data) {
+                        data.start = 0;
+                        data.length = -1;
+                    });
+
+                    dt.one('draw', function (e, settings) {
+                        // Run the real Excel export
+                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(self, e, dt, button, config);
+
+                        // Restore normal pagination
+                        dt.one('preXhr', function (e, s, data) {
+                            data.start = settings._iDisplayStart;
+                            data.length = settings._iDisplayLength;
+                        });
+
+                        setTimeout(function () {
+                            dt.ajax.reload(null, false);
+                        }, 100);
+                    });
+
+                    dt.ajax.reload();
                 }
             },
             {
                 extend: 'pdfHtml5',
-                text: '<i class="fa fa-file-pdf-o"></i> PDF',
-                className: 'btn btn-danger btn-sm',
+                text: 'PDF',
                 title: 'Fraud Recoveries',
                 orientation: 'landscape',
                 pageSize: 'A4',
                 exportOptions: {
                     columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                 },
-                customize: function (doc) {
-                    doc.styles.tableHeader.alignment = 'left';
-                    doc.defaultStyle.fontSize = 8;
-                    doc.styles.tableHeader.fontSize = 9;
+                action: function (e, dt, button, config) {
+                    var self = this;
+
+                    dt.one('preXhr', function (e, s, data) {
+                        data.start = 0;
+                        data.length = -1;
+                    });
+
+                    dt.one('draw', function (e, settings) {
+                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(self, e, dt, button, config);
+
+                        dt.one('preXhr', function (e, s, data) {
+                            data.start = settings._iDisplayStart;
+                            data.length = settings._iDisplayLength;
+                        });
+
+                        setTimeout(function () {
+                            dt.ajax.reload(null, false);
+                        }, 100);
+                    });
+
+                    dt.ajax.reload();
                 }
             },
             {
                 extend: 'print',
-                text: '<i class="fa fa-print"></i> Print',
-                className: 'btn btn-info btn-sm',
+                text: 'Print',
                 title: 'Fraud Recoveries',
                 exportOptions: {
                     columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                },
+                action: function (e, dt, button, config) {
+                    var self = this;
+
+                    dt.one('preXhr', function (e, s, data) {
+                        data.start = 0;
+                        data.length = -1;
+                    });
+
+                    dt.one('draw', function (e, settings) {
+                        $.fn.dataTable.ext.buttons.print.action.call(self, e, dt, button, config);
+
+                        dt.one('preXhr', function (e, s, data) {
+                            data.start = settings._iDisplayStart;
+                            data.length = settings._iDisplayLength;
+                        });
+
+                        setTimeout(function () {
+                            dt.ajax.reload(null, false);
+                        }, 100);
+                    });
+
+                    dt.ajax.reload();
                 }
             }
         ],
         columnDefs: [
-            { orderable: false, targets: [10] } // Options column not sortable
+            { orderable: false, targets: [10] }
         ]
     });
 
-    // Member search with dropdown results
+    // ===== Member search (unchanged) =====
     $('#member_search').keyup(function() {
         var search = $(this).val();
 
@@ -255,14 +315,12 @@ $(document).ready(function() {
         });
     }
 
-    // Close dropdown when clicking outside
     $(document).click(function(e) {
         if (!$(e.target).closest('#member_search, #member_search_results').length) {
             $('#member_search_results').hide();
         }
     });
 
-    // Enforce selecting member from search results
     $('form').on('submit', function(e) {
         if (!$('#selected_member_id').val()) {
             e.preventDefault();
