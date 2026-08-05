@@ -31,9 +31,13 @@ $fraudsters = $this->db->get()->result_array();
 						<tr>
 							<th><div><?php echo get_phrase('idnumber');?></div></th>
 							<th><div><?php echo get_phrase('passbook_no');?></div></th>
+							<th><div><?php echo get_phrase('name');?></div></th>
 							<th><div><?php echo get_phrase('cellnumber');?></div></th>
 							<th><div><?php echo get_phrase('employeeno');?></div></th>
+							<th><div><?php echo get_phrase('amount_owed');?></div></th>
+							<th><div><?php echo get_phrase('status');?></div></th>
 							<th><div><?php echo get_phrase('arrangement_date');?></div></th>
+							<th><div><?php echo get_phrase('total_paid');?></div></th>
 							<th><div><?php echo get_phrase('options');?></div></th>
 						</tr>
 					</thead>
@@ -42,9 +46,13 @@ $fraudsters = $this->db->get()->result_array();
 						<tr>
 							<td><?php echo $row['idnumber'];?></td>
 							<td><?php echo $row['passbook_no'];?></td>
+							<td><?php echo $row['name'];?></td>
 							<td><?php echo $row['cellnumber'];?></td>
 							<td><?php echo $row['employeeno'];?></td>
+							<td><?php echo $row['amount_owed'];?></td>
+							<td><?php echo $row['status'];?></td>
 							<td><?php echo date('d-m-Y', strtotime($row['arrangement_date'])) ?? '-';?></td>
+							<td><?php echo $row['total_paid'];?></td>
 							<td>
 
 									<!-- VIEW LINK -->
