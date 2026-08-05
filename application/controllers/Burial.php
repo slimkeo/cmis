@@ -909,7 +909,7 @@ class Burial extends CI_Controller
             $update_old = [
                 'replaced' => 1,
                 'replaced_with' => $new_beneficiary_id,
-                'status' => $old_was_benefitted ? 'BENEFITTED - REPLACED' : 'LATE NOT BENEFITTED - REPLACED'
+                'status' => $old_was_benefitted ? 'BENEFITTED - REPLACED' : 'PASSBOOK REPLACEMENT'
             ];
 
             if (!$old_was_benefitted && $replacement_reason === 'Not Matured' && !empty($death_certificate_date)) {
@@ -3977,23 +3977,33 @@ class Burial extends CI_Controller
         if ($this->session->userdata('user_login') != 1) {
             return $this->output
                 ->set_content_type('application/json')
-                ->set_output(json_encode(['success' => false, 'data' => []]));
+                ->set_output(json_encode([
+                    'draw' => 0,
+                    'recordsTotal' => 0,
+                    'recordsFiltered' => 0,
+                    'data' => []
+                ]));
         }
-
+    
         $draw   = intval($this->input->post('draw'));
         $start  = intval($this->input->post('start'));
         $length = intval($this->input->post('length'));
         $search = $this->input->post('search')['value'] ?? '';
-
+    
+        // Total records (no filter)
         $recordsTotal = $this->db->count_all('fraud_recoveries');
-
+    
+        // Base query
         $this->db
-            ->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, m.idnumber, m.passbook_no,m.cellnumber, m.employeeno, m.surname, m.name, IFNULL(SUM(fp.amount_paid),0) AS total_paid', false)
+            ->select('fr.recovery_id, fr.member_id, fr.amount_owed, fr.arrangement_date, fr.status, fr.case_description, fr.created_at,
+                      m.idnumber, m.passbook_no, m.cellnumber, m.employeeno, m.surname, m.name,
+                      IFNULL(SUM(fp.amount_paid), 0) AS total_paid', false)
             ->from('fraud_recoveries fr')
             ->join('members m', 'm.id = fr.member_id', 'left')
             ->join('fraud_recovery_payments fp', 'fp.recovery_id = fr.recovery_id', 'left')
             ->group_by('fr.recovery_id');
-
+    
+        // Search filter
         if (!empty($search)) {
             $this->db->group_start();
             $this->db->like('m.idnumber', $search);
@@ -4006,23 +4016,67 @@ class Burial extends CI_Controller
             $this->db->or_like('fr.case_description', $search);
             $this->db->group_end();
         }
-
+    
+        // Count filtered records (before limit)
         $recordsFiltered = $this->db->count_all_results('', false);
-
-        if ($length > 0) {
+    
+        // Ordering (default newest first)
+        $order_column = $this->input->post('order')[0]['column'] ?? 0;
+        $order_dir    = $this->input->post('order')[0]['dir'] ?? 'desc';
+    
+        $columns = [
+            0 => 'fr.recovery_id',
+            1 => 'm.idnumber',
+            2 => 'm.employeeno',
+            3 => 'm.surname',
+            4 => 'm.passbook_no',
+            5 => 'm.cellnumber',
+            6 => 'fr.amount_owed',
+            7 => 'total_paid',
+            8 => 'fr.amount_owed', // balance calculated later
+            9 => 'fr.status'
+        ];
+    
+        if (isset($columns[$order_column])) {
+            $this->db->order_by($columns[$order_column], $order_dir);
+        } else {
+            $this->db->order_by('fr.created_at', 'DESC');
+        }
+    
+        // Pagination
+        if ($length != -1) {
             $this->db->limit($length, $start);
         }
-        $this->db->order_by('fr.created_at', 'DESC');
-
+    
         $query = $this->db->get();
-
+    
         $data = [];
         $count = $start + 1;
+    
         foreach ($query->result() as $r) {
-            $balance = (float) $r->amount_owed - (float) $r->total_paid;
-            $member_name = trim((string) $r->surname . ' ' . (string) $r->name);
-            $status_label = '<span class="label label-' . ($r->status === 'Paid' ? 'success' : ($r->status === 'Written Off' ? 'danger' : 'warning')) . '">' . htmlspecialchars($r->status) . '</span>';
-
+            $balance = (float)$r->amount_owed - (float)$r->total_paid;
+    
+            $member_name = trim(($r->surname ?? '') . ' ' . ($r->name ?? ''));
+    
+            $status_class = 'warning';
+            if ($r->status === 'Paid') {
+                $status_class = 'success';
+            } elseif ($r->status === 'Written Off') {
+                $status_class = 'danger';
+            }
+    
+            $status_label = '<span class="label label-' . $status_class . '">' . htmlspecialchars($r->status) . '</span>';
+    
+            $options = '
+                <a href="' . base_url('index.php?burial/fraud_statement/' . $r->recovery_id) . '" 
+                   class="btn btn-xs btn-info" target="_blank" data-toggle="tooltip" title="View Fraud Statement">
+                    <i class="fa fa-money"></i>
+                </a>
+                <a href="' . base_url('index.php?burial/member_details/' . $r->member_id) . '" 
+                   class="btn btn-xs btn-primary" target="_blank" data-toggle="tooltip" title="View Member">
+                    <i class="fa fa-eye"></i>
+                </a>';
+    
             $data[] = [
                 $count++,
                 htmlspecialchars($r->idnumber ?? ''),
@@ -4030,28 +4084,21 @@ class Burial extends CI_Controller
                 htmlspecialchars($member_name),
                 htmlspecialchars($r->passbook_no ?? ''),
                 htmlspecialchars($r->cellnumber ?? ''),
-                number_format((float) $r->amount_owed, 2),
-                number_format((float) $r->total_paid, 2),
+                number_format((float)$r->amount_owed, 2),
+                number_format((float)$r->total_paid, 2),
                 number_format($balance, 2),
                 $status_label,
-                '
-                <a href="' . base_url('index.php?burial/fraud_statement/' . $r->recovery_id) . '" class="btn btn-xs btn-info" target="_blank" data-toggle="tooltip" title="View Fraud Statement">
-                    <i class="fa fa-money"></i>
-                </a>
-                <a href="' . base_url('index.php?burial/member_details/' . $r->member_id) . '" class="btn btn-xs btn-primary" target="_blank" data-toggle="tooltip" title="View Member">
-                    <i class="fa fa-eye"></i>
-                </a>
-                '
+                $options
             ];
         }
-
+    
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode([
-                'draw' => $draw,
-                'recordsTotal' => $recordsTotal,
+                'draw'            => $draw,
+                'recordsTotal'    => $recordsTotal,
                 'recordsFiltered' => $recordsFiltered,
-                'data' => $data
+                'data'            => $data
             ]));
     }
 

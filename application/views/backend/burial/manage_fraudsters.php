@@ -13,7 +13,7 @@
             <div class="tab-content">
                 <br>
                 <div class="tab-pane box active" id="list">
-                    <table class="table table-bordered table-striped mb-none" id="datatable-fraudsters">
+                    <table class="table table-bordered table-striped mb-none" id="datatable-fraudsters" width="100%">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -35,6 +35,7 @@
 
                 <div class="tab-pane box" id="add" style="padding: 10px;">
                     <?php echo form_open(base_url('index.php?burial/create_fraud_recovery'), array('class' => 'form-horizontal form-bordered validate')); ?>
+                    
                     <div class="form-group">
                         <label class="col-md-3 control-label">Search Member <span style="color: red;">*</span></label>
                         <div class="col-md-7">
@@ -106,7 +107,7 @@
                             </button>
                         </div>
                     </div>
-                    </form>
+                    <?php echo form_close(); ?>
                 </div>
             </div>
         </div>
@@ -115,7 +116,8 @@
 
 <script>
 $(document).ready(function() {
-    $('#datatable-fraudsters').DataTable({
+
+    var table = $('#datatable-fraudsters').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -123,16 +125,59 @@ $(document).ready(function() {
             type: "POST"
         },
         order: [[0, 'desc']],
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         dom: 'Bfrtip',
         buttons: [
-            { extend: 'copy', text: 'Copy' },
-            { extend: 'excel', text: 'Excel' },
-            { extend: 'pdf', text: 'PDF' },
-            { extend: 'print', text: 'Print' }
+            {
+                extend: 'copyHtml5',
+                text: '<i class="fa fa-copy"></i> Copy',
+                className: 'btn btn-default btn-sm',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] // exclude Options column
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fa fa-file-excel-o"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                title: 'Fraud Recoveries - ' + new Date().toISOString().slice(0,10),
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                className: 'btn btn-danger btn-sm',
+                title: 'Fraud Recoveries',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                },
+                customize: function (doc) {
+                    doc.styles.tableHeader.alignment = 'left';
+                    doc.defaultStyle.fontSize = 8;
+                    doc.styles.tableHeader.fontSize = 9;
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa fa-print"></i> Print',
+                className: 'btn btn-info btn-sm',
+                title: 'Fraud Recoveries',
+                exportOptions: {
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                }
+            }
+        ],
+        columnDefs: [
+            { orderable: false, targets: [10] } // Options column not sortable
         ]
     });
 
-    // Member search with dropdown results (same UX as payments screen)
+    // Member search with dropdown results
     $('#member_search').keyup(function() {
         var search = $(this).val();
 
