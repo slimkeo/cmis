@@ -11,6 +11,7 @@ class Beneficiary_model extends CI_Model
         'DECEASED - REPLACED',
         'DELETED',
         'LATE NOT BENEFITTED',
+        'PASSBOOK REPLACEMENT',
         'LATE NOT BENEFITTED - REPLACED'
     ];
 
