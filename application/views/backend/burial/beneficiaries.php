@@ -25,6 +25,7 @@ foreach ($member_data as $member_row):
 			'DECEASED - REPLACED',
 			'DELETED',
 			'LATE NOT BENEFITTED',
+			'PASSBOOK REPLACEMENT',
 			'LATE NOT BENEFITTED - REPLACED'
 		];
 
