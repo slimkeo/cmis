@@ -1168,7 +1168,7 @@ class Burial extends CI_Controller
                 $maturity_badge = 'label-success';
                 $row_class = 'success';
             } elseif ($r->status == 'PASSBOOK REPLACEMENT') {
-                $maturity_status = 'Matured';
+                $maturity_status = 'REPLACED';
                 $maturity_badge = 'label-success';
                 $row_class = 'danger';
             } elseif ($is_matured) {
