@@ -129,7 +129,7 @@ foreach ($member_data as $member_row):
 							$is_matured = ($submission_timestamp && $submission_timestamp <= $one_year_ago);
 							
 							// Determine maturity status text and badge class
-							if ($b['status'] == 'BENEFITTED' || $b['status'] == 'BENEFITTED - REPLACED'| $b['status'] == 'DECEASED - REPLACED'| $b['status'] == 'DELETED' | $b['status'] == 'LATE NOT BENEFITTED'| $b['status'] == 'LATE NOT BENEFITTED - REPLACED') {
+							if ($b['status'] == 'BENEFITTED' || $b['status'] == 'BENEFITTED - REPLACED'| $b['status'] == 'DECEASED - REPLACED'| $b['status'] == 'DELETED' | $b['status'] == 'LATE NOT BENEFITTED'| $b['status'] == 'LATE NOT BENEFITTED - REPLACED','PASSBOOK REPLACEMENT') {
 								$maturity_status = $b['status'];
 								$maturity_badge = 'label-danger';
 								$row_class = 'danger';
