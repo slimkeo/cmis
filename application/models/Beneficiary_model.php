@@ -116,7 +116,7 @@ class Beneficiary_model extends CI_Model
 
         $status = strtoupper(trim($b->status));
 
-        if (in_array($status, ['BENEFITTED', 'BENEFITTED-REPLACED'], true)) {
+        if (in_array($status, ['BENEFITTED', 'BENEFITTED-REPLACED','PASSBOOK REPLACEMENT'], true)) {
             return '';
         }
 
