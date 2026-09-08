@@ -19,7 +19,10 @@ class Burial extends CI_Controller
         $this->load->model('Claims_model');
         $this->load->model('Sms_model');
         // load config for SMS (you'll create this config or set constants)
-        $this->load->config('sms_config', true); // optional, see notes        
+        $this->load->config('sms_config', true); // optional, see notes   
+        
+        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw==";
+        $this->api_key = $api_key;
         /* Cache control */
         $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $this->output->set_header('Pragma: no-cache');
@@ -1509,99 +1512,119 @@ class Burial extends CI_Controller
      * Returns boolean.
      */
 
-    public function send_sms_otp($phone,$otp, $attendance_row = null) {
+     public function send_sms_otp($phone, $message)
+     {
 
-        // 2️⃣ Prepare message
-        $message = "SNAT Burial AGM: 13 Dec 2025, 07:00 AM, Metropolitan Evangelical Church. OTP:$otp Members: Passbook, ID & payslip. Pensioners: ID, Passbook & proof.";
-
-
-        // 3️⃣ URL encode message
-        $encoded_message = urlencode($message);
-
-        // 4️⃣ API key
-        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
-
-        // 5️⃣ Construct API URL
-        //$phone="26876404197";
-        $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$encoded_message}";
-
-        // 6️⃣ Send SMS using file_get_contents
-        $response = file_get_contents($url);
-
-        if ($response !== FALSE) {
-            // Optional: you can parse response if RealSMS returns JSON/text
-            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
-        } else {
-            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
-        }
-    }
-    public function send_broadcast()
-    {
-        // prevent PHP timeout for this single request (but keep small batch)
-        set_time_limit(60);
-
-        $offset = intval($this->input->post('offset'));
-        $limit = intval($this->input->post('limit'));
-        $message = $this->input->post('message');
-        $message = urlencode($message);
-
-        if ($limit <= 0) $limit = 100;
-
-        // fetch batch of members
-        $members = $this->Member_model->get_members_batch($offset, $limit);
-
-        $logs = [];
-        $success_count = 0;
-
-        foreach ($members as $m) {
-
-                // send SMS
-                $sms_ok = $this->broadcast_message($m['cellnumber'], $message);
-
-                if ($sms_ok) {
-                    $logs[] = "SMS sent to {$m['cellnumber']} (message: {$message})";
-                    $success_count++;
-                } else {
-                    $logs[] = "SMS FAILED for {$m['cellnumber']} (message: {$message})";
-                    // you may update attendance row with failed flag if desired
-                }
-        }
-
-        // compute processed count for client progress
-        $processed = count($members);
-
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode([
-                'processed' => $processed,
-                'success_count' => $success_count,
-                'logs' => $logs
-            ]));
-    }
-
-    public function broadcast_message($phone,$message) {
-
-        // 2️⃣ Prepare message
-        /*$message = "SNAT Burial AGM TEST (internal staff and board members only). Date: 05 Dec 2025, 10:00 AM. Venue: Metropolitan Evangelical Church. Your code: $otp. Present this at registration.";*/
-
-
-        // 4️⃣ API key
-        $api_key = "c25hdGJ1cmlhbEBzd2F6aS5uZXQtcmVhbHNtcw=="; // Replace with your real API key
-
-        // 5️⃣ Construct API URL
-        //$phone="26876404197";
-        $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$message}";
-
-        // 6️⃣ Send SMS using file_get_contents
-        $response = file_get_contents($url);
-
-        if ($response !== FALSE) {
-            // Optional: you can parse response if RealSMS returns JSON/text
-            return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
-        } else {
-            return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
-        }
-    }
+        $api_key = $this->api_key;
+     
+         // clean phone (optional but recommended)
+         $phone = preg_replace('/[^0-9]/', '', $phone);
+     
+         // encode message
+         $encoded_message = urlencode($message);
+     
+         $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message={$encoded_message}";
+     
+         $response = @file_get_contents($url);
+     
+         if ($response !== FALSE) {
+             return [
+                 'success' => true,
+                 'api_response' => $response
+             ];
+         } else {
+             return [
+                 'success' => false,
+                 'error' => "SMS API request failed"
+             ];
+         }
+     }
+     public function send_broadcast()
+     {
+         // prevent PHP timeout for this single request (but keep small batch)
+         set_time_limit(60);
+ 
+         $offset = intval($this->input->post('offset'));
+         $limit = intval($this->input->post('limit'));
+         $message = $this->input->post('message');
+         //$message = urlencode($message);
+ 
+         if ($limit <= 0) $limit = 100;
+ 
+         // fetch batch of members
+         $members = $this->Member_model->get_members_batch($offset, $limit);
+ 
+         $logs = [];
+         $success_count = 0;
+ 
+         foreach ($members as $m) {
+ 
+ 
+                 // APPEND WELCOME MESSAGE
+                 $defaultPart="Valued Member 058-".$m['id'];
+                 $personalised_message=$defaultPart.'. '.$message;
+                 // send SMS
+                 $sms_ok = $this->broadcast_message($m['cellnumber'], $personalised_message);
+ 
+                 if ($sms_ok) {
+                     $logs[] = "SMS sent to {$m['cellnumber']} (message: {$personalised_message})";
+                     $success_count++;
+                 } else {
+                     $logs[] = "SMS FAILED for {$m['cellnumber']} (message: {$personalised_message})";
+                     // you may update attendance row with failed flag if desired
+                 }
+         }
+ 
+         // compute processed count for client progress
+         $processed = count($members);
+ 
+         return $this->output
+             ->set_content_type('application/json')
+             ->set_output(json_encode([
+                 'processed' => $processed,
+                 'success_count' => $success_count,
+                 'logs' => $logs
+             ]));
+     }
+ 
+     public function broadcast_message($phone,$message) {
+        $api_key = $this->api_key;
+ 
+         // 5️⃣ Construct API URL
+         //$phone="26876404197";
+         $url = "https://www.realsms.co.sz/urlSend?_apiKey={$api_key}&dest={$phone}&message=" . urlencode($message);
+ 
+         // 6️⃣ Send SMS using file_get_contents
+         $response = file_get_contents($url);
+ 
+         if ($response !== FALSE) {
+             // Optional: you can parse response if RealSMS returns JSON/text
+             return ['success' => true, 'message' => "SMS sent to {$phone}", 'api_response' => $response];
+         } else {
+             return ['success' => false, 'error' => "Failed to send SMS", 'api_response' => $response];
+         }
+     }
+ 
+     /********** MANAGE ATTENDANCE (Members Present at AGM) ********************/
+     function manage_attendance($param1 = '', $param2 = '', $param3 = '')
+     {
+         if ($this->session->userdata('user_login') != 1)
+             redirect('login', 'refresh');
+ 
+         if ($param1 == 'get_detailed') {
+ 
+             $event_id = $this->input->post('event_id');
+ 
+             redirect(base_url() . 'index.php?burial/attendance/'.$event_id, 'refresh');
+         }
+ 
+ 
+         $page_data['events']   = $this->db->get('events')->result_array();
+         $page_data['page_name']   = 'manage_attendance';
+         $page_data['page_title']  = 'Manage Attendance';
+         $this->load->view('backend/index', $page_data);
+     }
+ 
     
 
 
