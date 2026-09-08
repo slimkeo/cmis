@@ -58,7 +58,31 @@
 					</li>								
 				</ul>
 			</li>				
-
+			<!-- ADMIN MANAGEMENT PANEL -->
+			<?php if ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 2) { ?>						
+			<li class="nav-parent <?php
+			if ($page_name == 'manage_users' ||
+					$page_name == 'manage_events' || $page_name == 'pay_with_momo' || $page_name == 'event_invite' )
+				echo 'nav-expanded nav-active';
+			?> ">
+				<a href="#">
+					<i class="fa fa-street-view"></i>
+					<span>Events Management</span>
+				</a>
+				<ul class="nav nav-children">
+					<!-- \Manage USers -->
+			<li class="<?php if ($page_name == 'manage_events' || $page_name == 'pay_with_momo' || $page_name == 'event_invite') echo 'nav-active'; ?> ">
+				<a href="<?php echo base_url(); ?>index.php?burial/manage_events">
+					<i class="fa fa-slideshare"></i> 
+					<span><?php echo get_phrase('manage_events'); ?></span>
+				</a>
+			</li>		
+			
+			
+				</ul>
+			</li>
+			
+				<?php } ?>	
 			<!-- manage attendance -->
 			<?php if ($this->session->userdata('level')==1) { ?>
 			<li class="nav-parent <?php

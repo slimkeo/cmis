@@ -17,7 +17,7 @@ class Attendance_model extends CI_Model {
     public function insert_if_not_exists($row)
     {
         // simple check: member_code unique? (you can adjust logic)
-        $exists = $this->db->get_where($this->table, ['momo' => $row['momo']])->num_rows();
+        $exists = $this->db->get_where($this->table, ['memberid' => $row['memberid']])->num_rows();
         if ($exists > 0) {
             return false;
         }

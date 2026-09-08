@@ -4263,6 +4263,161 @@ class Burial extends CI_Controller
         $this->load->view('backend/print_fraudulent_reciept.php', $page_data);
     }
 
+    ///initaite sms sending
+    public function invite_batch_init()
+    {
+        // You can restrict members (e.g., active only). For now all members.
+        $total = $this->Member_model->count_all_members();
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['total' => (int)$total]));
+    }
+    public function invite_batch()
+    {
+        set_time_limit(60);
+    
+        $offset = intval($this->input->post('offset'));
+        $limit  = intval($this->input->post('limit'));
+        $message_template = $this->input->post('message');
+        $event_id = intval($this->input->post('event_id')); // ✅ RECEIVED
+    
+        if ($limit <= 0) $limit = 100;
+    
+        $members = $this->Member_model->get_members_batch($offset, $limit);
+    
+        $logs = [];
+        $success_count = 0;
+    
+        foreach ($members as $m) {
+    
+            $otp = $this->generate_unique_otp();
+    
+            $att = [
+                'memberid' => $m['id'],
+                'event' => $event_id,
+                'otp' => $otp,
+                'createdate' => date('Y-m-d H:i:s'),
+                'attended_at' => null
+            ];
+    
+            $insert_id = $this->Attendance_model->insert_if_not_exists($att);
+    
+            if ($insert_id) {
+    
+                // ✅ Inject OTP into message
+                $final_message = $message_template . " OTP: " . $otp;
+    
+                $sms_res = $this->send_sms_otp($m['cellnumber'], $final_message);
+    
+                if ($sms_res['success']) {
+                    $logs[] = "SMS sent to {$m['cellnumber']}";
+                    $success_count++;
+                } else {
+                    $logs[] = "FAILED {$m['cellnumber']} - " . $sms_res['error'];
+                }
+    
+            } else {
+                $logs[] = "Skipped {$m['cellnumber']} (already exists)";
+            }
+        }
+    
+        $processed = count($members);
+        $total_success = $this->Attendance_model->count_sent();
+    
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'processed' => $processed,
+                'success_count' => $success_count,
+                'logs' => $logs,
+                'total_success' => $total_success
+            ]));
+    }
+    /**
+     * Generate unique 6-digit OTP.
+     * Tries a few times to avoid DB collisions. Good enough for 15k.
+     */
+    private function generate_unique_otp($tries = 5)
+    {
+        for ($i = 0; $i < $tries; $i++) {
+            $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            if (!$this->Attendance_model->otp_exists($code)) {
+                return $code;
+            }
+        }
+        // fallback: force unique by using microtime hashed (guaranteed unique-ish)
+        return substr(sha1(uniqid('', true)), 0, 6);
+    }    
+
+    /********** MANAGE Annual General Events ********************/
+    function manage_events($param1 = '', $param2 = '', $param3 = '')
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect('login', 'refresh');
+
+        if ($param1 == 'create') {
+            $data['description'] = $this->input->post('description');
+            $data['date']        =date('Y-m-d', strtotime($this->input->post('date')));
+            $data['time']        =$this->input->post('time');
+            $data['location']        =$this->input->post('location');
+            $data['year']        = $this->input->post('year');
+            $data['createdate']  = date("Y-m-d");
+            $data['user']     = $this->session->userdata('user_id');
+
+            $this->db->insert('events', $data);
+            $this->session->set_flashdata('flash_message', 'Event added successfully');
+            redirect(base_url() . 'index.php?burial/manage_events', 'refresh');
+        }
+
+        if ($param1 == 'do_update') {
+            $data['description'] = $this->input->post('description');
+            $data['date']        = $this->input->post('date');
+            $data['year']        = $this->input->post('year');
+            $data['time']        =$this->input->post('time');
+            $data['location']        =$this->input->post('location');
+
+            $this->db->where('id', $param2);
+            $this->db->update('events', $data);
+            $this->session->set_flashdata('flash_message', get_phrase('Event updated successfully'));
+            redirect(base_url() . 'index.php?burial/manage_events', 'refresh');
+        }
+
+        if ($param1 == 'delete') {
+            $this->db->where('id', $param2);
+            $this->db->delete('events');
+            $this->session->set_flashdata('flash_message', get_phrase('Event deleted successfully'));
+            redirect(base_url() . 'index.php?burial/manage_events', 'refresh');
+        }
+
+        $page_data['events']       = $this->db->get('events')->result_array();
+        $page_data['page_name']  = 'manage_events';
+        $page_data['page_title'] = get_phrase('manage_events');
+        $this->load->view('backend/index', $page_data);
+    }
+    /********** batch invite per event ********************/
+    function event_invite($event_id)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $page_data['event_id'] = $event_id;   
+        $page_data['page_name']  = 'event_invite';
+        $page_data['page_title'] = $this->db->get_where('events', array('id' => $page_data['event_id']))->row()->description.' Invite';
+        $this->load->view('backend/index', $page_data);
+    }  
+
+    /********** report per event ********************/
+    function report_per_event($event_id)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $page_data['event_id'] = $event_id;   
+        $page_data['page_name']  = 'report_per_event';
+        $page_data['page_title'] =  $this->db->get_where('events', array('id' => $page_data['event_id']))->row()->description.' Attandence';
+        $this->load->view('backend/index', $page_data);
+    } 
 
 
 }
