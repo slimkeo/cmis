@@ -2,11 +2,6 @@
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-
-$branches=$this->db->get('branches')->result_array();
-$employment_status=$this->db->get('employment_status')->result_array();
-
 ?>
 <div class="row">
 	<div class="col-md-12">
@@ -145,30 +140,6 @@ $employment_status=$this->db->get('employment_status')->result_array();
 			                    <option value="">Select</option>
 			                    <option value="M">Male</option>
 			                    <option value="F">Female</option>
-			                </select>
-			            </div>
-			        </div>
-			        <!-- Employement Status -->
-			        <div class="form-group">
-			            <label class="col-md-3 control-label">Employement Type</label>
-			            <div class="col-md-7">
-			                <select name="employment_status" data-plugin-selectTwo data-minimum-results-for-search="4" data-width="100%" class="form-control populate">
-			                    <option value="">Select</option>
-								<?php foreach ($employment_status as $rowz): ?>
-								<option value="<?php echo $rowz['id']; ?>"><?php echo $rowz['description']; ?></option>
-								<?php endforeach; ?>
-			                </select>
-			            </div>
-			        </div>					
-			        <!-- Branch -->
-			        <div class="form-group">
-			            <label class="col-md-3 control-label">Branch</label>
-			            <div class="col-md-7">
-			                <select name="branch" data-plugin-selectTwo data-minimum-results-for-search="4" data-width="100%" class="form-control populate">
-			                    <option value="">Select</option>
-								<?php foreach ($branches as $rowz): ?>
-								<option value="<?php echo $rowz['id']; ?>"><?php echo $rowz['name']; ?></option>
-								<?php endforeach; ?>
 			                </select>
 			            </div>
 			        </div>
