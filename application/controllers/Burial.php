@@ -1684,71 +1684,7 @@ class Burial extends CI_Controller
         $page_data['page_title']  = get_phrase('manage_attendance');
         $this->load->view('backend/index', $page_data);
     }
-    //DISPLAY ATTENDED MEMBERS ON DATATABLE
-     public function get_attended()
-    {
-        $draw   = intval($this->input->post("draw"));
-        $start  = intval($this->input->post("start"));
-        $length = intval($this->input->post("length"));
-        $search = $this->input->post("search")['value'];
-
-        // --------------------------------------------
-        // 1️⃣ Total records (no search)
-        // --------------------------------------------
-        $this->db->where("status", 1);
-        $recordsTotal = $this->db->count_all("attendance");
-
-        // --------------------------------------------
-        // 2️⃣ Build filtered query
-        // --------------------------------------------
-        $this->db->from("attendance");
-         $this->db->where("status", 1);
-
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->or_like("passbook_no", $search);
-            $this->db->or_like("national_id", $search);
-            $this->db->or_like("otp", $search);
-            $this->db->or_like("fullname", $search);
-            $this->db->or_like("momo", $search);
-            $this->db->group_end();
-        }
-
-        // --------------------------------------------
-        // 3️⃣ Count filtered records
-        // --------------------------------------------
-        $recordsFiltered = $this->db->count_all_results('', false);
-
-        // --------------------------------------------
-        // 4️⃣ Pagination
-        // --------------------------------------------
-        $this->db->limit($length, $start);
-
-        // --------------------------------------------
-        // 5️⃣ Fetch results
-        // --------------------------------------------
-        $query = $this->db->get();
-        $count=1;
-        $data = [];
-        foreach($query->result() as $r){
-            $data[] = [
-                $count++,
-                "MSISDN",
-                $r->momo,
-                $this->db->get_where('settings' , array('type'=>'momo_amount'))->row()->description,
-                "Lunch" 
-            ];
-        }
-
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode([
-                "draw" => $draw,
-                "recordsTotal" => $recordsTotal,
-                "recordsFiltered" => $recordsFiltered,
-                "data" => $data
-            ]));
-    }   
+  
     /********** MANAGE AGMs (Annual General Meetings) ********************/
     function agms($param1 = '', $param2 = '', $param3 = '')
     {
