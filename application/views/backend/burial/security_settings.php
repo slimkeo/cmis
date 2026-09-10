@@ -18,7 +18,7 @@
                       <label  class="col-sm-3 control-label"><?php echo get_phrase('full_name');?></label>
                       <div class="col-sm-9">
                           <input type="text" class="form-control" name="name" 
-                              value="<?php echo $this->db->get_where('user' , array('id' =>$this->session->userdata('user_id')))->row()->name;?>" required="">
+                              value="<?php echo $this->db->get_where('admin' , array('id' =>$this->session->userdata('user_id')))->row()->name;?>" required="">
                       </div>
                   </div>
                     
@@ -26,7 +26,7 @@
                       <label  class="col-sm-3 control-label"><?php echo get_phrase('email');?></label>
                       <div class="col-sm-9">
                           <input type="text" class="form-control" name="email" 
-                              value="<?php echo $this->db->get_where('user' , array('id' =>$this->session->userdata('user_id')))->row()->email;?>" required="">
+                              value="<?php echo $this->db->get_where('admin' , array('id' =>$this->session->userdata('user_id')))->row()->email;?>" required="">
                       </div>
                   </div>
                   <div class="form-group">

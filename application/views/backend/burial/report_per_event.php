@@ -46,7 +46,7 @@ error_reporting(E_ALL);
 			<!--CREATION FORM STARTS-->
 			<div class="tab-pane box" id="add" style="padding: 5px">
 				<div class="box-content">
-					<?php echo form_open(base_url() . 'index.php?union/add_attendee/'.$event_id , array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
+					<?php echo form_open(base_url() . 'index.php?burial/add_attendee/'.$event_id , array('class' => 'form-horizontal form-bordered validate','enctype'=>'multipart/form-data'));?>
 
 			        <!-- ID NUMBER -->
 			        <div class="form-group">
@@ -202,7 +202,7 @@ $(document).ready(function() {
         "pageLength": 500,  
 
         "ajax": {
-            "url": "<?php echo base_url('index.php?union/get_attendance');?>",
+            "url": "<?php echo base_url('index.php?burial/get_attendance');?>",
             "type": "POST",
 
             // ✅ SEND EXTRA PARAMETER

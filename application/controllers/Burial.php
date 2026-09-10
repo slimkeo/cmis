@@ -3241,11 +3241,11 @@ class Burial extends CI_Controller
             $new_password = sha1($this->input->post('new_password'));
             $user_id = $this->session->userdata('user_id');
 
-            $stored_pass = $this->db->get_where('user', array('id' => $user_id))->row()->password;
+            $stored_pass = $this->db->get_where('admin', array('id' => $user_id))->row()->password;
 
             if ($stored_pass == $old_password) {
                 $this->db->where('id', $user_id);
-                $this->db->update('user', array('password' => $new_password));
+                $this->db->update('admin', array('password' => $new_password));
                 $this->session->set_flashdata('flash_message', get_phrase('password_updated'));
             } else {
                 $this->session->set_flashdata('flash_message_error', get_phrase('old_password_incorrect'));
@@ -4349,6 +4349,260 @@ class Burial extends CI_Controller
         $page_data['page_title'] =  $this->db->get_where('events', array('id' => $page_data['event_id']))->row()->description.' Attandence';
         $this->load->view('backend/index', $page_data);
     } 
+
+    function add_attendee($event_id)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh');
+
+            $data['idnumber']    = $this->input->post('idnumber');
+            $data['employeeno']  = $this->input->post('employeeno');
+            $data['tscno']       = $this->input->post('tscno');
+            $data['surname']     = $this->input->post('surname');
+            $data['name']        = $this->input->post('name');
+            $data['cellnumber']  = $this->input->post('cellnumber');
+            $data['dob']         = $this->input->post('dob');
+            $data['gender']      = $this->input->post('gender');
+            $data['branch']    = $this->input->post('branch');
+            $data['schoolcode']  = $this->input->post('schoolcode');
+            
+            // Format cellnumber: append 268 if not present
+            if (!empty($data['cellnumber']) && strpos($data['cellnumber'], '268') !== 0) {
+                $data['cellnumber'] = '268' . $data['cellnumber'];
+            }
+    
+            // Prevent duplicate ID number or passbook number
+            $this->db->group_start();
+    
+            if ($data['idnumber'] !== null && $data['idnumber'] !== '') {
+                $this->db->where('idnumber', $data['idnumber']);
+            }
+    
+            if ($data['cellnumber'] !== null && $data['cellnumber'] !== '') {
+                $this->db->or_where('cellnumber', $data['cellnumber']);
+            }
+    
+            if ($data['employeeno'] !== null && $data['employeeno'] !== '') {
+                $this->db->or_where('employeeno', $data['employeeno']);
+            }
+    
+            $this->db->group_end();
+    
+            $exists = $this->db->get('members')->num_rows();
+    
+            if ($exists > 0) {
+                $this->session->set_flashdata('flash_message_error', 'Member already registered: ID Number, Phone Number, Employment No and Pass Book Duplicacy not allowed');
+            } else {
+                $this->db->insert('members', $data);
+                $member_id = $this->db->insert_id();
+                
+                // Handle otp creation (only if member does not exist)
+                $otp = $this->generate_unique_otp();
+    
+                $att = [
+                    'memberid' => $member_id,
+                    'event' => $event_id,
+                    'otp' => $otp,
+                    'createdate' => date('Y-m-d H:i:s'),
+                    'attended_at' => date('Y-m-d H:i:s')
+                ];
+        
+                $insert_id = $this->Attendance_model->insert_if_not_exists($att);
+        
+                if ($insert_id) {
+                    $event = $this->db->get_where('events', array('id' => $event_id))->row();
+                    $event_name = $event->description;
+                    $time = $event->time;
+                    $location = $event->location;
+                    $date = $event->date;
+
+                    $message_template =$event_name . " : " .date('j F Y', strtotime($date)). ", at " . $location . ". Registration : " . $time . ", Bring: Payslip/receipt and ID.";
+                    // ✅ Inject OTP into message
+                    $final_message = $message_template . " OTP: " . $otp;
+        
+                    $sms_res = $this->send_sms_otp($data['cellnumber'], $final_message);
+        
+                    if ($sms_res['success']) {
+                        $this->session->set_flashdata('flash_message', "SMS sent to {$data['cellnumber']}");
+                        $success_count++;
+                    } else {
+                        $this->session->set_flashdata('flash_message_error', "SMS ERROR" . $sms_res['error']);
+                    }
+        
+                } else {
+                    $this->session->set_flashdata('flash_message_error', 'Member Already has OTP');
+                }               
+            }
+
+            redirect(base_url() . 'index.php?burial/report_per_event/'.$event_id, 'refresh');
+    }  
+
+    public function get_attendance()
+    {
+        $draw   = intval($this->input->post("draw"));
+        $start  = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search")['value'];
+        $event_id = intval($this->input->post('event_id')); // ✅ RECEIVED
+    
+        // --------------------------------------------
+        // 1️⃣ Total records
+        // --------------------------------------------
+        $this->db->from("attendance");
+
+        if (!empty($event_id)) {
+            $this->db->where("event", $event_id);
+        }
+        
+        $recordsTotal = $this->db->count_all_results();
+    
+        // --------------------------------------------
+        // 2️⃣ Build query with JOIN
+        // --------------------------------------------
+        $this->db->select('attendance.*, members.idnumber, members.name, members.surname, members.cellnumber');
+        $this->db->from("attendance");
+        $this->db->join("members", "members.id = attendance.memberid", "left");
+
+                // ✅ FILTER BY EVENT
+        if (!empty($event_id)) {
+            $this->db->where("attendance.event", $event_id);
+        }
+            
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like("members.idnumber", $search);
+            $this->db->or_like("attendance.otp", $search);
+            $this->db->or_like("members.name", $search);
+            $this->db->or_like("members.surname", $search);
+            $this->db->or_like("members.cellnumber", $search);
+            $this->db->group_end();
+        }
+    
+        // --------------------------------------------
+        // 3️⃣ Filtered count
+        // --------------------------------------------
+        $recordsFiltered = $this->db->count_all_results('', false);
+    
+        // --------------------------------------------
+        // 4️⃣ Pagination
+        // --------------------------------------------
+        $this->db->limit($length, $start);
+    
+        // --------------------------------------------
+        // 5️⃣ Fetch data
+        // --------------------------------------------
+        $query = $this->db->get();
+    
+        $count = $start + 1;
+        $data = [];
+    
+        foreach ($query->result() as $r) {
+    
+            $data[] = [
+                $count++,
+                $r->idnumber,
+                $r->name . ' ' . $r->surname,
+                $r->cellnumber,
+                $r->otp,
+                ($r->status == 1) ? "Attended" : "Not Attended",
+                '
+                <button 
+                    class="btn btn-xs btn-warning resend-otp" 
+                    data-url="' . base_url() . 'index.php?burial/resend_sms_otp/' . $r->cellnumber . '/' . $r->otp . '">
+                    <i class="fa fa-refresh"></i> Resend OTP
+                </button>
+                '
+            ];
+        }
+    
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
+    }
+    //DISPLAY ATTENDED MEMBERS ON DATATABLE
+     public function get_attended()
+    {
+        $draw   = intval($this->input->post("draw"));
+        $start  = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search")['value'];
+        $event_id = intval($this->input->post('event_id')); // ✅ RECEIVED
+
+        // --------------------------------------------
+        // 1️⃣ Total records (no search)
+        // --------------------------------------------
+        $this->db->where("status", 1);
+        $this->db->from("attendance");
+
+        if (!empty($event_id)) {
+            $this->db->where("event", $event_id);
+        }
+        
+        $recordsTotal = $this->db->count_all_results();
+    
+
+        // --------------------------------------------
+        // 2️⃣ Build query with JOIN
+        // --------------------------------------------
+        $this->db->select('attendance.*, members.idnumber, members.name, members.surname, members.cellnumber');
+        $this->db->from("attendance");
+        $this->db->join("members", "members.id = attendance.memberid", "left");
+
+                // ✅ FILTER BY EVENT
+        if (!empty($event_id)) {
+            $this->db->where("attendance.event", $event_id);
+            $this->db->where("attendance.status", 1);
+        }
+            
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like("members.idnumber", $search);
+            $this->db->or_like("attendance.otp", $search);
+            $this->db->or_like("members.name", $search);
+            $this->db->or_like("members.surname", $search);
+            $this->db->or_like("members.cellnumber", $search);
+            $this->db->group_end();
+        }
+        // --------------------------------------------
+        // 3️⃣ Count filtered records
+        // --------------------------------------------
+        $recordsFiltered = $this->db->count_all_results('', false);
+
+        // --------------------------------------------
+        // 4️⃣ Pagination
+        // --------------------------------------------
+        $this->db->limit($length, $start);
+
+        // --------------------------------------------
+        // 5️⃣ Fetch results
+        // --------------------------------------------
+        $query = $this->db->get();
+        $count=1;
+        $data = [];
+        foreach($query->result() as $r){
+            $data[] = [
+                $count++,
+                "MSISDN",
+                $r->cellnumber,
+                $this->db->get_where('settings' , array('type'=>'momo_amount'))->row()->description,
+                "Lunch" 
+            ];
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                "draw" => $draw,
+                "recordsTotal" => $recordsTotal,
+                "recordsFiltered" => $recordsFiltered,
+                "data" => $data
+            ]));
+    }   
 
 
 }
