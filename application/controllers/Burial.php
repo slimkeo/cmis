@@ -4171,7 +4171,7 @@ class Burial extends CI_Controller
             $data['year']        = $this->input->post('year');
             $data['time']        =$this->input->post('time');
             $data['location']        =$this->input->post('location');
-
+            $data['year']        = $this->input->post('year');
             $this->db->where('id', $param2);
             $this->db->update('events', $data);
             $this->session->set_flashdata('flash_message', get_phrase('Event updated successfully'));

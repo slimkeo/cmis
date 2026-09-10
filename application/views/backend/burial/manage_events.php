@@ -172,6 +172,24 @@
 						<input type="number" class="form-control" name="year" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
 					</div>
 				</div>	
+				<div class="form-group">
+					<label class="col-md-3 control-label">
+						<?php echo get_phrase('location');?> <span class="required">*</span>
+					</label>
+
+					<div class="col-md-7">
+						<input type="text" class="form-control" name="location" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">
+						<?php echo get_phrase('time');?> <span class="required">*</span>
+					</label>
+
+					<div class="col-md-7">
+						<input type="text" class="form-control" name="time" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
+					</div>
+				</div>
 						<div class="form-group">
 					<label class="col-md-3 control-label">
 						<?php echo get_phrase('date');?> <span class="required">*</span>
