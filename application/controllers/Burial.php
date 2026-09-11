@@ -1835,15 +1835,16 @@ class Burial extends CI_Controller
     }
 
 
-    function pay_with_momo($agmid="")
+    function pay_with_momo($event_id="")
     {
         if ($this->session->userdata('user_login') != 1)
             redirect('login', 'refresh');
 
-        $eventid = ($agmid==null) ? $this->input->post('event') : $agmid ;
+        $event_id = ($agmid==null) ? $this->input->post('event') : $event_id ;
 
         $page_data['page_name']  = 'pay_with_momo';
-        $page_data['attendees']  = $this->db->get_where('attendance', array('event' => $eventid))->result_array();
+        $page_data['event_id']  = $event_id;
+        $page_data['attendees']  = $this->db->get_where('attendance', array('event' => $event_id))->result_array();
         $page_data['page_title'] = get_phrase('pay_with_momo');
         $this->load->view('backend/index', $page_data);
     }
