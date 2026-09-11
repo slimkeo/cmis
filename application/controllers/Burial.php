@@ -1840,7 +1840,7 @@ class Burial extends CI_Controller
         if ($this->session->userdata('user_login') != 1)
             redirect('login', 'refresh');
 
-        $event_id = ($agmid==null) ? $this->input->post('event') : $event_id ;
+        $event_id = ($event_id==null) ? $this->input->post('event') : $event_id ;
 
         $page_data['page_name']  = 'pay_with_momo';
         $page_data['event_id']  = $event_id;
