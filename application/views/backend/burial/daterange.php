@@ -29,7 +29,7 @@
 						
 											<div class="form-group">
 							  <div class="col-sm-offset-7 col-sm-5">
-								  <button type="submit" class="btn btn-default btn-sm"><i class="fa fa-search"></i> View Subventions Report</button>
+								  <button type="submit" class="btn btn-default btn-sm"><i class="fa fa-search"></i> View  Report</button>
 							  </div>
 							</div>
 						

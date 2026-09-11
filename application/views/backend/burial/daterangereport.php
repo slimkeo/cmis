@@ -156,51 +156,6 @@
 					</div>
 				</div>
 
-				<h4 style="margin-top: 20px;">Statements (Detail)</h4>
-				<table class="table table-bordered table-striped table-condensed">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Date</th>
-							<th>Member</th>
-							<th>Description</th>
-							<th>Type</th>
-							<th>Source</th>
-							<th style="text-align:right;">Amount (E)</th>
-							<?php if ($is_user_report): ?>
-								<th>Captured</th>
-							<?php endif; ?>
-						</tr>
-					</thead>
-					<tbody>
-						<?php if (empty($statements)): ?>
-							<tr><td colspan="<?php echo $is_user_report ? 8 : 7; ?>">No statements found.</td></tr>
-						<?php else: ?>
-							<?php $i = 1; foreach ($statements as $s): ?>
-								<?php
-									$m = null;
-									if (!empty($s['memberid'])) {
-										$m = $this->db->get_where('members', ['id' => (int)$s['memberid']])->row_array();
-									}
-									$mname = $m ? trim(($m['surname'] ?? '') . ' ' . ($m['name'] ?? '')) : '-';
-								?>
-								<tr>
-									<td><?php echo $i++; ?></td>
-									<td><?php echo htmlspecialchars($s['date'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-									<td><?php echo htmlspecialchars($mname, ENT_QUOTES, 'UTF-8'); ?></td>
-									<td><?php echo htmlspecialchars($s['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-									<td><?php echo htmlspecialchars($s['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-									<td><?php echo htmlspecialchars($s['source'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-									<td style="text-align:right;"><?php echo number_format((float)($s['amount'] ?? 0), 2); ?></td>
-									<?php if ($is_user_report): ?>
-										<td><?php echo htmlspecialchars($s['created_at'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
-									<?php endif; ?>
-								</tr>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</tbody>
-				</table>
-
 				<h4 style="margin-top: 20px;">Claims (Detail)</h4>
 				<table class="table table-bordered table-striped table-condensed">
 					<thead>
