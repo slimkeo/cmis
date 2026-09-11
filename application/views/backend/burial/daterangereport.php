@@ -1,4 +1,5 @@
 <?php
+	$claimtype_enum = $this->Enum_model->get_enum_values('claims', 'claim_type');
 	$startdate = isset($startdate) ? $startdate : null;
 	$enddate   = isset($enddate) ? $enddate : null;
 	$user_id   = isset($user_id) ? (int)$user_id : null;
@@ -86,7 +87,7 @@
 				<div class="row">
 					<div class="col-md-4">
 						<div class="alert alert-info">
-							<strong>Statements</strong><br>
+							<strong>Subscriptions</strong><br>
 							Count: <?php echo (int)$statement_count; ?><br>
 							Total: E <?php echo number_format($statement_total, 2); ?>
 						</div>
@@ -108,8 +109,8 @@
 				</div>
 
 				<div class="row" style="margin-top: 10px;">
-					<div class="col-md-6">
-						<h4>Statements by Source</h4>
+					<div class="col-md-4">
+						<h4>Subscriptions by Source</h4>
 						<table class="table table-bordered table-condensed">
 							<thead>
 								<tr>
@@ -131,7 +132,39 @@
 							</tbody>
 						</table>
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-4">
+						<h4>Claims by Type</h4>
+						<table class="table table-bordered table-condensed">
+							<thead>
+								<tr>
+									<th>Type</th>
+									<th style="text-align:right;">Total (E)</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							<?php foreach ($claimtype_enum as $value): ?>
+
+								<?php
+									// Calculate number of claims per type
+									$claim_count = $this->db
+										->where('claim_type', $value)
+										->count_all_results('claims');
+								?>
+
+								<tr>
+									<td><?php echo $value; ?></td>
+									<td style="text-align:right;">
+										<?php echo number_format($claim_count); ?>
+									</td>
+								</tr>
+
+							<?php endforeach; ?>
+
+							</tbody>
+						</table>
+					</div>
+					<div class="col-md-4">
 						<h4>Statements by Type</h4>
 						<table class="table table-bordered table-condensed">
 							<thead>
