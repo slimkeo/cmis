@@ -148,8 +148,10 @@
 								<?php
 									// Calculate number of claims per type
 									$claim_count = $this->db
-										->where('claim_type', $value)
-										->count_all_results('claims');
+									->where('claim_type', $value)
+									->where('date >=', $startdate)
+									->where('date <=', $enddate)
+									->count_all_results('claims');
 								?>
 
 								<tr>
