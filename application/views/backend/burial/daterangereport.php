@@ -241,7 +241,7 @@
 										<td><?php echo htmlspecialchars($c['created_at'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
 									<?php endif; ?>
 									<td>
-									<a href="<?php echo base_url('index.php?burial/claims/view/' . $id); ?>"
+									<a href="<?php echo base_url('index.php?burial/claims/view/' . $C['id']); ?>"
 										class="btn btn-xs btn-info"
 										data-placement="top"
 										data-toggle="tooltip"
