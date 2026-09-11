@@ -20,6 +20,7 @@
 
 	// Claims
 	$this->db->from('claims');
+	$this->db->where('status', "PAID");
 	if ($is_user_report) {
 		$this->db->where('processed_by', $user_id);
 		if (!empty($startdate)) $this->db->where('created_at >=', $startdate . ' 00:00:00');
