@@ -204,6 +204,7 @@
 							<th style="text-align:right;">Amount (E)</th>
 							<?php if ($is_user_report): ?>
 								<th>Captured</th>
+							<th>View Claim</th>
 							<?php endif; ?>
 						</tr>
 					</thead>
@@ -236,6 +237,15 @@
 									<td style="text-align:right;"><?php echo number_format((float)($c['amount'] ?? 0), 2); ?></td>
 									<?php if ($is_user_report): ?>
 										<td><?php echo htmlspecialchars($c['created_at'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+									<td>
+									<a href="<?php echo base_url('index.php?burial/claims/view/' . $id); ?>"
+										class="btn btn-xs btn-info"
+										data-placement="top"
+										data-toggle="tooltip"
+										data-original-title="<?php echo get_phrase('view_claim'); ?>">
+											<i class="fa fa-eye"></i>
+									</a>										
+									</td>
 									<?php endif; ?>
 								</tr>
 							<?php endforeach; ?>
