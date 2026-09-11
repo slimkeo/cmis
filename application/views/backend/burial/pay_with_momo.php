@@ -7,7 +7,7 @@
                 <li class="active">
                     <a href="#list" data-toggle="tab">
                         <i class="fa fa-list"></i> 
-                        <?php echo get_phrase('all_attendance'); ?>
+                        <?php echo $this->db->get_where('events', array('id' => $event_id))->row()->description.' Pay With MOMO'; ?>
                     </a>
                 </li>
             </ul>
@@ -22,7 +22,7 @@
             <thead>
                 <tr>
                                 <th><div>HDR</div></th>
-                                <th><div>Event</div></th>
+                                <th><div>EVENT</div></th>
                                 <th><div>Number</div></th>
                                 <th><div>Amount</div></th>
                                 <th><div>Ref</div></th>
@@ -47,13 +47,20 @@
 <script>
 $(document).ready(function() {
 
+    var event_id = "<?php echo $event_id; ?>"; // OR get from dropdown/input
+
     $('#datatable-tabletoolsw').DataTable({
         "processing": true,
         "serverSide": true,
         "pageLength": 2000,
         "ajax": {
             "url": "<?php echo base_url('index.php?burial/get_attended');?>",
-            "type": "POST"
+            "type": "POST",
+
+            // ✅ SEND EXTRA PARAMETER
+            "data": function(d) {
+                d.event_id = event_id;
+            }
         },
 
         // ADD THIS ↓↓↓
