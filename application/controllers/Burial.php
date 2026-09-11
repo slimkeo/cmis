@@ -1840,10 +1840,10 @@ class Burial extends CI_Controller
         if ($this->session->userdata('user_login') != 1)
             redirect('login', 'refresh');
 
-        $agmid = ($agmid==null) ? $this->input->post('agm') : $agmid ;
+        $eventid = ($agmid==null) ? $this->input->post('event') : $agmid ;
 
         $page_data['page_name']  = 'pay_with_momo';
-        $page_data['attendees']  = $this->db->get_where('attendance', array('agm' => $agmid))->result_array();
+        $page_data['attendees']  = $this->db->get_where('attendance', array('event' => $eventid))->result_array();
         $page_data['page_title'] = get_phrase('pay_with_momo');
         $this->load->view('backend/index', $page_data);
     }

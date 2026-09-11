@@ -22,7 +22,7 @@
             <thead>
                 <tr>
                                 <th><div>HDR</div></th>
-                                <th><div>AGM</div></th>
+                                <th><div>Event</div></th>
                                 <th><div>Number</div></th>
                                 <th><div>Amount</div></th>
                                 <th><div>Ref</div></th>

@@ -133,14 +133,14 @@
 						<!-- EVENT EDITING LINK -->
 
 						<a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip" 
-						data-original-title="<?php echo get_phrase('edit');?>" onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_event_edit/<?php echo $row['id'];?>');">
+						data-original-title="<?php echo get_phrase('edit');?>" onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_edit_event/<?php echo $row['id'];?>');">
                         <i class="fa fa-pencil"></i>
                         </a>
 						
 
 						<!-- CLIENT DELETION LINK -->
 						<a href="#" class="btn btn-xs btn-danger" data-placement="top" data-toggle="tooltip"
-						 data-original-title="<?php echo get_phrase('delete');?>" onClick="confirm_modal('<?php echo base_url();?>index.php?union/manage_events/delete/<?php echo $row['id'];?>');">
+						 data-original-title="<?php echo get_phrase('delete');?>" onClick="confirm_modal('<?php echo base_url();?>index.php?burial/manage_events/delete/<?php echo $row['id'];?>');">
                         <i class="fa fa-trash"></i>
                         </a>			
 
@@ -165,20 +165,20 @@
 				</div>
 				<div class="form-group">
 					<label class="col-md-3 control-label">
+						<?php echo get_phrase('location');?> <span class="required">*</span>
+					</label>
+
+					<div class="col-md-7">
+						<input type="location" class="form-control" name="location" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
+					</div>
+				</div>	
+				<div class="form-group">
+					<label class="col-md-3 control-label">
 						<?php echo get_phrase('year');?> <span class="required">*</span>
 					</label>
 
 					<div class="col-md-7">
 						<input type="number" class="form-control" name="year" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
-					</div>
-				</div>	
-				<div class="form-group">
-					<label class="col-md-3 control-label">
-						<?php echo get_phrase('location');?> <span class="required">*</span>
-					</label>
-
-					<div class="col-md-7">
-						<input type="text" class="form-control" name="location" required title="<?php echo get_phrase('value_required');?>" value="" autofocus>
 					</div>
 				</div>
 				<div class="form-group">
