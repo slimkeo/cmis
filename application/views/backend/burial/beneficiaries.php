@@ -151,7 +151,7 @@ foreach ($member_data as $member_row):
 						?>
 						<tr class="<?php echo $row_class; ?>">
 							<td><?php echo $count++; ?></td>
-							<td><?php echo $b['fullname']; ?></td>
+							<td><?php echo $b['fullname']; ?><?php echo !empty($b['is_spouse']) ? '(Spouse)' : ''; ?></td>
 							<td><?php echo $b['gender']; ?></td>
 							<td><?php echo $b['dob']; ?></td>
 							<td><?php echo $b['submission_date']; ?></td>

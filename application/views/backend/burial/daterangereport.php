@@ -103,7 +103,7 @@
 					<div class="col-md-4">
 						<div class="alert alert-success">
 							<strong>Net</strong><br>
-							Statements - Claims<br>
+							Subscriptions - Claims<br>
 							E <?php echo number_format($statement_total - $claim_total, 2); ?>
 						</div>
 					</div>
