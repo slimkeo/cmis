@@ -1562,7 +1562,7 @@ class Burial extends CI_Controller
  
                  // APPEND WELCOME MESSAGE
                  $defaultPart="Valued Member 058-".$m['id'];
-                 $personalised_message=$defaultPart.'. '.$message;
+                 $personalised_message=$message;
                  // send SMS
                  $sms_ok = $this->broadcast_message($m['cellnumber'], $personalised_message);
  
