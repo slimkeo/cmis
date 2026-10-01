@@ -909,10 +909,20 @@ class Burial extends CI_Controller
             $new_beneficiary_id = $this->db->insert_id();
 
             // Update old beneficiary as replaced.
+            // Determine old beneficiary status based on replacement reason
+            if ($old_was_benefitted) {
+                $old_status = 'BENEFITTED - REPLACED';
+            } elseif ($replacement_reason === 'Not Matured') {
+                $old_status = 'LATE NOT BENEFITTED - REPLACED';
+            } elseif ($replacement_reason === 'Passbook Replacement') {
+                $old_status = 'PASSBOOK REPLACEMENT';
+            }
+
+            // Update old beneficiary as replaced
             $update_old = [
                 'replaced' => 1,
                 'replaced_with' => $new_beneficiary_id,
-                'status' => $old_was_benefitted ? 'BENEFITTED - REPLACED' : 'PASSBOOK REPLACEMENT'
+                'status' => $old_status
             ];
 
             if (!$old_was_benefitted && $replacement_reason === 'Not Matured' && !empty($death_certificate_date)) {
