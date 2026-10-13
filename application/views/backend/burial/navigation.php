@@ -113,7 +113,7 @@
 			<?php } ?>				
 			<li class="nav-parent <?php
 				if ($page_name == 'members' || $page_name == 'manage_fraudsters' ||
-						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'beneficiaries' || $page_name=='beneficiaries')
+						$page_name == 'modified_members' || $page_name == 'modified_members_report' || $page_name == 'member_details' || $page_name == 'beneficiaries' || $page_name=='manage_beneficiaries')
 					echo 'nav-expanded nav-active';
 				?> ">
 					<a href="#">
@@ -121,7 +121,7 @@
 						<span>Manage Members</span>
 					</a>
 				<ul class="nav nav-children">
-					<li class="<?php if ($page_name == 'members' || $page_name == 'beneficiaries' ) echo 'nav-active'; ?> ">
+					<li class="<?php if ($page_name == 'members' || $page_name == 'beneficiaries' || $page_name == 'member_details' || $page_name == 'member_details'  ) echo 'nav-active'; ?> ">
 						<a href="<?php echo base_url(); ?>index.php?burial/members">
 							 <i class="fa fa-address-book"></i>
 							<span>All Members</span>
