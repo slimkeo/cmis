@@ -4603,7 +4603,7 @@ class Burial extends CI_Controller
                 // Action buttons
                 '
                 <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
-                   class="btn btn-xs btn-info"
+                   class="btn btn-xs btn-warning"
                    target="_blank"
                    data-toggle="tooltip"
                    data-placement="top"
