@@ -4608,7 +4608,7 @@ class Burial extends CI_Controller
                    data-toggle="tooltip"
                    data-placement="top"
                    title="View Statement">
-                    <i class="fa fa-money"></i>
+                    <i class="fa fa-users"></i>
                 </a>
                 '
             ];
