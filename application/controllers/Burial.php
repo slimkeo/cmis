@@ -4598,36 +4598,7 @@ class Burial extends CI_Controller
                 $r->cellnumber,
                 number_format($actualPremium, 2, '.', ''),
                 number_format($paidPremium, 2, '.', ''),
-                number_format($premiumDifference, 2, '.', ''),
-                ,
-
-                '
-                <a href="'.base_url('index.php?burial/member_statement/'.$r->id).'"
-                class="btn btn-xs btn-info"
-                target="_blank"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="View Statement">
-                    <i class="fa fa-money"></i>
-                </a>
-
-                <a href="'.base_url('index.php?burial/member_details/'.$r->id).'"
-                class="btn btn-xs btn-info"
-                target="_blank"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="View Member">
-                    <i class="fa fa-eye"></i>
-                </a>
-
-                <a href="'.base_url('index.php?burial/beneficiaries/'.$r->id).'"
-                class="btn btn-xs btn-warning"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="View Beneficiaries">
-                    <i class="fa fa-users"></i>
-                </a>
-                '
+                number_format($premiumDifference, 2, '.', '')
             ];
 
             // Highlight under/over payments; matches stay unstyled

@@ -30,7 +30,6 @@
                     <th>Actual Premium</th>
                     <th>Paid Premium</th>
 					<th>Difference</th>
-                    <th>Option</th>
 				</tr>
 			</thead>
 
