@@ -55,11 +55,10 @@ $(document).ready(function() {
             "url": "<?php echo base_url('index.php?burial/get_premium_exceptions');?>",
             "type": "POST"
         },
+        "order": [[0, "desc"]],
         "columnDefs": [
-            { "targets": [10], "visible": false, "searchable": false }
+            { "targets": [6, 7, 8], "className": "text-right" }
         ],
-
-        // ADD THIS ↓↓↓
         dom: 'Bfrtip',
         buttons: [
             { extend: 'copy',  text: 'Copy' },
@@ -67,11 +66,6 @@ $(document).ready(function() {
             { extend: 'pdf',   text: 'PDF' },
             { extend: 'print', text: 'Print' }
         ]
-    });
-
-    // Switch to "Add Member" tab when button is clicked
-    $('#add_member_btn').on('click', function () {
-        $('.nav-tabs a[href="#add"]').tab('show');
     });
 
 });

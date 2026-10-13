@@ -4490,42 +4490,41 @@ class Burial extends CI_Controller
         $this->load->view('backend/index', $page_data);
     }      
 
+    /**
+     * DataTables: members with subscription statements whose last
+     * paid amount differs from the calculated monthly premium.
+     */
     public function get_premium_exceptions()
     {
-        // 1. DataTables parameters
-        $draw = intval($this->input->post('draw'));
-        $start = intval($this->input->post('start'));
+        if ($this->session->userdata('user_login') != 1) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'draw'            => 0,
+                    'recordsTotal'    => 0,
+                    'recordsFiltered' => 0,
+                    'data'            => []
+                ]));
+        }
+
+        $draw   = intval($this->input->post('draw'));
+        $start  = intval($this->input->post('start'));
         $length = intval($this->input->post('length'));
-    
-        $searchData = $this->input->post('search');
-        $search = isset($searchData['value'])
-            ? trim($searchData['value'])
-            : '';
-    
-        // Load beneficiary model
+        $search = trim($this->input->post('search')['value'] ?? '');
+
         $this->load->model('Beneficiary_model');
-    
-        /*
-         * 2. Count all distinct members who appear
-         * in the statements table.
-         */
-        $this->db->distinct();
-        $this->db->select('members.id');
+
+        // Members who have at least one Subscription statement
+        $this->db->select('COUNT(DISTINCT members.id) AS total', false);
         $this->db->from('members');
         $this->db->join(
             'statements',
-            'statements.memberid = members.id',
+            "statements.memberid = members.id AND statements.type = 'Subscription'",
             'inner'
         );
-    
-        $recordsTotal = $this->db->count_all_results();
-    
-        /*
-         * 3. Build query for members appearing
-         * in the statements table.
-         */
-        $this->db->distinct();
-    
+        $recordsTotal = (int) $this->db->get()->row()->total;
+
+        // Same base set, with optional search
         $this->db->select([
             'members.id',
             'members.passbook_no',
@@ -4535,21 +4534,15 @@ class Burial extends CI_Controller
             'members.surname',
             'members.cellnumber'
         ]);
-    
         $this->db->from('members');
-    
         $this->db->join(
             'statements',
-            'statements.memberid = members.id',
+            "statements.memberid = members.id AND statements.type = 'Subscription'",
             'inner'
         );
-    
-        /*
-         * 4. Search functionality.
-         */
+
         if ($search !== '') {
             $this->db->group_start();
-    
             $this->db->like('members.idnumber', $search);
             $this->db->or_like('members.surname', $search);
             $this->db->or_like('members.name', $search);
@@ -4557,70 +4550,44 @@ class Burial extends CI_Controller
             $this->db->or_like('members.passbook_no', $search);
             $this->db->or_like('members.cellnumber', $search);
             $this->db->or_like('members.employeeno', $search);
-    
             $this->db->group_end();
         }
-    
-        /*
-         * 5. Count filtered members.
-         */
-        $recordsFiltered = $this->db
-            ->count_all_results('', false);
-    
-        /*
-         * 6. Apply ordering and pagination.
-         */
+
+        $this->db->group_by('members.id');
         $this->db->order_by('members.id', 'DESC');
-        $this->db->limit($length, $start);
-    
-        /*
-         * 7. Fetch members.
-         */
-        $query = $this->db->get();
-    
-        $data = [];
-    
-        foreach ($query->result() as $r) {
-    
-            /*
-             * 8. Calculate actual monthly premium
-             * using Beneficiary_model.
-             */
+
+        $members = $this->db->get()->result();
+
+        // Compare last subscription vs calculated monthly fee; keep mismatches only
+        $exceptions = [];
+
+        foreach ($members as $r) {
             $actualPremium = (float) $this->Beneficiary_model
                 ->get_total_monthly_fee($r->id);
-    
-            /*
-             * 9. Get the latest statement transaction
-             * for this member.
-             */
-            $lastStatement = $this->db
+
+            $lastSubscription = $this->db
                 ->select('amount')
                 ->from('statements')
                 ->where('memberid', $r->id)
+                ->where('type', 'Subscription')
                 ->order_by('date', 'DESC')
                 ->order_by('id', 'DESC')
                 ->limit(1)
                 ->get()
                 ->row();
-    
-            /*
-             * 10. Paid premium is the latest transaction amount.
-             */
-            $paidPremium = $lastStatement
-                ? (float) $lastStatement->amount
+
+            $paidPremium = $lastSubscription
+                ? (float) $lastSubscription->amount
                 : 0.00;
-    
-            /*
-             * 11. Calculate premium difference.
-             * Negative values indicate the latest transaction
-             * exceeds the calculated monthly premium.
-             */
-            $premiumDifference = $actualPremium - $paidPremium;
-    
-            /*
-             * 12. Prepare DataTables row.
-             */
-            $data[] = [
+
+            $premiumDifference = round($actualPremium - $paidPremium, 2);
+
+            // Exception = last paid subscription does not match expected premium
+            if (abs($premiumDifference) < 0.01) {
+                continue;
+            }
+
+            $row = [
                 $r->id,
                 $r->passbook_no,
                 $r->idnumber,
@@ -4631,21 +4598,29 @@ class Burial extends CI_Controller
                 number_format($paidPremium, 2, '.', ''),
                 number_format($premiumDifference, 2, '.', '')
             ];
+
+            // Highlight under/over payments
+            $row['DT_RowClass'] = $premiumDifference > 0 ? 'warning' : 'danger';
+
+            $exceptions[] = $row;
         }
-    
-        /*
-         * 13. Return JSON response for DataTables.
-         */
-        $response = [
-            'draw'            => $draw,
-            'recordsTotal'    => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data'            => $data
-        ];
-    
-        $this->output
+
+        $recordsFiltered = count($exceptions);
+
+        if ($length == -1) {
+            $data = $exceptions;
+        } else {
+            $data = array_slice($exceptions, $start, $length);
+        }
+
+        return $this->output
             ->set_content_type('application/json')
-            ->set_output(json_encode($response));
+            ->set_output(json_encode([
+                'draw'            => $draw,
+                'recordsTotal'    => $recordsTotal,
+                'recordsFiltered' => $recordsFiltered,
+                'data'            => $data
+            ]));
     }
 
 }
