@@ -139,13 +139,13 @@
 							<span>Fraudsters</span>
 						</a>
 					</li>	
-		<!--
-					<li class="<?php if ($page_name == 'manage_beneficiaries' ) echo 'nav-active'; ?> ">
-						<a href="<?php echo base_url(); ?>index.php?burial/manage_beneficiaries">
+		
+					<li class="<?php if ($page_name == 'premium_exceptions' ) echo 'nav-active'; ?> ">
+						<a href="<?php echo base_url(); ?>index.php?burial/premium_exceptions">
 							 <i class="fa fa-address-card"></i>
-							<span>Deactivate Members</span>
+							<span>Premium Exceptions</span>
 						</a>
-					</li> -->									
+					</li> 									
 				</ul>
 			</li>	
 			<!-- ADMIN MANAGEMENT PANEL -->

@@ -4480,4 +4480,172 @@ class Burial extends CI_Controller
     }   
 
 
+    /********** batch invite per event ********************/
+    function premium_exceptions($event_id)
+    {
+        if ($this->session->userdata('user_login') != 1)
+            redirect(base_url(), 'refresh'); 
+        $page_data['page_name']  = 'premium_exceptions';
+        $page_data['page_title'] = 'Premium Exceptions';
+        $this->load->view('backend/index', $page_data);
+    }      
+
+    public function get_premium_exceptions()
+    {
+        // 1. DataTables parameters
+        $draw = intval($this->input->post('draw'));
+        $start = intval($this->input->post('start'));
+        $length = intval($this->input->post('length'));
+    
+        $searchData = $this->input->post('search');
+        $search = isset($searchData['value'])
+            ? trim($searchData['value'])
+            : '';
+    
+        // Load beneficiary model
+        $this->load->model('Beneficiary_model');
+    
+        /*
+         * 2. Count all distinct members who appear
+         * in the statements table.
+         */
+        $this->db->distinct();
+        $this->db->select('members.id');
+        $this->db->from('members');
+        $this->db->join(
+            'statements',
+            'statements.memberid = members.id',
+            'inner'
+        );
+    
+        $recordsTotal = $this->db->count_all_results();
+    
+        /*
+         * 3. Build query for members appearing
+         * in the statements table.
+         */
+        $this->db->distinct();
+    
+        $this->db->select([
+            'members.id',
+            'members.passbook_no',
+            'members.idnumber',
+            'members.employeeno',
+            'members.name',
+            'members.surname',
+            'members.cellnumber'
+        ]);
+    
+        $this->db->from('members');
+    
+        $this->db->join(
+            'statements',
+            'statements.memberid = members.id',
+            'inner'
+        );
+    
+        /*
+         * 4. Search functionality.
+         */
+        if ($search !== '') {
+            $this->db->group_start();
+    
+            $this->db->like('members.idnumber', $search);
+            $this->db->or_like('members.surname', $search);
+            $this->db->or_like('members.name', $search);
+            $this->db->or_like('members.id', $search);
+            $this->db->or_like('members.passbook_no', $search);
+            $this->db->or_like('members.cellnumber', $search);
+            $this->db->or_like('members.employeeno', $search);
+    
+            $this->db->group_end();
+        }
+    
+        /*
+         * 5. Count filtered members.
+         */
+        $recordsFiltered = $this->db
+            ->count_all_results('', false);
+    
+        /*
+         * 6. Apply ordering and pagination.
+         */
+        $this->db->order_by('members.id', 'DESC');
+        $this->db->limit($length, $start);
+    
+        /*
+         * 7. Fetch members.
+         */
+        $query = $this->db->get();
+    
+        $data = [];
+    
+        foreach ($query->result() as $r) {
+    
+            /*
+             * 8. Calculate actual monthly premium
+             * using Beneficiary_model.
+             */
+            $actualPremium = (float) $this->Beneficiary_model
+                ->get_total_monthly_fee($r->id);
+    
+            /*
+             * 9. Get the latest statement transaction
+             * for this member.
+             */
+            $lastStatement = $this->db
+                ->select('amount')
+                ->from('statements')
+                ->where('memberid', $r->id)
+                ->order_by('date', 'DESC')
+                ->order_by('id', 'DESC')
+                ->limit(1)
+                ->get()
+                ->row();
+    
+            /*
+             * 10. Paid premium is the latest transaction amount.
+             */
+            $paidPremium = $lastStatement
+                ? (float) $lastStatement->amount
+                : 0.00;
+    
+            /*
+             * 11. Calculate premium difference.
+             * Negative values indicate the latest transaction
+             * exceeds the calculated monthly premium.
+             */
+            $premiumDifference = $actualPremium - $paidPremium;
+    
+            /*
+             * 12. Prepare DataTables row.
+             */
+            $data[] = [
+                $r->id,
+                $r->passbook_no,
+                $r->idnumber,
+                $r->employeeno,
+                trim($r->name . ' ' . $r->surname),
+                $r->cellnumber,
+                number_format($actualPremium, 2, '.', ''),
+                number_format($paidPremium, 2, '.', ''),
+                number_format($premiumDifference, 2, '.', '')
+            ];
+        }
+    
+        /*
+         * 13. Return JSON response for DataTables.
+         */
+        $response = [
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $data
+        ];
+    
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
+    }
+
 }
