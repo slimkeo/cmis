@@ -4491,8 +4491,8 @@ class Burial extends CI_Controller
     }      
 
     /**
-     * DataTables: members with subscription statements whose last
-     * paid amount differs from the calculated monthly premium.
+     * DataTables: all members with subscription statements,
+     * showing calculated premium vs last paid subscription.
      */
     public function get_premium_exceptions()
     {
@@ -4554,12 +4554,19 @@ class Burial extends CI_Controller
         }
 
         $this->db->group_by('members.id');
+
+        // Count filtered members (reuse query without resetting)
+        $recordsFiltered = $this->db->count_all_results('', false);
+
         $this->db->order_by('members.id', 'DESC');
+
+        if ($length != -1) {
+            $this->db->limit($length, $start);
+        }
 
         $members = $this->db->get()->result();
 
-        // Compare last subscription vs calculated monthly fee; keep mismatches only
-        $exceptions = [];
+        $data = [];
 
         foreach ($members as $r) {
             $actualPremium = (float) $this->Beneficiary_model
@@ -4582,11 +4589,6 @@ class Burial extends CI_Controller
 
             $premiumDifference = round($actualPremium - $paidPremium, 2);
 
-            // Exception = last paid subscription does not match expected premium
-            if (abs($premiumDifference) < 0.01) {
-                continue;
-            }
-
             $row = [
                 $r->id,
                 $r->passbook_no,
@@ -4599,18 +4601,14 @@ class Burial extends CI_Controller
                 number_format($premiumDifference, 2, '.', '')
             ];
 
-            // Highlight under/over payments
-            $row['DT_RowClass'] = $premiumDifference > 0 ? 'warning' : 'danger';
+            // Highlight under/over payments; matches stay unstyled
+            if ($premiumDifference > 0.009) {
+                $row['DT_RowClass'] = 'warning';
+            } elseif ($premiumDifference < -0.009) {
+                $row['DT_RowClass'] = 'danger';
+            }
 
-            $exceptions[] = $row;
-        }
-
-        $recordsFiltered = count($exceptions);
-
-        if ($length == -1) {
-            $data = $exceptions;
-        } else {
-            $data = array_slice($exceptions, $start, $length);
+            $data[] = $row;
         }
 
         return $this->output
