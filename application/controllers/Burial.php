@@ -4481,7 +4481,7 @@ class Burial extends CI_Controller
 
 
     /********** batch invite per event ********************/
-    function premium_exceptions($event_id)
+    function premium_exceptions()
     {
         if ($this->session->userdata('user_login') != 1)
             redirect(base_url(), 'refresh'); 
