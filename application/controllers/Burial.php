@@ -4607,8 +4607,8 @@ class Burial extends CI_Controller
                    target="_blank"
                    data-toggle="tooltip"
                    data-placement="top"
-                   title="View Statement">
-                    <i class="fa fa-users"></i>
+                   title="Member Details">
+                    <i class="fa fa-user"></i>
                 </a>
                 '
             ];
