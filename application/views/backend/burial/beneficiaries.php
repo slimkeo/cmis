@@ -412,6 +412,7 @@ foreach ($member_data as $member_row):
 											id="batch-submission-date"
 											pattern="\d{4}-(?:0?[1-9]|1[0-2])-(?:0?[1-9]|[12]\d|3[01])"
 											placeholder="yyyy-mm-dd"
+											value="<?php echo date("y-m-d"); ?>"
 											title="Format: yyyy-mm-dd (e.g. 2026-02-17)"
 											required>
 										<span class="input-group-addon">
