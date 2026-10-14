@@ -4615,9 +4615,9 @@ class Burial extends CI_Controller
 
             // Highlight under/over payments; matches stay unstyled
             if ($premiumDifference > 0.009) {
-                $row['DT_RowClass'] = 'warning';
-            } elseif ($premiumDifference < -0.009) {
                 $row['DT_RowClass'] = 'danger';
+            } elseif ($premiumDifference < -0.009) {
+                $row['DT_RowClass'] = 'warning';
             }
 
             $data[] = $row;
