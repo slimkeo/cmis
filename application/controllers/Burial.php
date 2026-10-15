@@ -4542,7 +4542,7 @@ class Burial extends CI_Controller
         );
 
         // Date range: one month ago → today
-        $startDate = date('Y-m-d', strtotime('-1 month'));
+        $startDate = date('Y-m-d', strtotime('-2 month'));
         $endDate   = date('Y-m-d');
 
         $this->db->where('statements.date >=', $startDate);
