@@ -2491,32 +2491,29 @@ class Burial extends CI_Controller
 
             $claim_type = $this->input->post('claim_type') ? $this->input->post('claim_type') : 'BENEFICIARY';
             
-            $data['member_id']      = $this->input->post('member_id');
-            $data['claim_type']     = $claim_type;
-            $data['national_id']    = $this->input->post('national_id');
-            $data['amount']         = $this->input->post('amount');
-            $data['claim_date']     = $this->input->post('claim_date');
-            $data['bank']           = $this->input->post('bank');
-            $data['account']        = $this->input->post('account');
-            $data['approved_date']  = !empty($this->input->post('approved_date')) ? $this->input->post('approved_date') : null;
-            $data['status']         = $this->input->post('status');
-            $data['payment_date']   = !empty($this->input->post('payment_date')) ? $this->input->post('payment_date') : null;
-            $data['processed_by']   = !empty($this->input->post('processed_by')) ? $this->input->post('processed_by') : null;
-            $data['approved_by']    = !empty($this->input->post('approved_by')) ? $this->input->post('approved_by') : null;
-            $data['notes']          = !empty($this->input->post('notes')) ? $this->input->post('notes') : null;
-            $data['updated_at']     = date('Y-m-d H:i:s');
+            $data['member_id']       = $this->input->post('member_id');
+            $data['claim_type']      = $claim_type;
+            $data['national_id']     = $this->input->post('national_id');
+            $data['amount']          = $this->input->post('amount');
+            $data['claim_date']      = $this->input->post('claim_date');
+            $data['bank']            = $this->input->post('bank');
+            $data['account']         = $this->input->post('account');
+            $data['mortuary']        = !empty($this->input->post('mortuary')) ? $this->input->post('mortuary') : null;
+            $data['date_of_entry']   = !empty($this->input->post('date_of_entry')) ? $this->input->post('date_of_entry') : null;
+            $data['place_of_burial'] = !empty($this->input->post('place_of_burial')) ? $this->input->post('place_of_burial') : null;
+            $data['date_of_burial']  = !empty($this->input->post('date_of_burial')) ? $this->input->post('date_of_burial') : null;
+            $data['status']          = $this->input->post('status');
+            $data['processed_by']    = !empty($this->input->post('processed_by')) ? $this->input->post('processed_by') : null;
+            $data['notes']           = !empty($this->input->post('notes')) ? $this->input->post('notes') : null;
+            $data['updated_at']      = date('Y-m-d H:i:s');
 
             // Handle based on claim type
             if ($claim_type === 'BENEFICIARY') {
                 $data['beneficiary_id'] = $this->input->post('beneficiary_id');
-                $data['place_of_burial'] = !empty($this->input->post('place_of_burial')) ? $this->input->post('place_of_burial') : null;
-                $data['date_of_burial']  = !empty($this->input->post('date_of_burial')) ? $this->input->post('date_of_burial') : null;
-                $data['nominee_id']      = null;
+                $data['nominee_id']     = null;
             } else {
                 $data['beneficiary_id'] = null;
-                $data['place_of_burial'] = null;
-                $data['date_of_burial']  = null;
-                $data['nominee_id']      = !empty($this->input->post('nominee_id')) ? $this->input->post('nominee_id') : null;
+                $data['nominee_id']     = !empty($this->input->post('nominee_id')) ? $this->input->post('nominee_id') : null;
             }
 
             $this->db->where('id', $param2);
@@ -2528,7 +2525,7 @@ class Burial extends CI_Controller
             }
 
             $this->session->set_flashdata('flash_message', 'Claim updated successfully');
-            redirect(base_url() . 'index.php?burial/claims', 'refresh');
+            redirect(base_url() . 'index.php?burial/claims/view/' . $param2, 'refresh');
         }
 
         // DELETE CLAIM
