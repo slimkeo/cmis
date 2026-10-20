@@ -29,12 +29,6 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                     $claim_id = $claim['id'] ?? '';
                     ?>
 
-                    <a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip"
-                        data-original-title="<?php echo get_phrase('edit');?>"
-                        onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_edit_claim/<?php echo $claim_id;?>');">
-                        <i class="fa fa-pencil"></i>
-                    </a>
-
                     <?php if ($status == 'PENDING'): ?>
                         <!-- Only Level 1 can Approve/Reject -->
                         <?php if ($user_level == 1): ?>
