@@ -43,6 +43,14 @@ $nominee_name = $nominee ? $nominee->fullname : '-';
                             
                             <a href="<?php echo base_url('index.php?burial/claims/reject/' . $claim_id); ?>" 
                             class="btn btn-danger" id="reject_btn">Reject</a>
+
+
+                            <a href="#" class="btn btn-xs btn-success" data-placement="top" data-toggle="tooltip"
+                                data-original-title="<?php echo get_phrase('edit');?>"
+                                onClick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_edit_claim/<?php echo $claim_id;?>');">
+                                <i class="fa fa-pencil"></i>Edit Claim
+                            </a>
+
                         <?php endif; ?>
 
                     <?php elseif ($status == 'APPROVED'): ?>
