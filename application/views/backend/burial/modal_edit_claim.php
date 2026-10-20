@@ -30,7 +30,7 @@ foreach ($edit_data as $row):
     $beneficiaries = [];
     $nominees = [];
     if (!empty($row['member_id'])) {
-        $beneficiaries = $this->db->get_where('beneficiaries', ['member_id' => $row['member_id']])->result_array();
+        $beneficiaries = $this->db->get_where('beneficiaries', ['memberid' => $row['member_id']])->result_array();
         $nominees = $this->db->get_where('nominee', ['member_id' => $row['member_id']])->result_array();
     }
 
