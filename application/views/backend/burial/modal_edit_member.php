@@ -118,11 +118,11 @@ foreach ($edit_data as $row):
                       <option value="">Select</option>
 
                       <option value="1" <?php echo ($row['is_alive'] == 1) ? 'selected' : ''; ?>>
-                          Yes
+                          No
                       </option>
 
                       <option value="0" <?php echo ($row['is_alive'] == 0) ? 'selected' : ''; ?>>
-                          No
+                          Yes
                       </option>
                   </select>
               </div>
